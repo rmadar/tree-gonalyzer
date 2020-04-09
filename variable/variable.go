@@ -1,3 +1,4 @@
+// Package managing the variables to plot
 package variable
 
 import (

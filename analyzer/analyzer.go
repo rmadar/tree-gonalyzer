@@ -1,5 +1,5 @@
+// Package allowing to wrap all needed element of a TTree plotting analysis
 package analyzer
-
 
 import (
 
