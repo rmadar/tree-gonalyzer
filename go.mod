@@ -1,4 +1,4 @@
-module tree-gonalizer
+module tree-gonalyzer
 
 go 1.14
 

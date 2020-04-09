@@ -1,4 +1,4 @@
-package main
+package analyzer_test
 
 import (
 	"log"
@@ -17,18 +17,9 @@ import (
 	
 	"github.com/rmadar/hplot-style/style"
 
-	"plot-go/sample"
-	"plot-go/variable"
+	"tree-gonalyzer/sample"
+	"tree-gonalyzer/variable"
 )
-
-// Starting to implement a TreeAnalyzer
-type TreeAnalyzer struct {
-	Samples []sample.Spl      // sample on which to run
-	SplGroup string           // specify how to group sample together
-	Variables []*variable.Var // variables to plot
-	Selections []string       // implement a type selection ?
-	Histos []*hbook.H1D       // multiple map histo[var, sample, cut, syst]
-}
 
 // All samples
 var all_samples = []sample.Spl {
@@ -64,19 +55,6 @@ var all_samples = []sample.Spl {
 		CircleSize: 1.5,
 		WithYErrBars: false,
 	},
-
-	/*
-	sample.Spl{
-		FileName: "../../../../data/outputs/ttbar_0j_parton_MG_NWA.root",
-		TreeName: "truth",
-		LegLabel: `$t\bar{t}$ MG NWA`,
-		LineColor: color.NRGBA{R:  180, G:  50, B: 180, A: 255},
-		LineWidth: 2,
-		CircleMarkers: false,
-		CircleSize: 1.5,
-		WithYErrBars: false,
-	},
-        */
 
 	sample.Spl{
 		FileName: "../../../../data/outputs/ttbar_0j_parton_MG_fullME.root",
