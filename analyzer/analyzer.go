@@ -101,6 +101,11 @@ func (ana *Ana) MakeHistos() error {
 // Plotting all histograms
 func (ana *Ana) PlotHistos() error {
 
+	ana.HistosPlot = make([][]*hplot.H1D, len(ana.Variables))
+        for iv := range ana.HistosPlot {
+		ana.HistosPlot[iv] = make([]*hplot.H1D, len(ana.Samples))
+	}
+	
 	// Loop over variables and get histo for all samples
 	for iv, hsamples := range ana.HistosData { 
 
@@ -116,23 +121,27 @@ func (ana *Ana) PlotHistos() error {
 		// Additionnal legend
 		p.Legend.Padding = 0.1 * vg.Inch
 		p.Legend.ThumbnailWidth = 25
-		p.Legend.TextStyle.Font.Size = 14
+		p.Legend.TextStyle.Font.Size = 12
 		
 		// Loop over samples and turn hook.H1D into styled plottable histo
 		for is, h := range hsamples {
 			thisSample := ana.Samples[is]
 			h.Scale(1.0/h.Integral())
-			hist := thisSample.CreateHisto(h)
+			ana.HistosPlot[iv][is] = thisSample.CreateHisto(h)
 			legLabel := thisSample.LegLabel
-			if strings.Count(thisVar.OutputName, ".tex") == 1 {
+			if strings.Count(thisVar.SaveName, ".tex") == 1 {
 				legLabel = alignLegendLabel(thisVar.LegPosLeft, p.Legend.TextStyle.Font.Size, thisSample.LegLabel)
 			}
-			p.Legend.Add(legLabel, hist)
-			p.Add(hist)
+			p.Legend.Add(legLabel, ana.HistosPlot[iv][is])
+			if is>0 { // Write data (assumed to be the first sample here) at last
+				p.Add(ana.HistosPlot[iv][is])
+			}
 		}
+		// Write data (assumed to be the first sample here) at last
+		p.Add(ana.HistosPlot[iv][0])
 		
 		// Save the plot
-		if err := p.Save(5.5*vg.Inch, 4*vg.Inch, "results/"+thisVar.OutputName); err != nil {
+		if err := p.Save(5.5*vg.Inch, 4*vg.Inch, "results/"+thisVar.SaveName); err != nil {
 			log.Fatalf("error saving plot: %v\n", err)
 		}
 	}

@@ -14,15 +14,20 @@ import (
 
 
 type Spl struct {
+	Name string
 	FileName string
 	TreeName string
+	Scale float64
 	LegLabel string
 	LineColor color.NRGBA
 	LineWidth vg.Length
 	FillColor color.NRGBA
 	CircleMarkers bool
 	CircleSize vg.Length
+	CircleColor color.NRGBA
 	WithYErrBars bool
+	YErrBarsLineWidth vg.Length
+	YErrBarsCapWidth vg.Length
 }
 
 // Return a hplot.H1D with the proper style
@@ -39,17 +44,30 @@ func (s Spl) CreateHisto(hdata *hbook.H1D) *hplot.H1D {
 	// Markers
 	if s.CircleMarkers {
 		style.SetCircleMarkersTo(h)
-		h.GlyphStyle.Color = s.LineColor
-		if s.CircleSize > 0 {
+		if &s.CircleColor != nil {
+			h.GlyphStyle.Color = s.CircleColor
+		} else {
+			h.GlyphStyle.Color = s.LineColor
+		}
+		if &s.CircleSize != nil {
 			h.GlyphStyle.Radius = s.CircleSize
 		}
 	}
 
 	// Error bars
 	if s.WithYErrBars {
-		h.YErrs.LineStyle.Color = s.LineColor
-		if s.LineWidth>0 {
-			h.YErrs.LineStyle.Width = s.LineWidth
+		if &s.CircleColor != nil {
+			h.YErrs.LineStyle.Color = s.CircleColor
+		} else {
+			h.YErrs.LineStyle.Color = s.LineColor
+		}
+		
+		if &s.YErrBarsLineWidth != nil {
+			h.YErrs.LineStyle.Width = s.YErrBarsLineWidth
+		}
+
+		if &s.YErrBarsCapWidth != nil {
+			h.YErrs.CapWidth = s.YErrBarsCapWidth
 		}
 	}
 	return h
