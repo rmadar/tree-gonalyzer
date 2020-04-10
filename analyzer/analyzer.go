@@ -24,7 +24,7 @@ import (
 // Analyzer type
 type Ana struct {
 	Samples      []sample.Spl     // sample on which to run
-	SamplesGroup string          // specify how to group sample together
+	SamplesGroup string           // specify how to group sample together
 	Variables    []*variable.Var  // variables to plot
 	Selections   []string         // implement a type selection ?
 	HistosData   [][]*hbook.H1D   // Currently 2D histo container, later: n-dim [var, sample, cut, syst]
