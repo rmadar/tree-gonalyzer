@@ -74,6 +74,8 @@ github.com/remyoudompheng/bigfft v0.0.0-20170806203942-52369c62f446/go.mod h1:uY
 github.com/remyoudompheng/bigfft v0.0.0-20190728182440-6a916e37a237/go.mod h1:qqbHyh8v60DhA7CoWK5oRCqLrMHRGoxYCSS9EjAz6Eo=
 github.com/rmadar/hplot-style v0.0.0-20200409093828-186ad95d84d6 h1:p+iHNqrQmc6UaFEP3trS7oEMX+55xzCm0np+Zc2nM/g=
 github.com/rmadar/hplot-style v0.0.0-20200409093828-186ad95d84d6/go.mod h1:C6Etirp67eWF4ArJJggNgm/IMzgCJt4d2nE5nmYbEts=
+github.com/rmadar/hplot-style v0.0.0-20200410212056-e0810de55c8e h1:maS7pLnVAkFqi/t7EyiHhD+MmErgLclJra5Bcvok3d4=
+github.com/rmadar/hplot-style v0.0.0-20200410212056-e0810de55c8e/go.mod h1:FlMHFDndEB3xerl0NDRxWxKzi4GodDoq+E0r9FYfMlw=
 github.com/ruudk/golang-pdf417 v0.0.0-20181029194003-1af4ab5afa58/go.mod h1:6lfFZQK844Gfx8o5WFuvpxWRwnSoipWe/p622j1v06w=
 github.com/sbinet/npyio v0.2.0/go.mod h1:Wk81yG1hlHgHAy4KXRQ59EfpZoAzT+2V4Pjyv7rUEM0=
 github.com/sbinet/npyio v0.3.0/go.mod h1:dJ6OpFwUDVVuDSqP5b8paU3yd7Rcs2TZiFimWwD30nc=
@@ -100,6 +102,8 @@ go-hep.org/x/hep v0.25.1-0.20200408105008-04dc20661541 h1:r7HLUBEo88PZmEtBW3Zn8F
 go-hep.org/x/hep v0.25.1-0.20200408105008-04dc20661541/go.mod h1:bB8/qKT5FTwGsz+9zlBYOQqxxeoGQL8ylN+eQNrywno=
 go-hep.org/x/hep v0.25.1-0.20200409111103-d62708a8fdf5 h1:0KDwo3ZqwvSYWOX/qI3hqydePa/ovCBkdM9dpUGInIE=
 go-hep.org/x/hep v0.25.1-0.20200409111103-d62708a8fdf5/go.mod h1:PvO5VKAc/kRDPGrAj7yXvk/zq7cSZnSp691rqOVLerA=
+go-hep.org/x/hep v0.25.1-0.20200410130731-18bdac6b524d h1:ihlNe1PoLAlRw1b/ySobNT3aKLMAdvCbojm748ybIgE=
+go-hep.org/x/hep v0.25.1-0.20200410130731-18bdac6b524d/go.mod h1:PvO5VKAc/kRDPGrAj7yXvk/zq7cSZnSp691rqOVLerA=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
 golang.org/x/crypto v0.0.0-20190510104115-cbcb75029529/go.mod h1:yigFU9vqHzYiE8UmvKecakEJjdnWj3jj499lnFckfCI=
 golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550/go.mod h1:yigFU9vqHzYiE8UmvKecakEJjdnWj3jj499lnFckfCI=

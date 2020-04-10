@@ -22,7 +22,7 @@ func main(){
 		Samples: []sample.Spl{
 			spl_data,
 			spl_bkg1,
-			spl_bkg2,
+			//spl_bkg2,
 			spl_alt,
 		},
 		
@@ -78,7 +78,7 @@ var (
 		Name: "bkg1",
 		FileName: "../testdata/ttbar_MadSpinOn_1.root",
 		TreeName: "truth",
-		LegLabel: `$t\bar{t}$ 1/2`,
+		LegLabel: `$t\bar{t}$ spin effects`,
 		LineColor: color.NRGBA{R:  50, G:  20, B: 150, A: 20},
 		FillColor: color.NRGBA{R:  50, G:  20, B: 150, A: 20},
 		LineWidth: 0,
