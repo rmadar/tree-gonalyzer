@@ -173,6 +173,9 @@ func (ana *Obj) PlotHistos() error {
 		}
 
 		// Manage stack
+		for i, j := 0, len(hbkgs)-1; i < j; i, j = i+1, j-1 {
+			hbkgs[i], hbkgs[j] = hbkgs[j], hbkgs[i]
+		}
 		stack := hplot.NewHStack(hbkgs)
 		if ana.DontStack {
 			stack.Stack = hplot.HStackOff
@@ -209,4 +212,10 @@ func getTreeFromFile(filename, treename string) (*groot.File, rtree.Tree) {
 	}		
 
 	return f, obj.(rtree.Tree)
+}
+
+
+// Helper to reverse order in a slice
+func Reverse(s []float64) {
+
 }
