@@ -17,6 +17,8 @@ type Obj struct {
 	PlotTitle string
 	XLabel string
 	YLabel string
+	XTickFormat string
+	YTickFormat string
 	RangeXmin float64
 	RangeXmax float64
 	RangeYmin float64
@@ -63,6 +65,14 @@ func (v Obj) SetPlotStyle(p *hplot.Plot) {
 	}
 	if &v.RangeYmax != nil {
 		p.X.Max = v.RangeXmax
+	}
+	
+	// Axis ticks tuning
+	if v.XTickFormat != "" {
+		p.X.Tick.Marker = hplot.Ticks{N: 10, Format: v.XTickFormat}
+	}
+	if v.YTickFormat != "" {
+		p.Y.Tick.Marker = hplot.Ticks{N: 10, Format: v.YTickFormat}
 	}
 	
 	// Legend setup

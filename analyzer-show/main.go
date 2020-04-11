@@ -5,7 +5,7 @@ import (
 	"math"
 	
 	"image/color"
-
+	
 	"github.com/rmadar/hplot-style/style"
 	
 	"github.com/rmadar/tree-gonalyzer/analyzer"
@@ -18,11 +18,15 @@ func main(){
 
 	// Create analyzer object
 	ana := analyzer.Obj{
+
+		DontStack: false,
+		
+		Normalize: true,
 		
 		Samples: []sample.Obj{
 			spl_data,
 			spl_bkg1,
-			// spl_bkg2,
+			spl_bkg2,
 			spl_alt,
 		},
 		
@@ -62,7 +66,7 @@ var (
 	// samples
 	spl_data = sample.Obj{
 		Name: "data",
-		FileName: "../testdata/ttbar_ME.root",
+		FileName: "../testdata/ttbar_MadSpinOff.root",
 		TreeName: "truth",
 		LegLabel: `Pseudo-data`, 
 		CircleMarkers: true,
@@ -78,9 +82,8 @@ var (
 		Name: "bkg1",
 		FileName: "../testdata/ttbar_MadSpinOn_1.root",
 		TreeName: "truth",
-		LegLabel: `$t\bar{t}$ spin effects`,
-		LineColor: color.NRGBA{R:  50, G:  20, B: 150, A: 20},
-		FillColor: color.NRGBA{R:  50, G:  20, B: 150, A: 20},
+		LegLabel: `$t\bar{t}$ contribution 1`,
+		FillColor: color.NRGBA{R:  100, G:  100, B: 150, A: 255},
 		LineWidth: 0,
 		CircleMarkers: false,
 		CircleSize: 1.5,
@@ -91,27 +94,26 @@ var (
 		Name: "bkg2",
 		FileName: "../testdata/ttbar_MadSpinOn_2.root",
 		TreeName: "truth",
-		LegLabel: `$t\bar{t}$ 2/2 (nom)`,
-		LineColor: color.NRGBA{R:  50, G:  20, B: 150, A: 20},
-		FillColor: color.NRGBA{R:  50, G:  20, B: 150, A: 20},
+		LegLabel: `$t\bar{t}$ contribution 2`,
+		FillColor: color.NRGBA{R:  150, G:  100, B: 100, A: 255},
 		LineWidth: 0,
 		CircleMarkers: false,
 		CircleSize: 1.5,
 		WithYErrBars: true,
 	}		
-	
+
 	spl_alt = sample.Obj{
 		Name: "spinoff",
-		FileName: "../testdata/ttbar_MadSpinOff.root",
+		FileName: "../testdata/ttbar_ME.root",
 		TreeName: "truth",
-		LegLabel: `$t\bar{t}$ no spin effects (alt.)`,
+		LegLabel: `$t\bar{t}$`,
 		LineColor: color.NRGBA{R:  50, G:  50, B: 180, A: 255},
 		LineWidth: 2,
 		CircleMarkers: false,
 		CircleSize: 1.5,
 		WithYErrBars: false,
 	}
-
+	
 	// Variables
 	var_dphi= &variable.Obj{
 		Name: "truth_dphi_ll",
@@ -255,6 +257,7 @@ var (
 		PlotTitle: `{\tt TTree} {\bf GO}nalyzer -- $pp \to t\bar{t}$ @ $13\,$ TeV`,
 		XLabel: `Truth $E^{\mathrm{miss}}_{T} \; \equiv \; |\vec{p}^{\,\nu}_T + \vec{p}^{\,\bar{\nu}}_T|$`,
 		YLabel: `PDF($E^{\mathrm{miss}}_{T}$)`,
+		XTickFormat: "%2.0f",
 		LegPosTop: true,
 		LegPosLeft: false,
 	}

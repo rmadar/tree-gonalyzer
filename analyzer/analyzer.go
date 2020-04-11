@@ -5,6 +5,7 @@ import (
 	"log"
 	"fmt"
 	
+	"gonum.org/v1/gonum/floats"
 	"gonum.org/v1/plot/vg"
 
 	"go-hep.org/x/hep/groot"
@@ -22,12 +23,14 @@ import (
 
 // Analyzer type
 type Obj struct {
-	Samples      []sample.Obj     // sample on which to run
-	SamplesGroup string           // specify how to group samples together
-	Variables    []*variable.Obj  // variables to plot
-	Selections   []string         // implement a type selection ?
-	HistosData   [][]*hbook.H1D   // Currently 2D histo container, later: n-dim [var, sample, cut, syst]
-	HistosPlot   [][]*hplot.H1D   // Currently 2D histo container, later: n-dim [var, sample, cut, syst]
+	Samples       []sample.Obj   // Sample on which to run
+	SamplesGroup    string       // Specify how to group samples together
+	Variables    []*variable.Obj // List of variables to plot
+	Selections    []string       // List of cuts (implement a type 'selection'?)
+	HistosData [][]*hbook.H1D    // Currently 2D histo container, later: n-dim [var, sample, cut, syst]
+	HistosPlot [][]*hplot.H1D    // Currently 2D histo container, later: n-dim [var, sample, cut, syst]
+	DontStack       bool         // Disable histogram stacking (e.g. compare various processes)
+	Normalize       bool         // Normalize distributions to unit area (when stacked, the total is nomarlized)
 }
 
 
@@ -104,7 +107,12 @@ func (ana *Obj) PlotHistos() error {
         for iv := range ana.HistosPlot {
 		ana.HistosPlot[iv] = make([]*hplot.H1D, len(ana.Samples))
 	}
-	
+
+	// Return an error if all normalization are 0
+	if len(ana.HistosData) == 0 {
+		log.Fatalf("There is no histograms. Please make sure that 'MakeHistos()' is called before 'PlotHistos()'")
+	}
+		
 	// Loop over variables and get histo for all samples
 	for iv, hsamples := range ana.HistosData { 
 
@@ -117,23 +125,62 @@ func (ana *Obj) PlotHistos() error {
 		style.ApplyToPlot(p)
 		v.SetPlotStyle(p)
 
-		// Additionnal legend
+		// Additionnal legend style
 		p.Legend.Padding = 0.1 * vg.Inch
 		p.Legend.ThumbnailWidth = 25
 		p.Legend.TextStyle.Font.Size = 12
 		
-		// Loop over samples and turn hook.H1D into styled plottable histo
+		// Prepare a slice of histograms to be (possibly) stacked
+		var (
+			hbkgs []*hplot.H1D
+			hdata *hplot.H1D
+			norms []float64
+		)
+
+		// Keep track of the normalization for every sample
+		for _, h := range hsamples { norms = append(norms, h.Integral()) }
+		Nbkg := floats.Sum(norms[1:])
+		
+		// Loop over samples
 		for is, h := range hsamples {
-			s := ana.Samples[is]
-			h.Scale(1.0/h.Integral())
-			ana.HistosPlot[iv][is] = s.CreateHisto(h)
-			p.Legend.Add(s.LegLabel, ana.HistosPlot[iv][is])
-			if is>0 { // Write data (assumed to be the first sample here) at last
-				p.Add(ana.HistosPlot[iv][is])
+
+			// Deal with normalize option for data
+			if is==0 && ana.Normalize {
+				h.Scale(1/norms[is])
+			}
+
+			// Deal with normalize option of non-data
+			if is>0 && ana.Normalize {
+				if ana.DontStack {
+					h.Scale(1/norms[is])
+				} else {
+					h.Scale(1./Nbkg)
+				}
+			}
+			
+			// Get plottable histogram
+			ana.HistosPlot[iv][is] = ana.Samples[is].CreateHisto(h)
+
+			// Prepare the legend
+			p.Legend.Add(ana.Samples[is].LegLabel, ana.HistosPlot[iv][is])
+
+			// Keep data appart from backgrounds (FIX-ME: assumed to be the first sample for now)
+			if is == 0 {
+				hdata = ana.HistosPlot[iv][is]
+			} else {  
+				hbkgs = append(hbkgs, ana.HistosPlot[iv][is])
 			}
 		}
-		// Write data (assumed to be the first sample here) at last
-		p.Add(ana.HistosPlot[iv][0])
+
+		// Manage stack
+		stack := hplot.NewHStack(hbkgs)
+		if ana.DontStack {
+			stack.Stack = hplot.HStackOff
+		}
+		
+		// Add the histgrams (possibly stack) and data
+		p.Add(stack)
+		p.Add(hdata)
 		
 		// Save the plot
 		if err := p.Save(5.5*vg.Inch, 4*vg.Inch, "results/"+v.SaveName); err != nil {

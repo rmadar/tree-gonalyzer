@@ -9,6 +9,7 @@ github.com/apache/arrow/go/arrow v0.0.0-20200228160020-c67ff099122d/go.mod h1:QN
 github.com/apache/arrow/go/arrow v0.0.0-20200403134915-89ce1cadb678/go.mod h1:QNYViu/X0HXDHw7m3KXzWSVXIbfUvJqBFe6Gj8/pYA0=
 github.com/astrogo/fitsio v0.1.0/go.mod h1:AMazbBDPn8fcAglKAWIR5+5iDBnBv78pf6UHmTKSCbE=
 github.com/boombuler/barcode v1.0.0/go.mod h1:paBWMcWSl3LHKBqUq+rly7CNSldXjb2rDl3JlRe0mD8=
+github.com/campoy/embedmd v1.0.0 h1:V4kI2qTJJLf4J29RzI/MAt2c3Bl4dQSYPuflzwFH2hY=
 github.com/campoy/embedmd v1.0.0/go.mod h1:oxyr9RCiSXg0M3VJ3ks0UGfp98BpSSGr0kpiX3MzVl8=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
@@ -69,6 +70,7 @@ github.com/pierrec/lz4 v2.4.1+incompatible/go.mod h1:pdkljMzZIN41W+lC3N2tnIh5sFi
 github.com/pierrec/xxHash v0.1.5 h1:n/jBpwTHiER4xYvK3/CdPVnLDPchj8eTJFFLUb4QHBo=
 github.com/pierrec/xxHash v0.1.5/go.mod h1:w2waW5Zoa/Wc4Yqe0wgrIYAGKqRMf7czn2HNKXmuL+I=
 github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
+github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/remyoudompheng/bigfft v0.0.0-20170806203942-52369c62f446/go.mod h1:uYEyJGbgTkfkS4+E/PavXkNJcbFIpEtjt2B0KDQ5+9M=
 github.com/remyoudompheng/bigfft v0.0.0-20190728182440-6a916e37a237/go.mod h1:qqbHyh8v60DhA7CoWK5oRCqLrMHRGoxYCSS9EjAz6Eo=
@@ -76,6 +78,10 @@ github.com/rmadar/hplot-style v0.0.0-20200409093828-186ad95d84d6 h1:p+iHNqrQmc6U
 github.com/rmadar/hplot-style v0.0.0-20200409093828-186ad95d84d6/go.mod h1:C6Etirp67eWF4ArJJggNgm/IMzgCJt4d2nE5nmYbEts=
 github.com/rmadar/hplot-style v0.0.0-20200410212056-e0810de55c8e h1:maS7pLnVAkFqi/t7EyiHhD+MmErgLclJra5Bcvok3d4=
 github.com/rmadar/hplot-style v0.0.0-20200410212056-e0810de55c8e/go.mod h1:FlMHFDndEB3xerl0NDRxWxKzi4GodDoq+E0r9FYfMlw=
+github.com/rmadar/hplot-style v0.0.0-20200411142148-3eb64b0a69b5 h1:em6GtDOwyxyWpj1dvfxwseXfaYo9frHzeUuIcJFAK9k=
+github.com/rmadar/hplot-style v0.0.0-20200411142148-3eb64b0a69b5/go.mod h1:FlMHFDndEB3xerl0NDRxWxKzi4GodDoq+E0r9FYfMlw=
+github.com/rmadar/hplot-style v0.0.0-20200411142456-95ac5bcd1735 h1:sQiHVOyhCbpR0sZuHS5x1YsyMli5yS/WpS1yrRuYc6k=
+github.com/rmadar/hplot-style v0.0.0-20200411142456-95ac5bcd1735/go.mod h1:FlMHFDndEB3xerl0NDRxWxKzi4GodDoq+E0r9FYfMlw=
 github.com/ruudk/golang-pdf417 v0.0.0-20181029194003-1af4ab5afa58/go.mod h1:6lfFZQK844Gfx8o5WFuvpxWRwnSoipWe/p622j1v06w=
 github.com/sbinet/npyio v0.2.0/go.mod h1:Wk81yG1hlHgHAy4KXRQ59EfpZoAzT+2V4Pjyv7rUEM0=
 github.com/sbinet/npyio v0.3.0/go.mod h1:dJ6OpFwUDVVuDSqP5b8paU3yd7Rcs2TZiFimWwD30nc=
