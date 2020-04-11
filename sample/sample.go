@@ -13,7 +13,7 @@ import (
 )
 
 
-type Spl struct {
+type Obj struct {
 	Name string
 	FileName string
 	TreeName string
@@ -31,7 +31,7 @@ type Spl struct {
 }
 
 // Return a hplot.H1D with the proper style
-func (s Spl) CreateHisto(hdata *hbook.H1D) *hplot.H1D {
+func (s Obj) CreateHisto(hdata *hbook.H1D) *hplot.H1D {
 
 	// Create the plotable histo from histogrammed data
 	h := hplot.NewH1D(hdata, hplot.WithYErrBars(s.WithYErrBars))

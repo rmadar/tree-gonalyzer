@@ -7,7 +7,7 @@ import (
 	"go-hep.org/x/hep/hplot"
 )
 
-type Var struct {
+type Obj struct {
 	Name string
 	SaveName string
 	TreeName string
@@ -26,7 +26,7 @@ type Var struct {
 }
 
 // Get a value according to it's type
-func (v Var) GetValue() float64 {
+func (v Obj) GetValue() float64 {
         switch v := v.Value.(type) {
         case *float64:
                 return *v
@@ -38,7 +38,7 @@ func (v Var) GetValue() float64 {
 }
 
 // Set user-specified style on the plot
-func (v Var) SetPlotStyle(p *hplot.Plot) {
+func (v Obj) SetPlotStyle(p *hplot.Plot) {
 
 	// Plot labels
 	if &v.PlotTitle != nil {

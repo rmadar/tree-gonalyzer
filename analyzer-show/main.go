@@ -17,16 +17,16 @@ import (
 func main(){
 
 	// Create analyzer object
-	ana := analyzer.Ana{
+	ana := analyzer.Obj{
 		
-		Samples: []sample.Spl{
+		Samples: []sample.Obj{
 			spl_data,
 			spl_bkg1,
-			//spl_bkg2,
+			// spl_bkg2,
 			spl_alt,
 		},
 		
-		Variables: []*variable.Var{
+		Variables: []*variable.Obj{
 			var_dphi,
 			var_Ckk,
 			var_Crr,
@@ -60,11 +60,11 @@ func main(){
 // Define all samples and variables of the analysis
 var (
 	// samples
-	spl_data = sample.Spl{
+	spl_data = sample.Obj{
 		Name: "data",
 		FileName: "../testdata/ttbar_ME.root",
 		TreeName: "truth",
-		LegLabel: `Pseudo-data`,
+		LegLabel: `Pseudo-data`, 
 		CircleMarkers: true,
 		CircleColor: style.SmoothBlack, 
 		CircleSize: 2,
@@ -74,7 +74,7 @@ var (
 	}
 
 
-	spl_bkg1 = sample.Spl{
+	spl_bkg1 = sample.Obj{
 		Name: "bkg1",
 		FileName: "../testdata/ttbar_MadSpinOn_1.root",
 		TreeName: "truth",
@@ -87,7 +87,7 @@ var (
 		WithYErrBars: true,
 	}
 
-	spl_bkg2 = sample.Spl{
+	spl_bkg2 = sample.Obj{
 		Name: "bkg2",
 		FileName: "../testdata/ttbar_MadSpinOn_2.root",
 		TreeName: "truth",
@@ -100,7 +100,7 @@ var (
 		WithYErrBars: true,
 	}		
 	
-	spl_alt = sample.Spl{
+	spl_alt = sample.Obj{
 		Name: "spinoff",
 		FileName: "../testdata/ttbar_MadSpinOff.root",
 		TreeName: "truth",
@@ -113,7 +113,7 @@ var (
 	}
 
 	// Variables
-	var_dphi= &variable.Var{
+	var_dphi= &variable.Obj{
 		Name: "truth_dphi_ll",
 		SaveName: "truth_dphi_ll.tex",
 		TreeName: "truth_dphi_ll",
@@ -129,7 +129,7 @@ var (
 		RangeYmax: 0.08,
 	}
 	
-	var_Ckk = &variable.Var{
+	var_Ckk = &variable.Obj{
 		Name: "truth_Ckk",
 		SaveName: "truth_Ckk.tex",
 		TreeName: "truth_Ckk",
@@ -146,7 +146,7 @@ var (
 		LegPosLeft: true,
 	}
 
-	var_Crr = &variable.Var{
+	var_Crr = &variable.Obj{
 		Name: "truth_Crr",
 		SaveName: "truth_Crr.tex",
 		TreeName: "truth_Crr",
@@ -163,7 +163,7 @@ var (
 		LegPosLeft: true,
 	}
 	
-	var_Cnn = &variable.Var{
+	var_Cnn = &variable.Obj{
 		Name: "truth_Cnn",
 		SaveName: "truth_Cnn.tex",
 		TreeName: "truth_Cnn",
@@ -180,7 +180,7 @@ var (
 		LegPosLeft: true,
 	}
 
-	var_pt_lep = &variable.Var{
+	var_pt_lep = &variable.Obj{
 		Name: "pt_lep",
 		SaveName: "pt_lep.tex",
 		TreeName: "l_pt",
@@ -196,7 +196,7 @@ var (
 
 	}
 	
-	var_eta_lep = &variable.Var{
+	var_eta_lep = &variable.Obj{
 		Name: "eta_lep",
 		SaveName: "eta_lep.tex",
 		TreeName: "l_eta",
@@ -213,7 +213,7 @@ var (
 
 	}
 
-	var_pt_b = &variable.Var{
+	var_pt_b = &variable.Obj{
 		Name: "pt_b",
 		SaveName: "pt_b.tex",
 		TreeName: "b_pt",
@@ -228,7 +228,7 @@ var (
 		LegPosLeft: false,
 	}
 
-	var_eta_b = &variable.Var{
+	var_eta_b = &variable.Obj{
 		Name: "eta_b",
 		SaveName: "eta_b.tex",
 		TreeName: "b_eta",
@@ -244,7 +244,7 @@ var (
 		RangeXmax:  8,
 	}
 
-	var_pt_vsum = &variable.Var{
+	var_pt_vsum = &variable.Obj{
 		Name: "vsum_pt",
 		SaveName: "pt_vsum.tex",
 		TreeName: "vsum_pt",
@@ -259,7 +259,7 @@ var (
 		LegPosLeft: false,
 	}
 	
-	var_pt_t = &variable.Var{
+	var_pt_t = &variable.Obj{
 		Name: "t_pt",
 		SaveName: "pt_t.tex",
 		TreeName: "t_pt",
@@ -274,7 +274,7 @@ var (
 		LegPosLeft: false,
 	}
 
-	var_eta_t = &variable.Var{
+	var_eta_t = &variable.Obj{
 		Name: "eta_t",
 		SaveName: "eta_t.tex",
 		TreeName: "t_eta",
@@ -290,7 +290,7 @@ var (
 		RangeXmax:  8,
 	}
 
-	var_m_tt = &variable.Var{
+	var_m_tt = &variable.Obj{
 		Name: "m_tt",
 		SaveName: "m_tt.tex",
 		TreeName: "ttbar_m",
@@ -306,7 +306,7 @@ var (
 		RangeXmin: 300,
 	}
 
-	var_pt_tt = &variable.Var{
+	var_pt_tt = &variable.Obj{
 		Name: "pt_tt",
 		SaveName: "pt_tt.tex",
 		TreeName: "ttbar_pt",

@@ -4,7 +4,6 @@ package analyzer
 import (
 	"log"
 	"fmt"
-	"strings"
 	
 	"gonum.org/v1/plot/vg"
 
@@ -22,10 +21,10 @@ import (
 )
 
 // Analyzer type
-type Ana struct {
-	Samples      []sample.Spl     // sample on which to run
+type Obj struct {
+	Samples      []sample.Obj     // sample on which to run
 	SamplesGroup string           // specify how to group sample together
-	Variables    []*variable.Var  // variables to plot
+	Variables    []*variable.Obj  // variables to plot
 	Selections   []string         // implement a type selection ?
 	HistosData   [][]*hbook.H1D   // Currently 2D histo container, later: n-dim [var, sample, cut, syst]
 	HistosPlot   [][]*hplot.H1D   // Currently 2D histo container, later: n-dim [var, sample, cut, syst]
@@ -33,7 +32,7 @@ type Ana struct {
 
 
 // Initialize histograms container shape
-func (ana *Ana) initHistosData(){
+func (ana *Obj) initHistosData(){
 	ana.HistosData = make([][]*hbook.H1D, len(ana.Variables))
 	for iv := range ana.HistosData {
 		ana.HistosData[iv] = make([]*hbook.H1D, len(ana.Samples))
@@ -45,12 +44,12 @@ func (ana *Ana) initHistosData(){
 }
 
 // Data histogram accessor
-//func (ana Ana) getHistoData(ivar, ispl int) *hbook.1HD {
+//func (ana Obj) getHistoData(ivar, ispl int) *hbook.1HD {
 //	return ana.HistosData[ivar][ispl]
 //}
 
 // Run the event loop to fill all histo across samples / variables (and later: cut / systematics)
-func (ana *Ana) MakeHistos() error {
+func (ana *Obj) MakeHistos() error {
 
 	// Build hbook histograms container
 	ana.initHistosData()
@@ -99,7 +98,7 @@ func (ana *Ana) MakeHistos() error {
 
 
 // Plotting all histograms
-func (ana *Ana) PlotHistos() error {
+func (ana *Obj) PlotHistos() error {
 
 	ana.HistosPlot = make([][]*hplot.H1D, len(ana.Variables))
         for iv := range ana.HistosPlot {
@@ -110,13 +109,13 @@ func (ana *Ana) PlotHistos() error {
 	for iv, hsamples := range ana.HistosData { 
 
 		// Manipulate the current variable
-		thisVar := ana.Variables[iv]
+		v := ana.Variables[iv]
 
 		// Create a new styled plot
 		p := hplot.New()
 		p.Latex = htex.DefaultHandler
 		style.ApplyToPlot(p)
-		thisVar.SetPlotStyle(p)
+		v.SetPlotStyle(p)
 
 		// Additionnal legend
 		p.Legend.Padding = 0.1 * vg.Inch
@@ -125,14 +124,10 @@ func (ana *Ana) PlotHistos() error {
 		
 		// Loop over samples and turn hook.H1D into styled plottable histo
 		for is, h := range hsamples {
-			thisSample := ana.Samples[is]
+			s := ana.Samples[is]
 			h.Scale(1.0/h.Integral())
-			ana.HistosPlot[iv][is] = thisSample.CreateHisto(h)
-			legLabel := thisSample.LegLabel
-			if strings.Count(thisVar.SaveName, ".tex") == 1 {
-				legLabel = alignLegendLabel(thisVar.LegPosLeft, p.Legend.TextStyle.Font.Size, thisSample.LegLabel)
-			}
-			p.Legend.Add(legLabel, ana.HistosPlot[iv][is])
+			ana.HistosPlot[iv][is] = s.CreateHisto(h)
+			p.Legend.Add(s.LegLabel, ana.HistosPlot[iv][is])
 			if is>0 { // Write data (assumed to be the first sample here) at last
 				p.Add(ana.HistosPlot[iv][is])
 			}
@@ -141,33 +136,12 @@ func (ana *Ana) PlotHistos() error {
 		p.Add(ana.HistosPlot[iv][0])
 		
 		// Save the plot
-		if err := p.Save(5.5*vg.Inch, 4*vg.Inch, "results/"+thisVar.SaveName); err != nil {
+		if err := p.Save(5.5*vg.Inch, 4*vg.Inch, "results/"+v.SaveName); err != nil {
 			log.Fatalf("error saving plot: %v\n", err)
 		}
 	}
 	
 	return nil
-}
-
-
-// Helper to manage legend label
-func alignLegendLabel(legLeft bool, legFontSize vg.Length, legLabel string) string {
-
-	if strings.Count(legLabel, `$`) == 0 {
-		offset := - 2.8 * float32(legFontSize) / 12.0
-		if legLeft {
-			return fmt.Sprintf(`\hspace{%.1fcm}`, offset) + legLabel
-		} else {
-			return legLabel + fmt.Sprintf(`\hspace{%.1fcm}`, offset)
-		}
-	} else {
-		offset := - 4.18 * float32(legFontSize) / 12.0
-		if legLeft {
-			return fmt.Sprintf(`\hspace{%.1fcm}`, offset) + legLabel
-		} else {
-			return legLabel + fmt.Sprintf(`\hspace{%.1fcm}`, offset)
-		}
-	}
 }
 
 // Helper to get a tree from a file
