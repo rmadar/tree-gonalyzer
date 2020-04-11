@@ -71,9 +71,9 @@ var (
 		LegLabel: `Pseudo-data`, 
 		CircleMarkers: true,
 		CircleColor: style.SmoothBlack, 
-		CircleSize: 2,
+		CircleSize: 3,
 		WithYErrBars: true,
-		YErrBarsLineWidth: 1,
+		YErrBarsLineWidth: 2,
 		YErrBarsCapWidth: 5,
 	}
 
