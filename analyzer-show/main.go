@@ -5,12 +5,12 @@ import (
 	"math"
 	
 	"image/color"
-	
-	"tree-gonalyzer/analyzer"
-	"tree-gonalyzer/sample"
-	"tree-gonalyzer/variable"
 
 	"github.com/rmadar/hplot-style/style"
+	
+	"github.com/rmadar/tree-gonalyzer/analyzer"
+	"github.com/rmadar/tree-gonalyzer/sample"
+	"github.com/rmadar/tree-gonalyzer/variable"
 )
 
 // Run the analyzer

@@ -16,8 +16,8 @@ import (
 	
 	"github.com/rmadar/hplot-style/style"
 	
-	"tree-gonalyzer/sample"
-	"tree-gonalyzer/variable"
+	"github.com/rmadar/tree-gonalyzer/sample"
+	"github.com/rmadar/tree-gonalyzer/variable"
 )
 
 // Analyzer type
