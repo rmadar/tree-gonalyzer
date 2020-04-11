@@ -23,7 +23,7 @@ import (
 // Analyzer type
 type Obj struct {
 	Samples      []sample.Obj     // sample on which to run
-	SamplesGroup string           // specify how to group sample together
+	SamplesGroup string           // specify how to group samples together
 	Variables    []*variable.Obj  // variables to plot
 	Selections   []string         // implement a type selection ?
 	HistosData   [][]*hbook.H1D   // Currently 2D histo container, later: n-dim [var, sample, cut, syst]
