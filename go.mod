@@ -1,4 +1,4 @@
-module tree-gonalyzer
+module github.com/rmadar/tree-gonalyzer
 
 go 1.14
 
