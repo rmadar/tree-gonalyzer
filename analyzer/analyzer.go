@@ -81,10 +81,13 @@ func (ana *Obj) MakeHistos() error {
 			defer r.Close()
 			
 			// Prepare the weight
+			wstr := ""
 			if s.Weight == "" {
-				s.Weight = "float64(1.0)"
+				wstr = "float64(1.0)"
+			} else {
+				wstr = "float64(" + s.Weight + ")"
 			}
-			weight, err := r.Formula(s.Weight, nil)
+			weight, err := r.Formula(wstr, nil)
 			if err != nil {
 				log.Fatalf("could not create formula: %+v", err)
 			}
