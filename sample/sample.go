@@ -17,7 +17,7 @@ type Obj struct {
 	Name string
 	FileName string
 	TreeName string
-	Scale float64
+	Weight string
 	LegLabel string
 	LineColor color.NRGBA
 	LineWidth vg.Length

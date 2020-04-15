@@ -21,7 +21,7 @@ func main(){
 
 		DontStack: false,
 		
-		Normalize: true,
+		Normalize: false,
 		
 		Samples: []sample.Obj{
 			spl_data,
@@ -82,6 +82,7 @@ var (
 		Name: "bkg1",
 		FileName: "../testdata/ttbar_MadSpinOn_1.root",
 		TreeName: "truth",
+		Weight: "float64(0.5)",
 		LegLabel: `$t\bar{t}$ contribution 1`,
 		FillColor: color.NRGBA{R:  0, G: 102, B: 255, A: 230},
 		LineColor: color.NRGBA{R: 255, G:  255, B: 255, A: 255},
@@ -95,6 +96,7 @@ var (
 		Name: "bkg2",
 		FileName: "../testdata/ttbar_MadSpinOn_2.root",
 		TreeName: "truth",
+		Weight: "float64(0.5)",
 		LegLabel: `$t\bar{t}$ contribution 2`,
 		FillColor: color.NRGBA{R: 255, G: 102, B: 0, A: 200},
 		LineColor: color.NRGBA{R: 255, G: 255, B: 255, A: 255},

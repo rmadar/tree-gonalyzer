@@ -80,12 +80,24 @@ func (ana *Obj) MakeHistos() error {
 			}
 			defer r.Close()
 			
+			// Prepare the weight
+			if s.Weight == "" {
+				s.Weight = "float64(1.0)"
+			}
+			weight, err := r.Formula(s.Weight, nil)
+			if err != nil {
+				log.Fatalf("could not create formula: %+v", err)
+			}
+			
 			// Read the tree
 			err = r.Read(func(ctx rtree.RCtx) error {
 
+				// Get the event weight
+				w := weight.Eval().(float64)
+				
 				// Later, add a loop on cuts here
 				for iv, v := range ana.Variables {
-					ana.HistosData[iv][is].Fill(v.GetValue(), 1)
+					ana.HistosData[iv][is].Fill(v.GetValue(), w)
 				}
 
 				return nil
