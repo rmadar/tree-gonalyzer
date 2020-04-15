@@ -31,6 +31,7 @@ func main(){
 		},
 		
 		Variables: []*variable.Obj{
+			//var_test,
 			var_dphi,
 			var_Ckk,
 			var_Crr,
@@ -68,6 +69,7 @@ var (
 		Name: "data",
 		FileName: "../testdata/ttbar_MadSpinOff.root",
 		TreeName: "truth",
+		Weight: "1",
 		LegLabel: `Pseudo-data`, 
 		CircleMarkers: true,
 		CircleColor: style.SmoothBlack, 
@@ -82,7 +84,7 @@ var (
 		Name: "bkg1",
 		FileName: "../testdata/ttbar_MadSpinOn_1.root",
 		TreeName: "truth",
-		Weight: "float64(0.5)",
+		Weight: "vbar_pt",
 		LegLabel: `$t\bar{t}$ contribution 1`,
 		FillColor: color.NRGBA{R:  0, G: 102, B: 255, A: 230},
 		LineColor: color.NRGBA{R: 255, G:  255, B: 255, A: 255},
@@ -96,7 +98,7 @@ var (
 		Name: "bkg2",
 		FileName: "../testdata/ttbar_MadSpinOn_2.root",
 		TreeName: "truth",
-		Weight: "float64(0.5)",
+		Weight: "0.5",
 		LegLabel: `$t\bar{t}$ contribution 2`,
 		FillColor: color.NRGBA{R: 255, G: 102, B: 0, A: 200},
 		LineColor: color.NRGBA{R: 255, G: 255, B: 255, A: 255},
@@ -110,6 +112,7 @@ var (
 		Name: "spinoff",
 		FileName: "../testdata/ttbar_ME.root",
 		TreeName: "truth",
+		Weight: "0.0",
 		LegLabel: `$t\bar{t}$ alternative`,
 		FillColor: color.NRGBA{R: 0, G:  204, B:  80, A: 200},
 		LineColor: color.NRGBA{R: 255, G:  255, B: 255, A: 255},
@@ -120,7 +123,17 @@ var (
 	}
 	
 	// Variables
-	var_dphi= &variable.Obj{
+	var_test = &variable.Obj{
+		Name: "vbar_pt",
+		SaveName: "vbar_pt.tex",
+		TreeName: "vbar_pt",
+		Value: new(float32),
+		Nbins: 15,
+		Xmin: 0, 
+		Xmax: 300,
+	}
+	
+	var_dphi = &variable.Obj{
 		Name: "truth_dphi_ll",
 		SaveName: "truth_dphi_ll.tex",
 		TreeName: "truth_dphi_ll",
