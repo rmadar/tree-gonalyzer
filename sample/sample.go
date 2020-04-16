@@ -2,6 +2,8 @@
 package sample
 
 import (
+	"strings"
+	
 	"image/color"
 
 	"gonum.org/v1/plot/vg"	
@@ -15,6 +17,7 @@ import (
 
 type Obj struct {
 	Name string
+	Type string
 	FileName string
 	TreeName string
 	Weight string
@@ -74,5 +77,18 @@ func (s Obj) CreateHisto(hdata *hbook.H1D) *hplot.H1D {
 	return h
 }
 
+func (s *Obj) IsData() bool {
+	return strings.ToLower(s.Type) == "data"
+}
 
+func (s *Obj) IsBkg() bool {
+	return strings.ToLower(s.Type) == "bkg" ||
+		strings.ToLower(s.Type) == "bg" ||
+		strings.ToLower(s.Type) == "background"
+}
+
+func (s *Obj) IsSig() bool {
+	return strings.ToLower(s.Type) == "sig" ||
+		strings.ToLower(s.Type) == "signal"
+}
 

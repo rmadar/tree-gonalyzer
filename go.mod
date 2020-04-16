@@ -9,4 +9,7 @@ require (
 	gonum.org/v1/plot v0.7.1-0.20200414075901-f4e1939a9e7a
 )
 
-// replace github.com/rmadar/hplot-style => /home/rmadar/cernbox/goDev/hplot-style
+replace (
+     //github.com/rmadar/hplot-style => /home/rmadar/cernbox/goDev/hplot-style
+     go-hep.org/x/hep => /home/rmadar/cernbox/goDev/test_gohep/hep
+)

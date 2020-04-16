@@ -12,6 +12,7 @@ import (
 	"github.com/rmadar/tree-gonalyzer/analyzer"
 	"github.com/rmadar/tree-gonalyzer/sample"
 	"github.com/rmadar/tree-gonalyzer/variable"
+	"github.com/rmadar/tree-gonalyzer/selection"
 )
 
 // Run the analyzer
@@ -36,12 +37,23 @@ func main(){
 		DontStack: false,		
 
 		// Set of cuts
-		Selections: []string{
-			"l_pt<30 && ttbar_m<1000",
-			//"l_pt>30 && ttbar_m<1000",
-			//"l_pt>40 && ttbar_m<800",
-			//"l_pt>50 && ttbar_m<500",
-			//"l_pt>60 && ttbar_m>500",
+		Cuts: []selection.Obj{
+			selection.Obj{
+				Name: "cut1",
+				Cut:  "l_pt>30 && ttbar_m<1000",
+			},
+			selection.Obj{
+				Name: "cut2",
+				Cut:  "l_pt>50 && ttbar_m<1000",
+			},
+			selection.Obj{
+				Name: "cut3",
+				Cut:  "l_pt>80 && ttbar_m<1000",
+			},
+			selection.Obj{
+				Name: "cut4",
+				Cut:  "l_pt>100 && ttbar_m<1000",
+			},
 		},
 
 		// Included samples
@@ -60,7 +72,7 @@ func main(){
 			var_Ckk,
 			var_Crr,
 			var_Cnn,
-			/*var_pt_lep,
+			var_pt_lep,
 			var_eta_lep,
 			var_pt_b,
 			var_eta_b,
@@ -69,7 +81,7 @@ func main(){
 			var_pt_vsum,
 			var_m_tt,
 			var_pt_tt,
-			var_x1,*/
+			var_x1,
 		},
 	}
 	
@@ -95,6 +107,7 @@ var (
 	// samples
 	spl_data = sample.Obj{
 		Name: "data",
+		Type: "data",
 		FileName: "../testdata/ttbar_MadSpinOff.root",
 		TreeName: "truth",
 		Weight: "1",
@@ -110,6 +123,7 @@ var (
 
 	spl_bkg1 = sample.Obj{
 		Name: "bkg1",
+		Type: "bkg",
 		FileName: "../testdata/ttbar_MadSpinOn_1.root",
 		TreeName: "truth",
 		Weight: "0.5",
@@ -125,6 +139,7 @@ var (
 	
 	spl_bkg1bis = sample.Obj{
 		Name: "bkg1bis",
+		Type: "bkg",
 		FileName: "../testdata/ttbar_MadSpinOn_1.root",
 		TreeName: "truth",
 		Weight: "0.5",
@@ -140,6 +155,7 @@ var (
 
 	spl_bkg2 = sample.Obj{
 		Name: "bkg2",
+		Type: "bkg",
 		FileName: "../testdata/ttbar_MadSpinOn_2.root",
 		TreeName: "truth",
 		Weight: "0.5",
@@ -154,6 +170,7 @@ var (
 
 	spl_alt = sample.Obj{
 		Name: "spinoff",
+		Type: "bkg",
 		FileName: "../testdata/ttbar_ME.root",
 		TreeName: "truth",
 		LegLabel: `$t\bar{t}$ alternative`,

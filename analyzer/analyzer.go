@@ -5,6 +5,7 @@ import (
 	"log"
 	"fmt"
 	"time"
+	"os"
 	
 	"gonum.org/v1/gonum/floats"
 	"gonum.org/v1/plot/vg"
@@ -20,6 +21,7 @@ import (
 	
 	"github.com/rmadar/tree-gonalyzer/sample"
 	"github.com/rmadar/tree-gonalyzer/variable"
+	"github.com/rmadar/tree-gonalyzer/selection"
 )
 
 // Analyzer type
@@ -27,7 +29,7 @@ type Obj struct {
 	Samples []sample.Obj        // Sample on which to run
 	SamplesGroup string         // Specify how to group samples together
 	Variables []*variable.Obj   // List of variables to plot
-	Selections []string         // List of cuts (implement a type 'selection'?)
+	Cuts []selection.Obj        // List of cuts
 	SaveFormat string           // Extension of saved figure 'tex', 'pdf', 'png'
 	CompileLatex bool           // Enable on-the-fly latex compilation of plots
 	HistosData [][][]*hbook.H1D // Currently 3D histo container, later: n-dim [var, sample, cut, syst]
@@ -43,17 +45,18 @@ type Obj struct {
 	
 }
 
+
 // Initialize histograms container shape
 func (ana *Obj) initHistosData(){
 	
-	if len(ana.Selections) == 0 {
-		ana.Selections = append(ana.Selections, "true")
+	if len(ana.Cuts) == 0 {
+		ana.Cuts = append(ana.Cuts, selection.Obj{Name:"No-cut", Cut:"true"})
 	}
 
 	ana.HistosData = make([][][]*hbook.H1D, len(ana.Variables))
 	for iv := range ana.HistosData {
-		ana.HistosData[iv] = make([][]*hbook.H1D, len(ana.Selections))
-		for isel := range ana.Selections {
+		ana.HistosData[iv] = make([][]*hbook.H1D, len(ana.Cuts))
+		for isel := range ana.Cuts {
 			ana.HistosData[iv][isel] = make([]*hbook.H1D, len(ana.Samples))
 			v := ana.Variables[iv]
 			for isample := range ana.HistosData[iv][isel] {
@@ -82,19 +85,16 @@ func (ana *Obj) MakeHistos() error {
 			f, t := getTreeFromFile(s.FileName, s.TreeName)
 			defer f.Close()
 			
-			tree := rtree.Chain(t, t, t, t,
+			tree := rtree.Chain(t)/*, t, t, t,
 				t, t, t, t, t, t, t, t, 
 				t, t, t, t, t, t, t, t, 
 				t, t, t, t, t, t, t, t, 
 				t, t, t, t, t, t, t, t,
 				t, t, t, t, t, t, t, t,
-				t, t, t, t, t, t, t, t)
+				t, t, t, t, t, t, t, t)*/
 
-			var v_pt float32
 			var rvars []rtree.ReadVar
-			if ana.WithTreeFormula {
-				rvars = append(rvars, rtree.ReadVar{Name: "v_pt", Value: &v_pt})
-			}  else {
+			if !ana.WithTreeFormula {
 				for _, v := range ana.Variables {
 					rvars = append(rvars, rtree.ReadVar{Name: v.TreeName, Value: v.Value})
 				}
@@ -106,7 +106,6 @@ func (ana *Obj) MakeHistos() error {
 				return fmt.Errorf("could not create tree reader: %w", err)
 			}
 			defer r.Close()
-
 			
 			var_formula := make([]rtree.Formula, len(ana.Variables)) 
 			if ana.WithTreeFormula {
@@ -120,7 +119,7 @@ func (ana *Obj) MakeHistos() error {
 			}
 			
 			// Prepare the weight
-			wstr := "float64(1.0)"
+			wstr := "1.0"
 			if s.Weight != "" { wstr = "float64(" + s.Weight + ")" }
 			weight, err := r.Formula(wstr, nil)
 			if err != nil {
@@ -136,9 +135,9 @@ func (ana *Obj) MakeHistos() error {
 			}
 
 			// Prepare the cut string for kinematics
-			cutKinem := make([]rtree.Formula, len(ana.Selections))
-			for ic, cut := range ana.Selections {
-				cutKinem[ic], err = r.Formula("bool(" + cut + ")", nil)
+			cutKinem := make([]rtree.Formula, len(ana.Cuts))
+			for ic, cut := range ana.Cuts {
+				cutKinem[ic], err = r.Formula("bool(" + cut.Cut + ")", nil)
 				if err != nil {
 					log.Fatalf("could not create formula: %+v", err)
 				}
@@ -156,7 +155,7 @@ func (ana *Obj) MakeHistos() error {
 				w := weight.Eval().(float64)				
 
 				// Loop over selection and variables
-				for isel := range ana.Selections {
+				for isel := range ana.Cuts {
 					if cutKinem[isel].Eval().(bool) {
 						for iv, v := range ana.Variables {
 							val := v.GetValue()
@@ -198,8 +197,8 @@ func (ana *Obj) PlotHistos() error {
 	// Inititialize histograms
 	ana.HistosPlot = make([][][]*hplot.H1D, len(ana.Variables))
         for iv := range ana.HistosPlot {
-		ana.HistosPlot[iv] = make([][]*hplot.H1D, len(ana.Selections))
-		for isel := range ana.Selections {
+		ana.HistosPlot[iv] = make([][]*hplot.H1D, len(ana.Cuts))
+		for isel := range ana.Cuts {
 			ana.HistosPlot[iv][isel] = make([]*hplot.H1D, len(ana.Samples))
 		}
 	}
@@ -266,9 +265,10 @@ func (ana *Obj) PlotHistos() error {
 				p.Legend.Add(ana.Samples[is].LegLabel, ana.HistosPlot[iv][isel][is])
 				
 				// Keep data appart from backgrounds (FIX-ME: assumed to be the first sample for now)
-				if is == 0 {
+				if ana.Samples[is].IsData() {
 					hdata = ana.HistosPlot[iv][isel][is]
-				} else {  
+				}
+				if ana.Samples[is].IsBkg() {  
 					hbkgs = append(hbkgs, ana.HistosPlot[iv][isel][is])
 				}
 			}
@@ -289,7 +289,12 @@ func (ana *Obj) PlotHistos() error {
 			p.Add(hdata)
 		
 			// Save the plot
-			if err := p.Save(5.5*vg.Inch, 4*vg.Inch, "results/"+v.SaveName + "." + format); err != nil {
+			path := "results/"+ana.Cuts[isel].Name
+			if _, err := os.Stat(path); os.IsNotExist(err) {
+				os.Mkdir(path, 0755)
+			}
+			outputname := path + "/" + v.SaveName + "." + format
+			if err := p.Save(5.5*vg.Inch, 4*vg.Inch, outputname); err != nil {
 				log.Fatalf("error saving plot: %v\n", err)
 			}
 		}
@@ -325,7 +330,7 @@ func getTreeFromFile(filename, treename string) (*groot.File, rtree.Tree) {
 func (ana Obj) PrintReport() {
 
 	// Event, histo info
-	nvars, nsamples, ncuts := len(ana.Variables), len(ana.Samples), len(ana.Selections)
+	nvars, nsamples, ncuts := len(ana.Variables), len(ana.Samples), len(ana.Cuts)
 	nhist := nvars * nsamples
 	if ncuts > 0 {	nhist *= ncuts }
 	nkevt := float64(ana.nEvents)/1e3
