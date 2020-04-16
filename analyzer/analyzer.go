@@ -4,6 +4,7 @@ package analyzer
 import (
 	"log"
 	"fmt"
+	"time"
 	
 	"gonum.org/v1/gonum/floats"
 	"gonum.org/v1/plot/vg"
@@ -23,37 +24,51 @@ import (
 
 // Analyzer type
 type Obj struct {
-	Samples       []sample.Obj   // Sample on which to run
-	SamplesGroup    string       // Specify how to group samples together
-	Variables    []*variable.Obj // List of variables to plot
-	Selections    []string       // List of cuts (implement a type 'selection'?)
-	HistosData [][]*hbook.H1D    // Currently 2D histo container, later: n-dim [var, sample, cut, syst]
-	HistosPlot [][]*hplot.H1D    // Currently 2D histo container, later: n-dim [var, sample, cut, syst]
-	DontStack       bool         // Disable histogram stacking (e.g. compare various processes)
-	Normalize       bool         // Normalize distributions to unit area (when stacked, the total is nomarlized)
-}
+	Samples []sample.Obj        // Sample on which to run
+	SamplesGroup string         // Specify how to group samples together
+	Variables []*variable.Obj   // List of variables to plot
+	Selections []string         // List of cuts (implement a type 'selection'?)
+	SaveFormat string           // Extension of saved figure 'tex', 'pdf', 'png'
+	CompileLatex bool           // Enable on-the-fly latex compilation of plots
+	HistosData [][][]*hbook.H1D // Currently 3D histo container, later: n-dim [var, sample, cut, syst]
+	HistosPlot [][][]*hplot.H1D // Currently 3D histo container, later: n-dim [var, sample, cut, syst]
+	DontStack bool              // Disable histogram stacking (e.g. compare various processes)
+	Normalize bool              // Normalize distributions to unit area (when stacked, the total is nomarlized)
 
+	WithTreeFormula bool // TEMP for benchmarking
+	
+	nEvents int64 // Number of processed events
+	timeLoop time.Duration // Processing time for filling histograms (event loop over samples x cuts x histos)
+	timePlot time.Duration // Processing time for plotting histogram
+	
+}
 
 // Initialize histograms container shape
 func (ana *Obj) initHistosData(){
-	ana.HistosData = make([][]*hbook.H1D, len(ana.Variables))
+	
+	if len(ana.Selections) == 0 {
+		ana.Selections = append(ana.Selections, "true")
+	}
+
+	ana.HistosData = make([][][]*hbook.H1D, len(ana.Variables))
 	for iv := range ana.HistosData {
-		ana.HistosData[iv] = make([]*hbook.H1D, len(ana.Samples))
-		v := ana.Variables[iv]
-		for is := range ana.HistosData[iv] {
-			ana.HistosData[iv][is] = hbook.NewH1D(v.Nbins, v.Xmin, v.Xmax)
+		ana.HistosData[iv] = make([][]*hbook.H1D, len(ana.Selections))
+		for isel := range ana.Selections {
+			ana.HistosData[iv][isel] = make([]*hbook.H1D, len(ana.Samples))
+			v := ana.Variables[iv]
+			for isample := range ana.HistosData[iv][isel] {
+				ana.HistosData[iv][isel][isample] = hbook.NewH1D(v.Nbins, v.Xmin, v.Xmax)
+			}
 		}
 	}
 }
 
-// Data histogram accessor
-//func (ana Obj) getHistoData(ivar, ispl int) *hbook.1HD {
-//	return ana.HistosData[ivar][ispl]
-//}
-
 // Run the event loop to fill all histo across samples / variables (and later: cut / systematics)
 func (ana *Obj) MakeHistos() error {
 
+	// Start timing
+	start := time.Now()
+	
 	// Build hbook histograms container
 	ana.initHistosData()
 	
@@ -64,53 +79,108 @@ func (ana *Obj) MakeHistos() error {
 		func(j int) error { 
 		
 			// Get the file and tree
-			f, tree := getTreeFromFile(s.FileName, s.TreeName)
+			f, t := getTreeFromFile(s.FileName, s.TreeName)
 			defer f.Close()
 			
-			// Prepare the variables to read
-			rvars := []rtree.ReadVar{}
-			for _, v := range ana.Variables {
-				rvars = append(rvars, rtree.ReadVar{Name: v.TreeName, Value: v.Value})
+			tree := rtree.Chain(t, t, t, t,
+				t, t, t, t, t, t, t, t, 
+				t, t, t, t, t, t, t, t, 
+				t, t, t, t, t, t, t, t, 
+				t, t, t, t, t, t, t, t,
+				t, t, t, t, t, t, t, t,
+				t, t, t, t, t, t, t, t)
+
+			var v_pt float32
+			var rvars []rtree.ReadVar
+			if ana.WithTreeFormula {
+				rvars = append(rvars, rtree.ReadVar{Name: "v_pt", Value: &v_pt})
+			}  else {
+				for _, v := range ana.Variables {
+					rvars = append(rvars, rtree.ReadVar{Name: v.TreeName, Value: v.Value})
+				}
 			}
-			
+	
 			// Get the tree reader
 			r, err := rtree.NewReader(tree, rvars)
 			if err != nil {
 				return fmt.Errorf("could not create tree reader: %w", err)
 			}
 			defer r.Close()
+
+			
+			var_formula := make([]rtree.Formula, len(ana.Variables)) 
+			if ana.WithTreeFormula {
+				var errForm error
+				for i, v := range ana.Variables {
+					var_formula[i], errForm = r.Formula("float64(" + v.TreeName + ")", nil) 
+					if errForm != nil {
+						log.Fatalf("could not create formula: %+v", errForm)
+					}
+				}
+			}
 			
 			// Prepare the weight
-			wstr := ""
-			if s.Weight == "" {
-				wstr = "float64(1.0)"
-			} else {
-				wstr = "float64(" + s.Weight + ")"
-			}
+			wstr := "float64(1.0)"
+			if s.Weight != "" { wstr = "float64(" + s.Weight + ")" }
 			weight, err := r.Formula(wstr, nil)
 			if err != nil {
 				log.Fatalf("could not create formula: %+v", err)
 			}
 			
+			// Prepare the cut string sample
+			cstr := "true"
+			if s.Cut != "" { cstr = "bool(" + s.Cut + ")" }
+			cutSample, err := r.Formula(cstr, nil)
+			if err != nil {
+				log.Fatalf("could not create formula: %+v", err)
+			}
+
+			// Prepare the cut string for kinematics
+			cutKinem := make([]rtree.Formula, len(ana.Selections))
+			for ic, cut := range ana.Selections {
+				cutKinem[ic], err = r.Formula("bool(" + cut + ")", nil)
+				if err != nil {
+					log.Fatalf("could not create formula: %+v", err)
+				}
+			}
+			
 			// Read the tree
 			err = r.Read(func(ctx rtree.RCtx) error {
 
-				// Get the event weight
-				w := weight.Eval().(float64)
-				
-				// Later, add a loop on cuts here
-				for iv, v := range ana.Variables {
-					ana.HistosData[iv][is].Fill(v.GetValue(), w)
+				// Sample-level cut
+				if ! cutSample.Eval().(bool){
+					return nil
 				}
 
+				// Get the event weight
+				w := weight.Eval().(float64)				
+
+				// Loop over selection and variables
+				for isel := range ana.Selections {
+					if cutKinem[isel].Eval().(bool) {
+						for iv, v := range ana.Variables {
+							val := v.GetValue()
+							if ana.WithTreeFormula {
+								val = var_formula[iv].Eval().(float64)
+							}
+							ana.HistosData[iv][isel][is].Fill(val, w)
+						}
+					}
+				}
+				
 				return nil
 			})
 			
-			return nil	
-
+			// Keep track of the number of processed events
+			ana.nEvents += tree.Entries()
+			
+			return nil
 		}(is)
-	}	
-
+	}
+	
+	// End timing
+	ana.timeLoop = time.Now().Sub(start)
+	
 	return nil
 }
 
@@ -118,9 +188,20 @@ func (ana *Obj) MakeHistos() error {
 // Plotting all histograms
 func (ana *Obj) PlotHistos() error {
 
-	ana.HistosPlot = make([][]*hplot.H1D, len(ana.Variables))
+	// Start timing
+	start := time.Now()
+
+	// Plot format
+	format := "tex"
+	if ana.SaveFormat != "" { format = ana.SaveFormat }
+	
+	// Inititialize histograms
+	ana.HistosPlot = make([][][]*hplot.H1D, len(ana.Variables))
         for iv := range ana.HistosPlot {
-		ana.HistosPlot[iv] = make([]*hplot.H1D, len(ana.Samples))
+		ana.HistosPlot[iv] = make([][]*hplot.H1D, len(ana.Selections))
+		for isel := range ana.Selections {
+			ana.HistosPlot[iv][isel] = make([]*hplot.H1D, len(ana.Samples))
+		}
 	}
 
 	// Return an error if all normalization are 0
@@ -129,82 +210,93 @@ func (ana *Obj) PlotHistos() error {
 	}
 		
 	// Loop over variables and get histo for all samples
-	for iv, hsamples := range ana.HistosData { 
+	for iv, h_sel_samples := range ana.HistosData { 
 
 		// Manipulate the current variable
 		v := ana.Variables[iv]
 
-		// Create a new styled plot
-		p := hplot.New()
-		p.Latex = htex.DefaultHandler
-		style.ApplyToPlot(p)
-		v.SetPlotStyle(p)
-
-		// Additionnal legend style
-		p.Legend.Padding = 0.1 * vg.Inch
-		p.Legend.ThumbnailWidth = 25
-		p.Legend.TextStyle.Font.Size = 12
-		
-		// Prepare a slice of histograms to be (possibly) stacked
-		var (
-			hbkgs []*hplot.H1D
-			hdata *hplot.H1D
-			norms []float64
-		)
-
-		// Keep track of the normalization for every sample
-		for _, h := range hsamples { norms = append(norms, h.Integral()) }
-		Nbkg := floats.Sum(norms[1:])
-		
-		// Loop over samples
-		for is, h := range hsamples {
-
-			// Deal with normalize option for data
-			if is==0 && ana.Normalize {
-				h.Scale(1/norms[is])
+		// Loop over selections
+		for isel, hsamples := range h_sel_samples {
+			
+			// Create a new styled plot
+			p := hplot.New()
+			if ana.CompileLatex {
+				p.Latex = htex.DefaultHandler
 			}
-
-			// Deal with normalize option of non-data
-			if is>0 && ana.Normalize {
-				if ana.DontStack {
+			style.ApplyToPlot(p)
+			v.SetPlotStyle(p)
+			
+			// Additionnal legend style
+			p.Legend.Padding = 0.1 * vg.Inch
+			p.Legend.ThumbnailWidth = 25
+			p.Legend.TextStyle.Font.Size = 12
+			
+			// Prepare histogram (possible) stacking via []*hplot.H1D
+			var (
+				hbkgs []*hplot.H1D
+				hdata *hplot.H1D
+				norms []float64
+			)
+			
+			// Keep track of the normalization for every sample
+			for _, h := range hsamples { norms = append(norms, h.Integral()) }
+			Nbkg := floats.Sum(norms[1:])
+			
+			// Loop over samples
+			for is, h := range hsamples {
+				
+				// Deal with normalize option for data
+				if is==0 && ana.Normalize {
 					h.Scale(1/norms[is])
-				} else {
-					h.Scale(1./Nbkg)
+				}
+				
+				// Deal with normalize option of non-data
+				if is>0 && ana.Normalize {
+					if ana.DontStack {
+						h.Scale(1/norms[is])
+					} else {
+						h.Scale(1./Nbkg)
+					}
+				}
+			
+				// Get plottable histogram
+				ana.HistosPlot[iv][isel][is] = ana.Samples[is].CreateHisto(h)
+				
+				// Prepare the legend
+				p.Legend.Add(ana.Samples[is].LegLabel, ana.HistosPlot[iv][isel][is])
+				
+				// Keep data appart from backgrounds (FIX-ME: assumed to be the first sample for now)
+				if is == 0 {
+					hdata = ana.HistosPlot[iv][isel][is]
+				} else {  
+					hbkgs = append(hbkgs, ana.HistosPlot[iv][isel][is])
 				}
 			}
-			
-			// Get plottable histogram
-			ana.HistosPlot[iv][is] = ana.Samples[is].CreateHisto(h)
 
-			// Prepare the legend
-			p.Legend.Add(ana.Samples[is].LegLabel, ana.HistosPlot[iv][is])
-
-			// Keep data appart from backgrounds (FIX-ME: assumed to be the first sample for now)
-			if is == 0 {
-				hdata = ana.HistosPlot[iv][is]
-			} else {  
-				hbkgs = append(hbkgs, ana.HistosPlot[iv][is])
+			// Manage stack
+			if len(hbkgs)>1 {
+				for i, j := 0, len(hbkgs)-1; i < j; i, j = i+1, j-1 {
+					hbkgs[i], hbkgs[j] = hbkgs[j], hbkgs[i]
+				}
+				stack := hplot.NewHStack(hbkgs)
+				if ana.DontStack {
+					stack.Stack = hplot.HStackOff
+				}
+				
+				// Add the histgrams (possibly stack) and data
+				p.Add(stack)
+			}
+			p.Add(hdata)
+		
+			// Save the plot
+			if err := p.Save(5.5*vg.Inch, 4*vg.Inch, "results/"+v.SaveName + "." + format); err != nil {
+				log.Fatalf("error saving plot: %v\n", err)
 			}
 		}
-
-		// Manage stack
-		for i, j := 0, len(hbkgs)-1; i < j; i, j = i+1, j-1 {
-			hbkgs[i], hbkgs[j] = hbkgs[j], hbkgs[i]
-		}
-		stack := hplot.NewHStack(hbkgs)
-		if ana.DontStack {
-			stack.Stack = hplot.HStackOff
-		}
-		
-		// Add the histgrams (possibly stack) and data
-		p.Add(stack)
-		p.Add(hdata)
-		
-		// Save the plot
-		if err := p.Save(5.5*vg.Inch, 4*vg.Inch, "results/"+v.SaveName); err != nil {
-			log.Fatalf("error saving plot: %v\n", err)
-		}
 	}
+
+	// End timing
+	ana.timePlot = time.Now().Sub(start)
 	
 	return nil
 }
@@ -229,8 +321,38 @@ func getTreeFromFile(filename, treename string) (*groot.File, rtree.Tree) {
 	return f, obj.(rtree.Tree)
 }
 
+// Print processing report
+func (ana Obj) PrintReport() {
 
-// Helper to reverse order in a slice
-func Reverse(s []float64) {
+	// Event, histo info
+	nvars, nsamples, ncuts := len(ana.Variables), len(ana.Samples), len(ana.Selections)
+	nhist := nvars * nsamples
+	if ncuts > 0 {	nhist *= ncuts }
+	nkevt := float64(ana.nEvents)/1e3
 
+	// Timing info
+	dtLoop := float64(ana.timeLoop) / float64(time.Millisecond)
+	dtPlot := float64(ana.timePlot) / float64(time.Millisecond)
+
+	// Formating
+	str_template := "\n Processing report:\n"
+	str_template += "    - %v histograms filled over %.0f kEvts (%v samples, %v variables, %v selections)\n"
+	str_template += "    - running time: %.0f ms/kEvt (%s for %.0f kEvts)\n" 
+	str_template += "    - time fraction: %.0f%% (event loop), %.0f%% (plotting)\n\n"
+
+	fmt.Printf(str_template,
+		nhist, nkevt, nsamples, nvars, ncuts,
+		(dtLoop+dtPlot)/nkevt, fmtDuration(ana.timeLoop+ana.timePlot), nkevt,
+		dtLoop/(dtLoop+dtPlot)*100., dtPlot/(dtLoop+dtPlot)*100.,
+	)
+}
+
+// Helper duration formating: return a string 'hh:mm:ss' for a time.Duration object
+func fmtDuration(d time.Duration) string {
+        h := d / time.Hour
+	d -= h * time.Hour
+	m := d / time.Minute
+	d -= m * time.Minute
+	s := d / time.Second
+	return fmt.Sprintf("%02d:%02d:%02d", h, m, s)
 }

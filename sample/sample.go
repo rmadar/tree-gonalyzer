@@ -18,6 +18,7 @@ type Obj struct {
 	FileName string
 	TreeName string
 	Weight string
+	Cut string
 	LegLabel string
 	LineColor color.NRGBA
 	LineWidth vg.Length

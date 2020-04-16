@@ -34,6 +34,8 @@ func (v Obj) GetValue() float64 {
                 return *v
         case *float32:
                 return float64(*v)
+	case *bool:
+		return map[bool]float64{true: 1, false:0}[*v]
         default:
                 panic(fmt.Errorf("invalid variable value-type %T", v))
         }
