@@ -9,10 +9,7 @@ import (
 	
 	"github.com/rmadar/hplot-style/style"
 	
-	"github.com/rmadar/tree-gonalyzer/analyzer"
-	"github.com/rmadar/tree-gonalyzer/sample"
-	"github.com/rmadar/tree-gonalyzer/variable"
-	"github.com/rmadar/tree-gonalyzer/selection"
+	"github.com/rmadar/tree-gonalyzer/ana"
 )
 
 // Run the analyzer
@@ -23,7 +20,7 @@ func main(){
 	flag.Parse()
 	
 	// Create analyzer object
-	ana := analyzer.Obj{
+	ana := ana.Maker{
 
 		// Test Tree formula
 		WithTreeFormula: *useTreeFormula,
@@ -37,27 +34,27 @@ func main(){
 		DontStack: false,		
 
 		// Set of cuts
-		Cuts: []selection.Obj{
-			selection.Obj{
+		Cuts: []ana.Selection{
+			ana.Selection{
 				Name: "cut1",
 				Cut:  "l_pt>30 && ttbar_m<1000",
 			},
-			selection.Obj{
+			ana.Selection{
 				Name: "cut2",
 				Cut:  "l_pt>50 && ttbar_m<1000",
 			},
-			selection.Obj{
+			ana.Selection{
 				Name: "cut3",
 				Cut:  "l_pt>80 && ttbar_m<1000",
 			},
-			selection.Obj{
+			ana.Selection{
 				Name: "cut4",
 				Cut:  "l_pt>100 && ttbar_m<1000",
 			},
 		},
 
 		// Included samples
-		Samples: []sample.Obj{
+		Samples: []ana.Sample{
 			spl_data,
 			spl_bkg1,
 			spl_bkg1bis,
@@ -66,7 +63,7 @@ func main(){
 		},
 
 		// Set of observable to plot
-		Variables: []*variable.Obj{
+		Variables: []*ana.Variable{
                         var_pt_lep,
 			var_dphi,
 			var_Ckk,
@@ -105,7 +102,7 @@ func main(){
 // Define all samples and variables of the analysis
 var (
 	// samples
-	spl_data = sample.Obj{
+	spl_data = ana.Sample{
 		Name: "data",
 		Type: "data",
 		FileName: "../testdata/ttbar_MadSpinOff.root",
@@ -121,7 +118,7 @@ var (
 	}
 
 
-	spl_bkg1 = sample.Obj{
+	spl_bkg1 = ana.Sample{
 		Name: "bkg1",
 		Type: "bkg",
 		FileName: "../testdata/ttbar_MadSpinOn_1.root",
@@ -137,7 +134,7 @@ var (
 		WithYErrBars: true,
 	}
 	
-	spl_bkg1bis = sample.Obj{
+	spl_bkg1bis = ana.Sample{
 		Name: "bkg1bis",
 		Type: "bkg",
 		FileName: "../testdata/ttbar_MadSpinOn_1.root",
@@ -153,7 +150,7 @@ var (
 		WithYErrBars: true,
 	}
 
-	spl_bkg2 = sample.Obj{
+	spl_bkg2 = ana.Sample{
 		Name: "bkg2",
 		Type: "bkg",
 		FileName: "../testdata/ttbar_MadSpinOn_2.root",
@@ -168,7 +165,7 @@ var (
 		WithYErrBars: true,
 	}		
 
-	spl_alt = sample.Obj{
+	spl_alt = ana.Sample{
 		Name: "spinoff",
 		Type: "bkg",
 		FileName: "../testdata/ttbar_ME.root",
@@ -182,7 +179,7 @@ var (
 		WithYErrBars: false,
 	}
 		
-	var_dphi = &variable.Obj{
+	var_dphi = &ana.Variable{
 		Name: "truth_dphi_ll",
 		SaveName: "truth_dphi_ll",
 		TreeName: "truth_dphi_ll",
@@ -198,7 +195,7 @@ var (
 		RangeYmax: 0.08,
 	}
 	
-	var_Ckk = &variable.Obj{
+	var_Ckk = &ana.Variable{
 		Name: "truth_Ckk",
 		SaveName: "truth_Ckk",
 		TreeName: "truth_Ckk",
@@ -215,7 +212,7 @@ var (
 		LegPosLeft: true,
 	}
 
-	var_Crr = &variable.Obj{
+	var_Crr = &ana.Variable{
 		Name: "truth_Crr",
 		SaveName: "truth_Crr",
 		TreeName: "truth_Crr",
@@ -232,7 +229,7 @@ var (
 		LegPosLeft: true,
 	}
 	
-	var_Cnn = &variable.Obj{
+	var_Cnn = &ana.Variable{
 		Name: "truth_Cnn",
 		SaveName: "truth_Cnn",
 		TreeName: "truth_Cnn",
@@ -249,7 +246,7 @@ var (
 		LegPosLeft: true,
 	}
 
-	var_pt_lep = &variable.Obj{
+	var_pt_lep = &ana.Variable{
 		Name: "pt_lep",
 		SaveName: "pt_lep",
 		TreeName: "l_pt",
@@ -265,7 +262,7 @@ var (
 
 	}
 	
-	var_eta_lep = &variable.Obj{
+	var_eta_lep = &ana.Variable{
 		Name: "eta_lep",
 		SaveName: "eta_lep",
 		TreeName: "l_eta",
@@ -282,7 +279,7 @@ var (
 
 	}
 
-	var_pt_b = &variable.Obj{
+	var_pt_b = &ana.Variable{
 		Name: "pt_b",
 		SaveName: "pt_b",
 		TreeName: "b_pt",
@@ -297,7 +294,7 @@ var (
 		LegPosLeft: false,
 	}
 
-	var_eta_b = &variable.Obj{
+	var_eta_b = &ana.Variable{
 		Name: "eta_b",
 		SaveName: "eta_b",
 		TreeName: "b_eta",
@@ -313,7 +310,7 @@ var (
 		RangeXmax:  8,
 	}
 
-	var_pt_vsum = &variable.Obj{
+	var_pt_vsum = &ana.Variable{
 		Name: "vsum_pt",
 		SaveName: "pt_vsum",
 		TreeName: "vsum_pt",
@@ -329,7 +326,7 @@ var (
 		LegPosLeft: false,
 	}
 	
-	var_pt_t = &variable.Obj{
+	var_pt_t = &ana.Variable{
 		Name: "t_pt",
 		SaveName: "pt_t",
 		TreeName: "t_pt",
@@ -344,7 +341,7 @@ var (
 		LegPosLeft: false,
 	}
 
-	var_eta_t = &variable.Obj{
+	var_eta_t = &ana.Variable{
 		Name: "eta_t",
 		SaveName: "eta_t",
 		TreeName: "t_eta",
@@ -360,7 +357,7 @@ var (
 		RangeXmax:  8,
 	}
 
-	var_m_tt = &variable.Obj{
+	var_m_tt = &ana.Variable{
 		Name: "m_tt",
 		SaveName: "m_tt",
 		TreeName: "ttbar_m",
@@ -376,7 +373,7 @@ var (
 		RangeXmin: 300,
 	}
 	
-	var_pt_tt = &variable.Obj{
+	var_pt_tt = &ana.Variable{
 		Name: "pt_tt",
 		SaveName: "pt_tt",
 		TreeName: "ttbar_pt",
@@ -391,7 +388,7 @@ var (
 		LegPosLeft: false,
 	}
 
-	var_x1 = &variable.Obj{
+	var_x1 = &ana.Variable{
 		TreeName: "init_x1",
 		Value: new(float32),
 		SaveName: "init_x1",
