@@ -6,4 +6,4 @@ This tool is built on top of [go-hep.org](https://go-hep.org/) and [gonum/v1/plo
 
 ## Example
 
-![example](analyzer-show/eg-plot.png)
+![example](ana-show/eg-plot.png)
