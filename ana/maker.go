@@ -81,13 +81,13 @@ func (ana *Maker) MakeHistos() error {
 			f, t := getTreeFromFile(s.FileName, s.TreeName)
 			defer f.Close()
 			
-			tree := rtree.Chain(t)/*, t, t, t,
+			tree := rtree.Chain(t, t, t, t,
 				t, t, t, t, t, t, t, t, 
 				t, t, t, t, t, t, t, t, 
 				t, t, t, t, t, t, t, t, 
 				t, t, t, t, t, t, t, t,
 				t, t, t, t, t, t, t, t,
-				t, t, t, t, t, t, t, t)*/
+				t, t, t, t, t, t, t, t)
 
 			var rvars []rtree.ReadVar
 			if !ana.WithTreeFormula {
@@ -115,59 +115,62 @@ func (ana *Maker) MakeHistos() error {
 			}
 			
 			// Prepare the weight
-			wstr := "1.0"
-			// wflo := float64(1.0)
-			if s.Weight != "" { wstr = "float64(" + s.Weight + ")" }
-			weight, err := r.Formula(wstr, nil)
-			if err != nil {
-				log.Fatalf("could not create formula: %+v", err)
-			}
-			
-			// Prepare the cut string sample
-			cstr := "true"
-			if s.Cut != "" { cstr = "bool(" + s.Cut + ")" }
-			cutSample, err := r.Formula(cstr, nil)
-			if err != nil {
-				log.Fatalf("could not create formula: %+v", err)
-			}
-
-			// Prepare the cut string for kinematics
-			cutKinem := make([]rtree.Formula, len(ana.Cuts))
-			for ic, cut := range ana.Cuts {
-				cutKinem[ic], err = r.Formula("bool(" + cut.Cut + ")", nil)
+			var wform rtree.Formula
+			getWeight := func () float64 { return float64(1.0) }
+			if s.Weight != "" {
+				wform, err = r.Formula("float64(" + s.Weight + ")", nil)
 				if err != nil {
 					log.Fatalf("could not create formula: %+v", err)
 				}
+				getWeight = func () float64 { return  wform.Eval().(float64) }
 			}
 			
-			// Read the tree
-			err = r.Read(func(ctx rtree.RCtx) error {
-
-				// Sample-level cut - if any
-				if s.Cut != "" {
-					if ! cutSample.Eval().(bool){
-						return nil
+			// Prepare the sample cut
+			var cutSampleform rtree.Formula
+			passSampleCut := func () bool { return true }
+			if s.Cut != "" { 
+				cutSampleform, err = r.Formula("bool(" + s.Cut  + ")", nil)
+				if err != nil {
+					log.Fatalf("could not create formula: %+v", err)
+				}
+				passSampleCut = func () bool { return cutSampleform.Eval().(bool) }
+			}
+			
+			
+			// Prepare the cut string for kinematics
+			cutKinem := make([]rtree.Formula, len(ana.Cuts))
+			passKinemCut := make([]func() bool, len(ana.Cuts))
+			for ic, cut := range ana.Cuts {
+				passKinemCut[ic] = func () bool { return true }
+				if ana.Cuts[ic].Cut != "true" {
+					cutKinem[ic], err = r.Formula("bool(" + cut.Cut + ")", nil)
+					if err != nil {
+						log.Fatalf("could not create formula: %+v", err)
 					}
+					passKinemCut[ic] = func () bool { return cutKinem[ic].Eval().(bool) }
 				}
-
-				// Get the event weight - if any
-				w := float64(1.0)
-				if s.Weight != ""{
-					w = weight.Eval().(float64)
-				}
+			}
+			
+			// Read the tree (event loop)
+			err = r.Read(func(ctx rtree.RCtx) error {
+				
+				// Sample-level cut
+				if !passSampleCut() { return nil }
+			
+				// Get the event weight
+				w := getWeight()
 
 				// Loop over selection and variables
 				for isel := range ana.Cuts {
-					if ana.Cuts[isel].Cut != "true" {
-						if cutKinem[isel].Eval().(bool) {
-							for iv, v := range ana.Variables {
-								val := v.GetValue()
-								if ana.WithTreeFormula {
-									val = var_formula[iv].Eval().(float64)
-								}
-								ana.HistosData[iv][isel][is].Fill(val, w)
-							}
+
+					if !passKinemCut[isel]() { return nil }
+                                        
+					for iv, v := range ana.Variables {
+						val := v.GetValue()
+						if ana.WithTreeFormula {
+							val = var_formula[iv].Eval().(float64)
 						}
+						ana.HistosData[iv][isel][is].Fill(val, w)
 					}
 				}
 				
