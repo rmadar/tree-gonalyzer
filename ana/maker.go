@@ -143,23 +143,30 @@ func (ana *Maker) MakeHistos() error {
 			// Read the tree
 			err = r.Read(func(ctx rtree.RCtx) error {
 
-				// Sample-level cut
-				if ! cutSample.Eval().(bool){
-					return nil
+				// Sample-level cut - if any
+				if s.Cut != "" {
+					if ! cutSample.Eval().(bool){
+						return nil
+					}
 				}
 
-				// Get the event weight
-				w := weight.Eval().(float64)				
+				// Get the event weight - if any
+				w := float64(1.0)
+				if s.Weight != ""{
+					w = weight.Eval().(float64)
+				}
 
 				// Loop over selection and variables
 				for isel := range ana.Cuts {
-					if cutKinem[isel].Eval().(bool) {
-						for iv, v := range ana.Variables {
-							val := v.GetValue()
-							if ana.WithTreeFormula {
-								val = var_formula[iv].Eval().(float64)
+					if ana.Cuts[isel].Cut != "true" {
+						if cutKinem[isel].Eval().(bool) {
+							for iv, v := range ana.Variables {
+								val := v.GetValue()
+								if ana.WithTreeFormula {
+									val = var_formula[iv].Eval().(float64)
+								}
+								ana.HistosData[iv][isel][is].Fill(val, w)
 							}
-							ana.HistosData[iv][isel][is].Fill(val, w)
 						}
 					}
 				}
