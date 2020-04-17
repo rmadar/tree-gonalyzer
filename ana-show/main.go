@@ -20,7 +20,7 @@ func main(){
 	flag.Parse()
 	
 	// Create analyzer object
-	ana := ana.Maker{
+	analyzer := ana.Maker{
 
 		// Test Tree formula
 		WithTreeFormula: *useTreeFormula,
@@ -83,19 +83,19 @@ func main(){
 	}
 	
 	// Create histograms via an event loop
-	err := ana.MakeHistos()
+	err := analyzer.MakeHistos()
 	if err != nil {
 		panic(err)
 	}
 	
 	// Plot them on the same canvas
-	err = ana.PlotHistos()
+	err = analyzer.PlotHistos()
 	if err != nil {
 		panic(err)
 	}
 
 	// Print report
-	ana.PrintReport()
+	analyzer.PrintReport()
 	
 }
 
