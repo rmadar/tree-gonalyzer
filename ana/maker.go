@@ -1,5 +1,5 @@
 // Package allowing to wrap all needed element of a TTree plotting analysis
-package analyzer
+package ana
 
 import (
 	"log"
@@ -18,18 +18,14 @@ import (
 	"go-hep.org/x/hep/hplot/htex"
 	
 	"github.com/rmadar/hplot-style/style"
-	
-	"github.com/rmadar/tree-gonalyzer/sample"
-	"github.com/rmadar/tree-gonalyzer/variable"
-	"github.com/rmadar/tree-gonalyzer/selection"
 )
 
 // Analyzer type
-type Obj struct {
-	Samples []sample.Obj        // Sample on which to run
+type Maker struct {
+	Samples []Sample            // Sample on which to run
 	SamplesGroup string         // Specify how to group samples together
-	Variables []*variable.Obj   // List of variables to plot
-	Cuts []selection.Obj        // List of cuts
+	Variables []*Variable       // List of variables to plot
+	Cuts []Selection            // List of cuts
 	SaveFormat string           // Extension of saved figure 'tex', 'pdf', 'png'
 	CompileLatex bool           // Enable on-the-fly latex compilation of plots
 	HistosData [][][]*hbook.H1D // Currently 3D histo container, later: n-dim [var, sample, cut, syst]
@@ -47,10 +43,10 @@ type Obj struct {
 
 
 // Initialize histograms container shape
-func (ana *Obj) initHistosData(){
+func (ana *Maker) initHistosData(){
 	
 	if len(ana.Cuts) == 0 {
-		ana.Cuts = append(ana.Cuts, selection.Obj{Name:"No-cut", Cut:"true"})
+		ana.Cuts = append(ana.Cuts, Selection{Name:"No-cut", Cut:"true"})
 	}
 
 	ana.HistosData = make([][][]*hbook.H1D, len(ana.Variables))
@@ -67,7 +63,7 @@ func (ana *Obj) initHistosData(){
 }
 
 // Run the event loop to fill all histo across samples / variables (and later: cut / systematics)
-func (ana *Obj) MakeHistos() error {
+func (ana *Maker) MakeHistos() error {
 
 	// Start timing
 	start := time.Now()
@@ -120,6 +116,7 @@ func (ana *Obj) MakeHistos() error {
 			
 			// Prepare the weight
 			wstr := "1.0"
+			// wflo := float64(1.0)
 			if s.Weight != "" { wstr = "float64(" + s.Weight + ")" }
 			weight, err := r.Formula(wstr, nil)
 			if err != nil {
@@ -185,7 +182,7 @@ func (ana *Obj) MakeHistos() error {
 
 
 // Plotting all histograms
-func (ana *Obj) PlotHistos() error {
+func (ana *Maker) PlotHistos() error {
 
 	// Start timing
 	start := time.Now()
@@ -291,7 +288,7 @@ func (ana *Obj) PlotHistos() error {
 			// Save the plot
 			path := "results/"+ana.Cuts[isel].Name
 			if _, err := os.Stat(path); os.IsNotExist(err) {
-				os.Mkdir(path, 0755)
+				os.MkdirAll(path, 0755)
 			}
 			outputname := path + "/" + v.SaveName + "." + format
 			if err := p.Save(5.5*vg.Inch, 4*vg.Inch, outputname); err != nil {
@@ -327,7 +324,7 @@ func getTreeFromFile(filename, treename string) (*groot.File, rtree.Tree) {
 }
 
 // Print processing report
-func (ana Obj) PrintReport() {
+func (ana Maker) PrintReport() {
 
 	// Event, histo info
 	nvars, nsamples, ncuts := len(ana.Variables), len(ana.Samples), len(ana.Cuts)

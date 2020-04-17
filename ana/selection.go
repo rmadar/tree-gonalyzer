@@ -1,6 +1,6 @@
-package selection
+package ana
 
-type Obj struct {
+type Selection struct {
 	Name string
 	Cut string
 }

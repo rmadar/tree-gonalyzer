@@ -1,5 +1,5 @@
 // Manage included samples
-package sample
+package ana
 
 import (
 	"strings"
@@ -15,7 +15,7 @@ import (
 )
 
 
-type Obj struct {
+type Sample struct {
 	Name string
 	Type string
 	FileName string
@@ -35,7 +35,7 @@ type Obj struct {
 }
 
 // Return a hplot.H1D with the proper style
-func (s Obj) CreateHisto(hdata *hbook.H1D) *hplot.H1D {
+func (s Sample) CreateHisto(hdata *hbook.H1D) *hplot.H1D {
 
 	// Create the plotable histo from histogrammed data
 	h := hplot.NewH1D(hdata, hplot.WithYErrBars(s.WithYErrBars))
@@ -77,17 +77,17 @@ func (s Obj) CreateHisto(hdata *hbook.H1D) *hplot.H1D {
 	return h
 }
 
-func (s *Obj) IsData() bool {
+func (s *Sample) IsData() bool {
 	return strings.ToLower(s.Type) == "data"
 }
 
-func (s *Obj) IsBkg() bool {
+func (s *Sample) IsBkg() bool {
 	return strings.ToLower(s.Type) == "bkg" ||
 		strings.ToLower(s.Type) == "bg" ||
 		strings.ToLower(s.Type) == "background"
 }
 
-func (s *Obj) IsSig() bool {
+func (s *Sample) IsSig() bool {
 	return strings.ToLower(s.Type) == "sig" ||
 		strings.ToLower(s.Type) == "signal"
 }

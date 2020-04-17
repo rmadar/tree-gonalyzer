@@ -1,5 +1,5 @@
 // Package managing the variables to plot
-package variable
+package ana
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"go-hep.org/x/hep/hplot"
 )
 
-type Obj struct {
+type Variable struct {
 	Name string
 	SaveName string
 	TreeName string
@@ -28,7 +28,7 @@ type Obj struct {
 }
 
 // Get a value according to it's type
-func (v Obj) GetValue() float64 {
+func (v Variable) GetValue() float64 {
         switch v := v.Value.(type) {
         case *float64:
                 return *v
@@ -42,7 +42,7 @@ func (v Obj) GetValue() float64 {
 }
 
 // Set user-specified style on the plot
-func (v Obj) SetPlotStyle(p *hplot.Plot) {
+func (v Variable) SetPlotStyle(p *hplot.Plot) {
 
 	// Plot labels
 	if &v.PlotTitle != nil {
