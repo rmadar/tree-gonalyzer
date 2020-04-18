@@ -305,26 +305,34 @@ func (ana *Maker) PlotHistos() error {
 
 			var plt hplot.Drawer
 			plt = p
-			figWidth, figHeight := 5.5*vg.Inch, 4.5*vg.Inch
+			figWidth, figHeight := 6*vg.Inch, 4.5*vg.Inch
 
 			// Add ratio plot
 			if ana.RatioPlot {
+
+				// Update figure sizes
 				figWidth, figHeight = 6*vg.Inch, 4.5*vg.Inch
-				
-				rp := hplot.NewRatioPlot()
-				
-				hratio := hplot.NewH1D(DivideHistos(hDataData, hTotData), hplot.WithYErrBars(true))
+
+				// Build up the ratio histo
+				hratio := hplot.NewH1D(divideHistos(hDataData, hTotData), hplot.WithYErrBars(true))
 				style.ApplyToDataHist(hratio)
+
+				// Create ratio plot type
+				rp := hplot.NewRatioPlot()
+
+				// Deal with bottom pannel
+				style.ApplyToBottomPlot(rp.Bottom)
 				rp.Bottom.Add(hratio)
 				rp.Bottom.X.Label.Text = p.X.Label.Text
-				style.ApplyToBottomPlot(rp.Bottom)
 				rp.Bottom.Y.Min = 0.0
 				rp.Bottom.Y.Max = 2.0
-				
+
+				// Deal with Top pannel
 				rp.Top = p
 				rp.Top.HideX()
 				rp.Top.X.Label.Text = ""
 
+				// Update the drawer
 				plt = rp
 			}
 			
@@ -406,7 +414,7 @@ func fmtDuration(d time.Duration) string {
 }
 
 
-// Helper to add two histograms
+// Helper to add two histograms - uncertainty propagation is missing
 func addHistos(h1, h2 *hbook.H1D, m float64) *hbook.H1D {
 	hres := hbook.NewH1D(h1.Len(), h1.XMin(), h1.XMax())
 	for i := 0; i < hres.Len(); i++ {
@@ -415,12 +423,11 @@ func addHistos(h1, h2 *hbook.H1D, m float64) *hbook.H1D {
 		x1, _ := h1.XY(i)
 		hres.Fill(x1, v1 + m*v2)
 	}
-
 	return hres
 }
 
-
-func DivideHistos(hnum, hden *hbook.H1D) *hbook.H1D {
+// Helper to divide two histograms - uncertainty propagation is missing
+func divideHistos(hnum, hden *hbook.H1D) *hbook.H1D {
 	hres := hbook.NewH1D(hnum.Len(), hnum.XMin(), hnum.XMax())
 	for i := 0; i < hres.Len(); i++ {
 		vnum := hnum.Value(i)
@@ -428,6 +435,5 @@ func DivideHistos(hnum, hden *hbook.H1D) *hbook.H1D {
 		x, _ := hnum.XY(i)
 		hres.Fill(x, vnum/vden)
 	}
-
 	return hres
 }

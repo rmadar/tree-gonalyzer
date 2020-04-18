@@ -122,6 +122,8 @@ go-hep.org/x/hep v0.26.1-0.20200416105033-399c28b79b69 h1:9/U6/0b8Ki/p2lTSQ3gLVd
 go-hep.org/x/hep v0.26.1-0.20200416105033-399c28b79b69/go.mod h1:teUhrYhZSuKA5JXbIGqXWSn/LD9XNDE72OHgkP4kPvI=
 go-hep.org/x/hep v0.26.1-0.20200416184637-5f8cb9b022b8 h1:tJ4mvP891L44BJdkjPHBA72ftzFs8DAPxDgqhoBlvAc=
 go-hep.org/x/hep v0.26.1-0.20200416184637-5f8cb9b022b8/go.mod h1:+SCJnScEEQvruSqDZ8JnKbqE/N3K2kFrLW4G/6lFP24=
+go-hep.org/x/hep v0.26.1-0.20200417210631-420d16dfb83e h1:lWpsgCHPFqmPBh9IEqGd8/29tND4JYXCQz4w3yb6XcA=
+go-hep.org/x/hep v0.26.1-0.20200417210631-420d16dfb83e/go.mod h1:qe/aUgzSt+ADFnvRwilXExDjZnQ8LqxhDkTD3fp1g6Y=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
 golang.org/x/crypto v0.0.0-20190510104115-cbcb75029529/go.mod h1:yigFU9vqHzYiE8UmvKecakEJjdnWj3jj499lnFckfCI=
 golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550/go.mod h1:yigFU9vqHzYiE8UmvKecakEJjdnWj3jj499lnFckfCI=
@@ -165,6 +167,7 @@ golang.org/x/net v0.0.0-20190404232315-eb5bcb51f2a3/go.mod h1:t9HGtf8HONx5eT2rtn
 golang.org/x/net v0.0.0-20190620200207-3b0461eec859/go.mod h1:z5CRVTTTmAJ677TzLLGU+0bjPO0LkuOLi4/5GtJWs/s=
 golang.org/x/net v0.0.0-20191011234655-491137f69257/go.mod h1:z5CRVTTTmAJ677TzLLGU+0bjPO0LkuOLi4/5GtJWs/s=
 golang.org/x/net v0.0.0-20200114155413-6afb5195e5aa/go.mod h1:z5CRVTTTmAJ677TzLLGU+0bjPO0LkuOLi4/5GtJWs/s=
+golang.org/x/sync v0.0.0-20190423024810-112230192c58 h1:8gQV6CLnAEikrhgkHFbMAEhagSSnXWGV915qUMm9mrU=
 golang.org/x/sync v0.0.0-20190423024810-112230192c58/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
 golang.org/x/sys v0.0.0-20180830151530-49385e6e1522/go.mod h1:STP8DvDyc/dI5b8T5hshtkjS+E42TnysNCUPdjciGhY=
 golang.org/x/sys v0.0.0-20190215142949-d0b11bdaac8a/go.mod h1:STP8DvDyc/dI5b8T5hshtkjS+E42TnysNCUPdjciGhY=
