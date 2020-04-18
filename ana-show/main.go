@@ -17,6 +17,7 @@ func main(){
 
 	var doLatex = flag.Bool("latex", false, "On-the-fly LaTeX compilation of produced figure")
 	var useTreeFormula = flag.Bool("formula", false, "Use TreeFormula for variable")
+	var noRatio = flag.Bool("r", false, "Disable ratio plot")
 	flag.Parse()
 	
 	// Create analyzer object
@@ -28,14 +29,15 @@ func main(){
 		// Output figure
 		SaveFormat: "tex",
 		CompileLatex: *doLatex,
-
+		RatioPlot: !*noRatio,
+		
 		// Histogram representation
 		Normalize: false,
 		DontStack: false,		
 
 		// Set of cuts
-		/*Cuts: []ana.Selection{
-			ana.Selection{
+		Cuts: []ana.Selection{
+			/*ana.Selection{
 				Name: "cut1",
 				Cut:  "l_pt>30 && ttbar_m<1000",
 			},
@@ -50,21 +52,26 @@ func main(){
 			ana.Selection{
 				Name: "cut4",
 				Cut:  "l_pt>100 && ttbar_m<1000",
-			},
-		},*/
-
+			},*/
+		},
+		
 		// Included samples
 		Samples: []ana.Sample{
-			spl_data,
-			spl_bkg1,
-			spl_bkg1bis,
-			spl_bkg2,
-			spl_alt,
+			spl_data_bench,
+			spl_bkg0_bench,
+			spl_bkg1_bench,
+			spl_bkg2_bench,			
+			//spl_data,
+			//spl_bkg1,
+			//spl_bkg1bis,
+			//spl_bkg2,
+			//spl_alt,
 		},
 
 		// Set of observable to plot
 		Variables: []*ana.Variable{
-                        var_pt_lep,
+			var_m_tt,
+                        /*var_pt_lep,
 			var_dphi,
 			var_Ckk,
 			var_Crr,
@@ -76,9 +83,8 @@ func main(){
 			var_pt_t,
 			var_eta_t,
 			var_pt_vsum,
-			var_m_tt,
 			var_pt_tt,
-			var_x1,
+			var_x1,*/
 		},
 	}
 	
@@ -101,6 +107,52 @@ func main(){
 
 // Define all samples and variables of the analysis
 var (
+
+	spl_data_bench = ana.Sample{
+		Name: "data",
+		Type: "data",
+		FileName: "/home/rmadar/cernbox/ATLAS/Analysis/SM-SpinCorr/data/outputs/MC16a.410472.PhPy8EG.TruthOnly.root",
+		TreeName: "truth",
+		Weight: "1 + 0.1*(t_pt/100)",
+		LegLabel: `Pseudo-data`, 
+		CircleMarkers: true,
+		CircleColor: style.SmoothBlack, 
+		CircleSize: 3,
+		WithYErrBars: true,
+		YErrBarsLineWidth: 2,
+		YErrBarsCapWidth: 5,
+	}
+	
+	spl_bkg0_bench = ana.Sample{
+		Name: "bkg1",
+		Type: "bkg",
+		FileName: "/home/rmadar/cernbox/ATLAS/Analysis/SM-SpinCorr/data/outputs/MC16a.410472.PhPy8EG.TruthOnly.root",
+		TreeName: "truth",
+		Weight: "0.33",
+		LegLabel: `Background 1`,
+		FillColor: color.NRGBA{R:  0, G: 102, B: 255, A: 230},
+	}
+	
+	spl_bkg1_bench = ana.Sample{
+		Name: "bkg2",
+		Type: "bkg",
+		FileName: "/home/rmadar/cernbox/ATLAS/Analysis/SM-SpinCorr/data/outputs/MC16a.410472.PhPy8EG.TruthOnly.root",
+		TreeName: "truth",
+		Weight: "0.33",
+		LegLabel: `Background 2`,
+		FillColor: color.NRGBA{R: 200, G:   30, B: 60, A: 230},
+	}
+	
+	spl_bkg2_bench = ana.Sample{
+		Name: "bkg3",
+		Type: "bkg",
+		FileName: "/home/rmadar/cernbox/ATLAS/Analysis/SM-SpinCorr/data/outputs/MC16a.410472.PhPy8EG.TruthOnly.root",
+		TreeName: "truth",
+		Weight: "0.33",
+		LegLabel: `Background 3`,
+		FillColor: color.NRGBA{R:  0, G: 255, B: 102, A: 230},
+	}
+	
 	// samples
 	spl_data = ana.Sample{
 		Name: "data",
@@ -116,8 +168,7 @@ var (
 		YErrBarsLineWidth: 2,
 		YErrBarsCapWidth: 5,
 	}
-
-
+		
 	spl_bkg1 = ana.Sample{
 		Name: "bkg1",
 		Type: "bkg",
@@ -336,9 +387,10 @@ var (
 		Xmax: 500,
 		PlotTitle: `{\tt TTree} {\bf GO}nalyzer -- $pp \to t\bar{t}$ @ $13\,$ TeV`,
 		XLabel: `$p^{t}_{T}$ [GeV]`,
-		YLabel: `PDF($p^{t}_{T}$)`,
+		YLabel: `Number of Entries`,
 		LegPosTop: true,
 		LegPosLeft: false,
+		YTickFormat: "%2.0f",
 	}
 
 	var_eta_t = &ana.Variable{
