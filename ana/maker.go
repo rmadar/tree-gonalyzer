@@ -15,7 +15,7 @@ import (
 	
 	"go-hep.org/x/hep/hbook"
 	"go-hep.org/x/hep/hplot"
-	"go-hep.org/x/hep/hplot/htex"
+	//"go-hep.org/x/hep/hplot/htex"
 	
 	"github.com/rmadar/hplot-style/style"
 )
@@ -27,6 +27,7 @@ type Maker struct {
 	Variables []*Variable       // List of variables to plot
 	Cuts []Selection            // List of cuts
 	SaveFormat string           // Extension of saved figure 'tex', 'pdf', 'png'
+	RatioPlot bool              // Enable ratio plot
 	CompileLatex bool           // Enable on-the-fly latex compilation of plots
 	HistosData [][][]*hbook.H1D // Currently 3D histo container, later: n-dim [var, sample, cut, syst]
 	HistosPlot [][][]*hplot.H1D // Currently 3D histo container, later: n-dim [var, sample, cut, syst]
@@ -81,13 +82,13 @@ func (ana *Maker) MakeHistos() error {
 			f, t := getTreeFromFile(s.FileName, s.TreeName)
 			defer f.Close()
 			
-			tree := rtree.Chain(t, t, t, t,
+			tree := rtree.Chain(t)/*, t, t, t,
 				t, t, t, t, t, t, t, t, 
 				t, t, t, t, t, t, t, t, 
 				t, t, t, t, t, t, t, t, 
 				t, t, t, t, t, t, t, t,
 				t, t, t, t, t, t, t, t,
-				t, t, t, t, t, t, t, t)
+				t, t, t, t, t, t, t, t)*/
 
 			var rvars []rtree.ReadVar
 			if !ana.WithTreeFormula {
@@ -224,12 +225,11 @@ func (ana *Maker) PlotHistos() error {
 		// Loop over selections
 		for isel, hsamples := range h_sel_samples {
 			
-			// Create a new styled plot
-			p := hplot.New()
-			if ana.CompileLatex {
-				p.Latex = htex.DefaultHandler
-			}
+			// Create a new styled plot and figure
+			p := hplot.New();
 			style.ApplyToPlot(p)
+
+			// Propagate the user-defined style of the variable to the plot
 			v.SetPlotStyle(p)
 			
 			// Additionnal legend style
@@ -246,9 +246,11 @@ func (ana *Maker) PlotHistos() error {
 			
 			// Keep track of the normalization for every sample
 			for _, h := range hsamples { norms = append(norms, h.Integral()) }
-			Nbkg := floats.Sum(norms[1:])
+			Nbkg := floats.Sum(norms[1:]) // still assume that data is i==1
 			
 			// Loop over samples
+			hTotData  := hbook.NewH1D(v.Nbins, v.Xmin, v.Xmax)
+			hDataData := hbook.NewH1D(v.Nbins, v.Xmin, v.Xmax)
 			for is, h := range hsamples {
 				
 				// Deal with normalize option for data
@@ -264,7 +266,12 @@ func (ana *Maker) PlotHistos() error {
 						h.Scale(1./Nbkg)
 					}
 				}
-			
+
+				// Get the sum of all histos
+				if !ana.Samples[is].IsData() {
+					hTotData = addHistos(h, hTotData, float64(1))
+				}
+					
 				// Get plottable histogram
 				ana.HistosPlot[iv][isel][is] = ana.Samples[is].CreateHisto(h)
 				
@@ -274,6 +281,7 @@ func (ana *Maker) PlotHistos() error {
 				// Keep data appart from backgrounds (FIX-ME: assumed to be the first sample for now)
 				if ana.Samples[is].IsData() {
 					hdata = ana.HistosPlot[iv][isel][is]
+					hDataData = h
 				}
 				if ana.Samples[is].IsBkg() {  
 					hbkgs = append(hbkgs, ana.HistosPlot[iv][isel][is])
@@ -294,14 +302,42 @@ func (ana *Maker) PlotHistos() error {
 				p.Add(stack)
 			}
 			p.Add(hdata)
-		
-			// Save the plot
+
+			var plt hplot.Drawer
+			plt = p
+			figWidth, figHeight := 5.5*vg.Inch, 4.5*vg.Inch
+
+			// Add ratio plot
+			if ana.RatioPlot {
+				figWidth, figHeight = 6*vg.Inch, 4.5*vg.Inch
+				
+				rp := hplot.NewRatioPlot()
+				
+				hratio := hplot.NewH1D(DivideHistos(hDataData, hTotData), hplot.WithYErrBars(true))
+				style.ApplyToDataHist(hratio)
+				rp.Bottom.Add(hratio)
+				rp.Bottom.X.Label.Text = p.X.Label.Text
+				style.ApplyToBottomPlot(rp.Bottom)
+				rp.Bottom.Y.Min = 0.0
+				rp.Bottom.Y.Max = 2.0
+				
+				rp.Top = p
+				rp.Top.HideX()
+				rp.Top.X.Label.Text = ""
+
+				plt = rp
+			}
+			
+			// Save the figure
+			f := hplot.Wrap(plt);
+			style.ApplyToFigure(f, ana.CompileLatex)
+
 			path := "results/"+ana.Cuts[isel].Name
 			if _, err := os.Stat(path); os.IsNotExist(err) {
 				os.MkdirAll(path, 0755)
 			}
 			outputname := path + "/" + v.SaveName + "." + format
-			if err := p.Save(5.5*vg.Inch, 4*vg.Inch, outputname); err != nil {
+			if err := hplot.Save(f, figWidth, figHeight, outputname); err != nil {
 				log.Fatalf("error saving plot: %v\n", err)
 			}
 		}
@@ -349,7 +385,7 @@ func (ana Maker) PrintReport() {
 	// Formating
 	str_template := "\n Processing report:\n"
 	str_template += "    - %v histograms filled over %.0f kEvts (%v samples, %v variables, %v selections)\n"
-	str_template += "    - running time: %.0f ms/kEvt (%s for %.0f kEvts)\n" 
+	str_template += "    - running time: %.1f ms/kEvt (%s for %.0f kEvts)\n" 
 	str_template += "    - time fraction: %.0f%% (event loop), %.0f%% (plotting)\n\n"
 
 	fmt.Printf(str_template,
@@ -367,4 +403,31 @@ func fmtDuration(d time.Duration) string {
 	d -= m * time.Minute
 	s := d / time.Second
 	return fmt.Sprintf("%02d:%02d:%02d", h, m, s)
+}
+
+
+// Helper to add two histograms
+func addHistos(h1, h2 *hbook.H1D, m float64) *hbook.H1D {
+	hres := hbook.NewH1D(h1.Len(), h1.XMin(), h1.XMax())
+	for i := 0; i < hres.Len(); i++ {
+		v1 := h1.Value(i)
+		v2 := h2.Value(i)
+		x1, _ := h1.XY(i)
+		hres.Fill(x1, v1 + m*v2)
+	}
+
+	return hres
+}
+
+
+func DivideHistos(hnum, hden *hbook.H1D) *hbook.H1D {
+	hres := hbook.NewH1D(hnum.Len(), hnum.XMin(), hnum.XMax())
+	for i := 0; i < hres.Len(); i++ {
+		vnum := hnum.Value(i)
+		vden := hden.Value(i)
+		x, _ := hnum.XY(i)
+		hres.Fill(x, vnum/vden)
+	}
+
+	return hres
 }

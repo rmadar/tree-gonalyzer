@@ -10,7 +10,7 @@ import (
 
 	"go-hep.org/x/hep/hbook"
 	"go-hep.org/x/hep/hplot"
-
+	
 	"github.com/rmadar/hplot-style/style"
 )
 
