@@ -37,7 +37,7 @@ func main(){
 
 		// Set of cuts
 		Cuts: []ana.Selection{
-			/*ana.Selection{
+			ana.Selection{
 				Name: "cut1",
 				Cut:  "l_pt>30 && ttbar_m<1000",
 			},
@@ -52,7 +52,7 @@ func main(){
 			ana.Selection{
 				Name: "cut4",
 				Cut:  "l_pt>100 && ttbar_m<1000",
-			},*/
+			},
 		},
 		
 		// Included samples
@@ -71,7 +71,7 @@ func main(){
 		// Set of observable to plot
 		Variables: []*ana.Variable{
 			var_m_tt,
-                        /*var_pt_lep,
+                        var_pt_lep,
 			var_dphi,
 			var_Ckk,
 			var_Crr,
@@ -84,7 +84,7 @@ func main(){
 			var_eta_t,
 			var_pt_vsum,
 			var_pt_tt,
-			var_x1,*/
+			var_x1,
 		},
 	}
 	

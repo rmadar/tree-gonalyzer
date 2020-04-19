@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"time"
 	"os"
+	"math"
 	
 	"gonum.org/v1/gonum/floats"
 	"gonum.org/v1/plot/vg"
@@ -15,7 +16,7 @@ import (
 	
 	"go-hep.org/x/hep/hbook"
 	"go-hep.org/x/hep/hplot"
-	//"go-hep.org/x/hep/hplot/htex"
+	"go-hep.org/x/hep/hplot/htex"
 	
 	"github.com/rmadar/hplot-style/style"
 )
@@ -224,11 +225,11 @@ func (ana *Maker) PlotHistos() error {
 
 		// Loop over selections
 		for isel, hsamples := range h_sel_samples {
-			
+
 			// Create a new styled plot and figure
 			p := hplot.New();
 			style.ApplyToPlot(p)
-
+			
 			// Propagate the user-defined style of the variable to the plot
 			v.SetPlotStyle(p)
 			
@@ -236,6 +237,12 @@ func (ana *Maker) PlotHistos() error {
 			p.Legend.Padding = 0.1 * vg.Inch
 			p.Legend.ThumbnailWidth = 25
 			p.Legend.TextStyle.Font.Size = 12
+
+			// Handle on-the-fly LaTeX compilation
+			var latex htex.Handler = htex.NoopHandler{}
+			if ana.CompileLatex {
+				latex = htex.NewGoHandler(10, "pdflatex")
+			}
 			
 			// Prepare histogram (possible) stacking via []*hplot.H1D
 			var (
@@ -338,7 +345,7 @@ func (ana *Maker) PlotHistos() error {
 			
 			// Save the figure
 			f := hplot.Wrap(plt);
-			style.ApplyToFigure(f, ana.CompileLatex)
+			style.ApplyToFigure(f, latex)
 
 			path := "results/"+ana.Cuts[isel].Name
 			if _, err := os.Stat(path); os.IsNotExist(err) {
@@ -433,7 +440,14 @@ func divideHistos(hnum, hden *hbook.H1D) *hbook.H1D {
 		vnum := hnum.Value(i)
 		vden := hden.Value(i)
 		x, _ := hnum.XY(i)
-		hres.Fill(x, vnum/vden)
+		ratio := vnum/vden
+		if math.IsNaN(ratio) {
+			hres.Fill(x, 0)
+		} else {
+			hres.Fill(x, ratio)
+		}
+		
+
 	}
 	return hres
 }
