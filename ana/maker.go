@@ -202,6 +202,12 @@ func (ana *Maker) PlotHistos() error {
 	// Plot format
 	format := "tex"
 	if ana.SaveFormat != "" { format = ana.SaveFormat }
+
+	// Handle on-the-fly LaTeX compilation
+	var latex htex.Handler = htex.NoopHandler{}
+	if ana.CompileLatex {
+		latex = htex.NewGoHandler(15, "pdflatex")
+	}
 	
 	// Inititialize histograms
 	ana.HistosPlot = make([][][]*hplot.H1D, len(ana.Variables))
@@ -216,7 +222,7 @@ func (ana *Maker) PlotHistos() error {
 	if len(ana.HistosData) == 0 {
 		log.Fatalf("There is no histograms. Please make sure that 'MakeHistos()' is called before 'PlotHistos()'")
 	}
-		
+	
 	// Loop over variables and get histo for all samples
 	for iv, h_sel_samples := range ana.HistosData { 
 
@@ -237,12 +243,6 @@ func (ana *Maker) PlotHistos() error {
 			p.Legend.Padding = 0.1 * vg.Inch
 			p.Legend.ThumbnailWidth = 25
 			p.Legend.TextStyle.Font.Size = 12
-
-			// Handle on-the-fly LaTeX compilation
-			var latex htex.Handler = htex.NoopHandler{}
-			if ana.CompileLatex {
-				latex = htex.NewGoHandler(10, "pdflatex")
-			}
 			
 			// Prepare histogram (possible) stacking via []*hplot.H1D
 			var (
@@ -344,9 +344,10 @@ func (ana *Maker) PlotHistos() error {
 			}
 			
 			// Save the figure
-			f := hplot.Wrap(plt);
-			style.ApplyToFigure(f, latex)
-
+			f := hplot.Figure(plt, hplot.WithLatexHandler(latex))
+			// f := hplot.Figure(plt, hplot.WithLatexHandler(htex.DefaultHandler))
+			style.ApplyToFigure(f)
+			
 			path := "results/"+ana.Cuts[isel].Name
 			if _, err := os.Stat(path); os.IsNotExist(err) {
 				os.MkdirAll(path, 0755)
@@ -356,8 +357,14 @@ func (ana *Maker) PlotHistos() error {
 				log.Fatalf("error saving plot: %v\n", err)
 			}
 		}
-	}
 
+		if latex, ok := latex.(*htex.GoHandler); ok {
+			if err := latex.Wait(); err != nil {
+				log.Fatalf("could not compiler latex document(s): %+v", err)
+			}
+		}
+	}
+	
 	// End timing
 	ana.timePlot = time.Now().Sub(start)
 	
