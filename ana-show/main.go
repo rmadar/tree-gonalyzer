@@ -36,7 +36,7 @@ func main(){
 		DontStack: false,		
 
 		// Set of cuts
-		/*Cuts: []ana.Selection{
+		Cuts: []ana.Selection{
 			ana.Selection{
 				Name: "cut1",
 				Cut:  "l_pt>30 && ttbar_m<1000",
@@ -53,19 +53,19 @@ func main(){
 				Name: "cut4",
 				Cut:  "l_pt>100 && ttbar_m<1000",
 			},
-		},*/
+		},
 		
 		// Included samples
 		Samples: []ana.Sample{
-			spl_data_bench,
-			spl_bkg0_bench,
-			spl_bkg1_bench,
-			spl_bkg2_bench,			
-			//spl_data,
-			//spl_bkg1,
-			//spl_bkg1bis,
-			//spl_bkg2,
-			//spl_alt,
+			//spl_data_bench,
+			//spl_bkg0_bench,
+			//spl_bkg1_bench,
+			//spl_bkg2_bench,			
+			spl_data,
+			spl_bkg1,
+			spl_bkg1bis,
+			spl_bkg2,
+			spl_alt,
 		},
 
 		// Set of observable to plot
