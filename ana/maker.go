@@ -166,13 +166,14 @@ func (ana *Maker) MakeHistos() error {
 				for isel := range ana.Cuts {
 
 					if !passKinemCut[isel]() { return nil }
-                                        
+
+					_ = w
 					for iv, v := range ana.Variables {
 						val := v.GetValue()
 						if ana.WithTreeFormula {
 							val = var_formula[iv].Eval().(float64)
 						}
-						ana.HistosData[iv][isel][is].Fill(val, w)
+						ana.HistosData[iv][isel][is].Fill(val, float64(1.0))
 					}
 				}
 				
@@ -321,18 +322,25 @@ func (ana *Maker) PlotHistos() error {
 				figWidth, figHeight = 6*vg.Inch, 4.5*vg.Inch
 
 				// Build up the ratio histo
-				hratio := hplot.NewH1D(divideHistos(hDataData, hTotData), hplot.WithYErrBars(true))
-				style.ApplyToDataHist(hratio)
-
+				//_, _ = hDataData, hTotData
+				fmt.Println("before division")
+				s2d_ratio_data, err := hbook.DivideH1D(hDataData, hTotData)
+				if err != nil {
+					log.Fatal("cannot divide histo for the ratio plot")
+				}
+				fmt.Println("after division")
+				s2d_ratio := hplot.NewS2D(s2d_ratio_data, hplot.WithYErrBars(true)) 
+				style.ApplyToDataS2D(s2d_ratio)
+				
 				// Create ratio plot type
 				rp := hplot.NewRatioPlot()
 
 				// Deal with bottom pannel
 				style.ApplyToBottomPlot(rp.Bottom)
-				rp.Bottom.Add(hratio)
+				rp.Bottom.Add(s2d_ratio)
 				rp.Bottom.X.Label.Text = p.X.Label.Text
-				rp.Bottom.Y.Min = 0.0
-				rp.Bottom.Y.Max = 2.0
+				//rp.Bottom.Y.Min = 0.0
+				//rp.Bottom.Y.Max = 2.0
 
 				// Deal with Top pannel
 				rp.Top = p
@@ -342,13 +350,12 @@ func (ana *Maker) PlotHistos() error {
 				// Update the drawer
 				plt = rp
 			}
-			
+
 			// Save the figure
 			f := hplot.Figure(plt)
 			style.ApplyToFigure(f)
 			f.Latex = latex
-			//f.Latex = htex.DefaultHandler
-				
+							
 			path := "results/"+ana.Cuts[isel].Name
 			if _, err := os.Stat(path); os.IsNotExist(err) {
 				os.MkdirAll(path, 0755)
@@ -357,14 +364,18 @@ func (ana *Maker) PlotHistos() error {
 			if err := hplot.Save(f, figWidth, figHeight, outputname); err != nil {
 				log.Fatalf("error saving plot: %v\n", err)
 			}
-		}
-
-		if latex, ok := latex.(*htex.GoHandler); ok {
-			if err := latex.Wait(); err != nil {
-				log.Fatalf("could not compiler latex document(s): %+v", err)
-			}
+			fmt.Println("Figure saved")
 		}
 	}
+	
+
+	fmt.Println("Staring latex handling")
+	if latex, ok := latex.(*htex.GoHandler); ok {
+		if err := latex.Wait(); err != nil {
+			log.Fatalf("could not compiler latex document(s): %+v", err)
+		}
+	}
+	fmt.Println("End latex handling")
 	
 	// End timing
 	ana.timePlot = time.Now().Sub(start)
@@ -454,8 +465,6 @@ func divideHistos(hnum, hden *hbook.H1D) *hbook.H1D {
 		} else {
 			hres.Fill(x, ratio)
 		}
-		
-
 	}
 	return hres
 }

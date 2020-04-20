@@ -47,7 +47,7 @@ func (s Sample) CreateHisto(hdata *hbook.H1D) *hplot.H1D {
 
 	// Markers
 	if s.CircleMarkers {
-		style.SetCircleMarkersTo(h)
+		style.SetCircleMarkersToHist(h)
 		if &s.CircleColor != nil {
 			h.GlyphStyle.Color = s.CircleColor
 		} else {
