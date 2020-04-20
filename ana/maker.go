@@ -83,13 +83,13 @@ func (ana *Maker) MakeHistos() error {
 			f, t := getTreeFromFile(s.FileName, s.TreeName)
 			defer f.Close()
 			
-			tree := rtree.Chain(t)/*, t, t, t,
+			tree := rtree.Chain(t, t, t, t,
 				t, t, t, t, t, t, t, t, 
 				t, t, t, t, t, t, t, t, 
 				t, t, t, t, t, t, t, t, 
 				t, t, t, t, t, t, t, t,
 				t, t, t, t, t, t, t, t,
-				t, t, t, t, t, t, t, t)*/
+				t, t, t, t, t, t, t, t)
 
 			var rvars []rtree.ReadVar
 			if !ana.WithTreeFormula {
@@ -206,7 +206,7 @@ func (ana *Maker) PlotHistos() error {
 	// Handle on-the-fly LaTeX compilation
 	var latex htex.Handler = htex.NoopHandler{}
 	if ana.CompileLatex {
-		latex = htex.NewGoHandler(15, "pdflatex")
+		latex = htex.NewGoHandler(-1, "pdflatex")
 	}
 	
 	// Inititialize histograms
@@ -344,10 +344,11 @@ func (ana *Maker) PlotHistos() error {
 			}
 			
 			// Save the figure
-			f := hplot.Figure(plt, hplot.WithLatexHandler(latex))
-			// f := hplot.Figure(plt, hplot.WithLatexHandler(htex.DefaultHandler))
+			f := hplot.Figure(plt)
 			style.ApplyToFigure(f)
-			
+			f.Latex = latex
+			//f.Latex = htex.DefaultHandler
+				
 			path := "results/"+ana.Cuts[isel].Name
 			if _, err := os.Stat(path); os.IsNotExist(err) {
 				os.MkdirAll(path, 0755)
@@ -448,7 +449,7 @@ func divideHistos(hnum, hden *hbook.H1D) *hbook.H1D {
 		vden := hden.Value(i)
 		x, _ := hnum.XY(i)
 		ratio := vnum/vden
-		if math.IsNaN(ratio) {
+		if math.IsNaN(ratio) || math.IsInf(ratio, 0) {
 			hres.Fill(x, 0)
 		} else {
 			hres.Fill(x, ratio)
