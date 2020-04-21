@@ -3,35 +3,34 @@ package ana
 
 import (
 	"strings"
-	
+
 	"image/color"
 
-	"gonum.org/v1/plot/vg"	
+	"gonum.org/v1/plot/vg"
 
 	"go-hep.org/x/hep/hbook"
 	"go-hep.org/x/hep/hplot"
-	
+
 	"github.com/rmadar/hplot-style/style"
 )
 
-
 type Sample struct {
-	Name string
-	Type string
-	FileName string
-	TreeName string
-	Weight string
-	Cut string
-	LegLabel string
-	LineColor color.NRGBA
-	LineWidth vg.Length
-	FillColor color.NRGBA
-	CircleMarkers bool
-	CircleSize vg.Length
-	CircleColor color.NRGBA
-	WithYErrBars bool
+	Name              string
+	Type              string
+	FileName          string
+	TreeName          string
+	Weight            string
+	Cut               string
+	LegLabel          string
+	LineColor         color.NRGBA
+	LineWidth         vg.Length
+	FillColor         color.NRGBA
+	CircleMarkers     bool
+	CircleSize        vg.Length
+	CircleColor       color.NRGBA
+	WithYErrBars      bool
 	YErrBarsLineWidth vg.Length
-	YErrBarsCapWidth vg.Length
+	YErrBarsCapWidth  vg.Length
 }
 
 // Return a hplot.H1D with the proper style
@@ -65,7 +64,7 @@ func (s Sample) CreateHisto(hdata *hbook.H1D) *hplot.H1D {
 		} else {
 			h.YErrs.LineStyle.Color = s.LineColor
 		}
-		
+
 		if &s.YErrBarsLineWidth != nil {
 			h.YErrs.LineStyle.Width = s.YErrBarsLineWidth
 		}
@@ -91,4 +90,3 @@ func (s *Sample) IsSig() bool {
 	return strings.ToLower(s.Type) == "sig" ||
 		strings.ToLower(s.Type) == "signal"
 }
-

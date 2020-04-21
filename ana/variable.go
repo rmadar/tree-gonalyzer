@@ -3,42 +3,42 @@ package ana
 
 import (
 	"fmt"
-	
+
 	"go-hep.org/x/hep/hplot"
 )
 
 type Variable struct {
-	Name string
-	SaveName string
-	TreeName string
-	Value interface{}
-	Nbins int
-	Xmin, Xmax float64
-	PlotTitle string
-	XLabel string
-	YLabel string
+	Name        string
+	SaveName    string
+	TreeName    string
+	Value       interface{}
+	Nbins       int
+	Xmin, Xmax  float64
+	PlotTitle   string
+	XLabel      string
+	YLabel      string
 	XTickFormat string
 	YTickFormat string
-	RangeXmin float64
-	RangeXmax float64
-	RangeYmin float64
-	RangeYmax float64
-	LegPosTop bool
-	LegPosLeft bool
+	RangeXmin   float64
+	RangeXmax   float64
+	RangeYmin   float64
+	RangeYmax   float64
+	LegPosTop   bool
+	LegPosLeft  bool
 }
 
 // Get a value according to it's type
 func (v Variable) GetValue() float64 {
-        switch v := v.Value.(type) {
-        case *float64:
-                return *v
-        case *float32:
-                return float64(*v)
+	switch v := v.Value.(type) {
+	case *float64:
+		return *v
+	case *float32:
+		return float64(*v)
 	case *bool:
-		return map[bool]float64{true: 1, false:0}[*v]
-        default:
-                panic(fmt.Errorf("invalid variable value-type %T", v))
-        }
+		return map[bool]float64{true: 1, false: 0}[*v]
+	default:
+		panic(fmt.Errorf("invalid variable value-type %T", v))
+	}
 }
 
 // Set user-specified style on the plot
@@ -68,7 +68,7 @@ func (v Variable) SetPlotStyle(p *hplot.Plot) {
 	if &v.RangeYmax != nil {
 		p.X.Max = v.RangeXmax
 	}
-	
+
 	// Axis ticks tuning
 	if v.XTickFormat != "" {
 		p.X.Tick.Marker = hplot.Ticks{N: 10, Format: v.XTickFormat}
@@ -76,14 +76,14 @@ func (v Variable) SetPlotStyle(p *hplot.Plot) {
 	if v.YTickFormat != "" {
 		p.Y.Tick.Marker = hplot.Ticks{N: 10, Format: v.YTickFormat}
 	}
-	
+
 	// Legend setup
 	if &v.LegPosTop != nil {
 		p.Legend.Top = v.LegPosTop
 		if p.Legend.Top {
 			p.Legend.YOffs = -5
 		} else {
-			p.Legend.YOffs =  5
+			p.Legend.YOffs = 5
 		}
 	}
 	if &p.Legend.Left != nil {
