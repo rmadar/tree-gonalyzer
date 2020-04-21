@@ -32,14 +32,14 @@ func main(){
 		RatioPlot: !*noRatio,
 		
 		// Histogram representation
-		Normalize: false,
+		Normalize: true,
 		DontStack: false,		
 
 		// Set of cuts
 		Cuts: []ana.Selection{
 			ana.Selection{
 				Name: "cut1",
-				Cut:  "l_pt>30 && ttbar_m<1000",
+				Cut:  "l_pt>10 && ttbar_m<1000",
 			},
 			ana.Selection{
 				Name: "cut2",
@@ -57,15 +57,15 @@ func main(){
 		
 		// Included samples
 		Samples: []ana.Sample{
-			//spl_data_bench,
-			//spl_bkg0_bench,
-			//spl_bkg1_bench,
-			//spl_bkg2_bench,			
-			spl_data,
-			spl_bkg1,
-			spl_bkg1bis,
-			spl_bkg2,
-			spl_alt,
+			spl_data_bench,
+			spl_bkg0_bench,
+			spl_bkg1_bench,
+			spl_bkg2_bench,			
+			//spl_data,
+			//spl_bkg1,
+			//spl_bkg1bis,
+			//spl_bkg2,
+			//spl_alt,
 		},
 
 		// Set of observable to plot
@@ -113,7 +113,7 @@ var (
 		Type: "data",
 		FileName: "/home/rmadar/cernbox/ATLAS/Analysis/SM-SpinCorr/data/outputs/MC16a.410472.PhPy8EG.TruthOnly.root",
 		TreeName: "truth",
-		Weight: "1 + 0.1*(t_pt/100)",
+		Weight: "0.8 + 0.1*(t_pt/100)",
 		LegLabel: `Pseudo-data`, 
 		CircleMarkers: true,
 		CircleColor: style.SmoothBlack, 
@@ -387,10 +387,11 @@ var (
 		Xmax: 500,
 		PlotTitle: `{\tt TTree} {\bf GO}nalyzer -- $pp \to t\bar{t}$ @ $13\,$ TeV`,
 		XLabel: `$p^{t}_{T}$ [GeV]`,
-		YLabel: `Number of Entries`,
+		// YLabel: `Number of Entries`,
+		YLabel: `PDF($p^{t}_{T}$)`,
 		LegPosTop: true,
 		LegPosLeft: false,
-		YTickFormat: "%2.0f",
+		//YTickFormat: "%2.0f",
 	}
 
 	var_eta_t = &ana.Variable{

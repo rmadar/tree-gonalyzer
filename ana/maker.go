@@ -83,13 +83,13 @@ func (ana *Maker) MakeHistos() error {
 			f, t := getTreeFromFile(s.FileName, s.TreeName)
 			defer f.Close()
 			
-			tree := rtree.Chain(t, t, t, t,
+			tree := rtree.Chain(t)/*, t, t, t,
 				t, t, t, t, t, t, t, t, 
 				t, t, t, t, t, t, t, t, 
 				t, t, t, t, t, t, t, t, 
 				t, t, t, t, t, t, t, t,
 				t, t, t, t, t, t, t, t,
-				t, t, t, t, t, t, t, t)
+				t, t, t, t, t, t, t, t)*/
 
 			var rvars []rtree.ReadVar
 			if !ana.WithTreeFormula {
@@ -167,13 +167,12 @@ func (ana *Maker) MakeHistos() error {
 
 					if !passKinemCut[isel]() { return nil }
 
-					_ = w
 					for iv, v := range ana.Variables {
 						val := v.GetValue()
 						if ana.WithTreeFormula {
 							val = var_formula[iv].Eval().(float64)
 						}
-						ana.HistosData[iv][isel][is].Fill(val, float64(1.0))
+						ana.HistosData[iv][isel][is].Fill(val, w)
 					}
 				}
 				
@@ -277,7 +276,7 @@ func (ana *Maker) PlotHistos() error {
 
 				// Get the sum of all histos
 				if !ana.Samples[is].IsData() {
-					hTotData = addHistos(h, hTotData, float64(1))
+					hTotData = hbook.AddH1D(h, hTotData)
 				}
 					
 				// Get plottable histogram
@@ -322,26 +321,32 @@ func (ana *Maker) PlotHistos() error {
 				figWidth, figHeight = 6*vg.Inch, 4.5*vg.Inch
 
 				// Build up the ratio histo
-				//_, _ = hDataData, hTotData
-				fmt.Println("before division")
-				s2d_ratio_data, err := hbook.DivideH1D(hDataData, hTotData)
+				s2d_ratio_dataTMP, err := hbook.DivideH1D(hDataData, hTotData, true)
 				if err != nil {
 					log.Fatal("cannot divide histo for the ratio plot")
 				}
-				fmt.Println("after division")
-				s2d_ratio := hplot.NewS2D(s2d_ratio_data, hplot.WithYErrBars(true)) 
+				/*var pts = make([]hbook.Point2D, 0, len(s2d_ratio_dataTMP.Points()))
+				for i, pt := range s2d_ratio_dataTMP.Points() {
+					// log.Printf("ratio[%d]: %#v", i, pt)
+					if math.IsNaN(pt.ErrY.Min) || math.IsNaN(pt.ErrY.Max) {
+						continue
+					}
+					pts = append(pts, pt)
+				}
+				s2d_ratio := hplot.NewS2D(hbook.NewS2D(pts...), hplot.WithYErrBars(true))*/
+				s2d_ratio := hplot.NewS2D(s2d_ratio_dataTMP, hplot.WithYErrBars(true))
 				style.ApplyToDataS2D(s2d_ratio)
 				
 				// Create ratio plot type
 				rp := hplot.NewRatioPlot()
 
 				// Deal with bottom pannel
-				style.ApplyToBottomPlot(rp.Bottom)
+				style.ApplyToBottomPlot(rp.Bottom)				
 				rp.Bottom.Add(s2d_ratio)
-				rp.Bottom.X.Label.Text = p.X.Label.Text
-				//rp.Bottom.Y.Min = 0.0
-				//rp.Bottom.Y.Max = 2.0
-
+				rp.Bottom.X = p.X
+				//rp.Bottom.Y.Min = 0.95
+				//rp.Bottom.Y.Max = 1.05
+				
 				// Deal with Top pannel
 				rp.Top = p
 				rp.Top.HideX()
