@@ -3,7 +3,7 @@ module github.com/rmadar/tree-gonalyzer
 go 1.14
 
 require (
-	github.com/rmadar/hplot-style v0.0.0-20200420135036-6c906c218e02
+	github.com/rmadar/hplot-style v0.0.0-20200421213251-05894b265533
 	go-hep.org/x/hep v0.26.1-0.20200421211236-6dffb3ac62bb
 	gonum.org/v1/gonum v0.7.1-0.20200330111830-e98ce15ff236
 	gonum.org/v1/plot v0.7.1-0.20200414075901-f4e1939a9e7a
