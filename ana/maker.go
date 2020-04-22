@@ -6,9 +6,10 @@ import (
 	"log"
 	"os"
 	"time"
-
+	"image/color"
+	
 	"gonum.org/v1/plot/vg"
-
+	
 	"go-hep.org/x/hep/groot"
 	"go-hep.org/x/hep/groot/rtree"
 
@@ -31,7 +32,7 @@ type Maker struct {
 	HbookHistos   [][][]*hbook.H1D // Currently 3D histo container, later: n-dim [var, sample, cut, syst]
 	HplotHistos   [][][]*hplot.H1D // Currently 3D histo container, later: n-dim [var, sample, cut, syst]
 	DontStack    bool              // Disable histogram stacking (e.g. compare various processes)
-	Normalize    bool              // Normalize distributions to unit area (when stacked, the total is nomarlized)
+	Normalize    bool              // Normalize distributions to unit area (when stacked, the total is normalized)
 
 	WithTreeFormula bool // TEMP for benchmarking
 
@@ -222,9 +223,9 @@ func (ana *Maker) PlotHistos() error {
 				bhData = hbook.NewH1D(v.Nbins, v.Xmin, v.Xmax)
 				norm_histos = make([]float64, 0, len(hsamples))
 				norm_bkgtot = 0.0
-				bhbkgs_postnorm []*hbook.H1D
-				phbkgs []*hplot.H1D
-				phdata *hplot.H1D
+				bhBkgs_postnorm []*hbook.H1D
+				phBkgs []*hplot.H1D
+				phData *hplot.H1D
 			)
 			
 			// Apply common and user-defined style for this variable
@@ -245,7 +246,7 @@ func (ana *Maker) PlotHistos() error {
 					norm_bkgtot += n
 				}
 
-				// Keep data appart
+				// Keep data apart
 				if ana.Samples[is].IsData() {
 					bhData = h
 				}
@@ -276,27 +277,27 @@ func (ana *Maker) PlotHistos() error {
 
 				// Keep data appart from backgrounds
 				if ana.Samples[is].IsData() {
-					phdata = ana.HplotHistos[iv][isel][is]
+					phData = ana.HplotHistos[iv][isel][is]
 				}
 
 				// Sum-up normalized bkg and store all bkgs in a slice for the stack
 				if ana.Samples[is].IsBkg() {
-					bhbkgs_postnorm = append(bhbkgs_postnorm, h)
+					bhBkgs_postnorm = append(bhBkgs_postnorm, h)
 					bhBkgTot = hbook.AddH1D(h, bhBkgTot)
-					phbkgs = append(phbkgs, ana.HplotHistos[iv][isel][is])
+					phBkgs = append(phBkgs, ana.HplotHistos[iv][isel][is])
 				}
 			}
 
 			// Manage background stack plotting
-			if len(phbkgs) > 1 {
+			if len(phBkgs) > 1 {
 
 				// Reverse the order so that legend and plot order matches
-				for i, j := 0, len(phbkgs)-1; i < j; i, j = i+1, j-1 {
-					phbkgs[i], phbkgs[j] = phbkgs[j], phbkgs[i]
+				for i, j := 0, len(phBkgs)-1; i < j; i, j = i+1, j-1 {
+					phBkgs[i], phBkgs[j] = phBkgs[j], phBkgs[i]
 				}
 
 				// Stacking the background histo
-				stack := hplot.NewHStack(phbkgs)
+				stack := hplot.NewHStack(phBkgs)
 				if ana.DontStack {
 					stack.Stack = hplot.HStackOff
 				}
@@ -306,7 +307,9 @@ func (ana *Maker) PlotHistos() error {
 			}
 
 			// Adding hplot.H1D data to the plot, set the drawer to the current plot
-			p.Add(phdata)
+			if bhData.Entries()>0 {
+				p.Add(phData)
+			}
 			plt = p
 
 			// Addition of the ratio plot
@@ -330,21 +333,34 @@ func (ana *Maker) PlotHistos() error {
 					if err != nil {
 						log.Fatal("cannot divide histo for the ratio plot")
 					}
-					hps2d_ratio := hplot.NewS2D(hbs2d_ratio, hplot.WithXErrBars(true), hplot.WithYErrBars(true))
+					hps2d_ratio := hplot.NewS2D(hbs2d_ratio, hplot.WithYErrBars(true))
 					style.ApplyToDataS2D(hps2d_ratio)
 					rp.Bottom.Add(hps2d_ratio)
 				} else {
-					for is, h := range bhbkgs_postnorm {
-						hbs2d_ratio, err := hbook.DivideH1D(bhData, h, hbook.DivIgnoreNaNs())
+					// [FIX-ME 0 (rmadar)] Ratio wrt data (or 1 bkg if data is empty) -> to be specied as an option?
+					// [FIX-ME 1 (rmadar)] loop is over bhBkgs_postnorm while 'ana.Samples[is]' runs also over data.
+					for is, h := range bhBkgs_postnorm {
+
+						href := bhData
+						if bhData.Entries() == 0 {
+							href = bhBkgs_postnorm[0]
+						}
+						
+						hbs2d_ratio, err := hbook.DivideH1D(href, h, hbook.DivIgnoreNaNs())
 						if err != nil {
 							log.Fatal("cannot divide histo for the ratio plot")
 						}
-						hps2d_ratio := hplot.NewS2D(hbs2d_ratio)
+						hps2d_ratio := hplot.NewS2D(hbs2d_ratio, hplot.WithBand(true))
 						hps2d_ratio.GlyphStyle.Radius = 0
-						hps2d_ratio.LineStyle.Width = 3
-						// [FIX-ME 1 (rmadar)] FillColor or LineColor?
-						// [FIX-ME 2 (rmadar)] loop is over bhbkgs_postnorm while 'ana.Samples[is]' run over data too.
-						hps2d_ratio.LineStyle.Color = ana.Samples[is].FillColor
+						empty_color := color.NRGBA{R: 0, G: 0, B: 0, A: 0} 
+						if ana.Samples[is].FillColor == empty_color {
+							hps2d_ratio.LineStyle.Color = ana.Samples[is].LineColor
+							hps2d_ratio.Band.FillColor = ana.Samples[is].LineColor
+						}
+						if ana.Samples[is].LineColor == empty_color {
+							hps2d_ratio.LineStyle.Color = ana.Samples[is].FillColor
+							hps2d_ratio.Band.FillColor = ana.Samples[is].FillColor
+						}
 						rp.Bottom.Add(hps2d_ratio)	
 					}
 				}
