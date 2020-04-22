@@ -33,46 +33,46 @@ func main() {
 
 		// Histogram representation
 		Normalize: true,
-		DontStack: false,
+		DontStack: true,
 
 		// Set of cuts
 		Cuts: []ana.Selection{
 			ana.Selection{
 				Name:     "cut1",
-				TreeName: "l_pt>300",
-			},
-			ana.Selection{
-				Name:     "cut2",
 				TreeName: "l_pt>0",
 			},
 			ana.Selection{
+				Name:     "cut2",
+				TreeName: "l_pt>50",
+			},
+			ana.Selection{
 				Name:     "cut3",
-				TreeName: "l_pt>30",
+				TreeName: "l_pt>100",
 			},
 			ana.Selection{
 				Name:     "cut4",
-				TreeName: "l_pt>50",
+				TreeName: "l_pt>150",
 			},
 		},
 
 		// Included samples
 		Samples: []ana.Sample{
-			spl_data_bench,
-			spl_bkg0_bench,
-			spl_bkg1_bench,
-			spl_bkg2_bench,
-			//spl_data,
-			//spl_bkg1,
-			//spl_bkg1bis,
-			//spl_bkg2,
-			//spl_alt,
+			//spl_data_bench,
+			//spl_bkg0_bench,
+			//spl_bkg1_bench,
+			//spl_bkg2_bench,
+			spl_data,
+			spl_bkg1,
+			spl_bkg1bis,
+			spl_bkg2,
+			spl_alt,
 		},
 
 		// Set of observable to plot
 		Variables: []*ana.Variable{
-			//var_m_tt,
+			var_m_tt,
 			var_pt_lep,
-			/*var_dphi,
+			var_dphi,
 			var_Ckk,
 			var_Crr,
 			var_Cnn,
@@ -84,7 +84,7 @@ func main() {
 			var_eta_t,
 			var_pt_vsum,
 			var_pt_tt,
-			var_x1,*/
+			var_x1,
 		},
 	}
 
@@ -177,7 +177,6 @@ var (
 		Cut:           "init_gg",
 		LegLabel:      `$t\bar{t}$ contribution 1 (gg)`,
 		FillColor:     color.NRGBA{R: 0, G: 102, B: 255, A: 230},
-		LineColor:     color.NRGBA{R: 255, G: 255, B: 255, A: 255},
 		LineWidth:     0,
 		CircleMarkers: false,
 		CircleSize:    1.5,
@@ -193,7 +192,6 @@ var (
 		Cut:           "init_qq",
 		LegLabel:      `$t\bar{t}$ contribution 1 (qq)`,
 		FillColor:     color.NRGBA{R: 20, G: 20, B: 170, A: 230},
-		LineColor:     color.NRGBA{R: 255, G: 255, B: 255, A: 255},
 		LineWidth:     0,
 		CircleMarkers: false,
 		CircleSize:    1.5,
@@ -208,7 +206,6 @@ var (
 		Weight:        "0.5",
 		LegLabel:      `$t\bar{t}$ contribution 2`,
 		FillColor:     color.NRGBA{R: 255, G: 102, B: 0, A: 200},
-		LineColor:     color.NRGBA{R: 255, G: 255, B: 255, A: 255},
 		LineWidth:     0,
 		CircleMarkers: false,
 		CircleSize:    1.5,
@@ -222,7 +219,6 @@ var (
 		TreeName:      "truth",
 		LegLabel:      `$t\bar{t}$ alternative`,
 		FillColor:     color.NRGBA{R: 0, G: 204, B: 80, A: 200},
-		LineColor:     color.NRGBA{R: 255, G: 255, B: 255, A: 255},
 		LineWidth:     0,
 		CircleMarkers: false,
 		CircleSize:    1.5,
