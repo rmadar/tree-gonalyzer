@@ -320,7 +320,13 @@ func (ana *Maker) PlotHistos() error {
 				style.ApplyToBottomPlot(rp.Bottom)
 				rp.Bottom.X = p.X
 				rp.Top = p
-				rp.Top.HideX()
+				rp.Top.X.Tick.Label.Font.Size = 0
+				rp.Top.X.Tick.Label.Color = color.NRGBA{R: 0, G: 0, B: 0, A: 0}
+				rp.Top.X.Tick.LineStyle.Width = 0.5
+				rp.Top.X.Tick.LineStyle.Color = color.NRGBA{R: 120, G: 120, B: 120, A: 255}
+				rp.Top.X.Tick.Length = 5
+				rp.Top.X.LineStyle.Width = 0.8
+				rp.Top.X.LineStyle.Color = color.NRGBA{R: 120, G: 120, B: 120, A: 255}
 				rp.Top.X.Label.Text = ""
 
 				// Update the drawer and figure size
