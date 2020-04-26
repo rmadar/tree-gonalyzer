@@ -14,6 +14,8 @@ import (
 	"github.com/rmadar/hplot-style/style"
 )
 
+var colorNil = color.NRGBA{R: 0, G: 0, B: 0, A: 0}	
+
 type Sample struct {
 	Name              string
 	Type              string
@@ -35,8 +37,6 @@ type Sample struct {
 
 // Return a hplot.H1D with the proper style
 func (s Sample) CreateHisto(hdata *hbook.H1D, opts ...hplot.Options) *hplot.H1D {
-
-	colorNil := color.NRGBA{R: 0, G: 0, B: 0, A: 0}	
 	
 	// Append sample-defined options
 	opts = append(opts, hplot.WithYErrBars(s.WithYErrBars))
@@ -89,15 +89,12 @@ func (s Sample) CreateHisto(hdata *hbook.H1D, opts ...hplot.Options) *hplot.H1D 
 
 func (s Sample) SetBandStyle(b *hplot.Band) {
 
-	colorNil := color.NRGBA{R: 0, G: 0, B: 0, A: 0}
-
 	if s.FillColor != colorNil {
 		b.FillColor = s.FillColor
 	}
 	if s.LineColor != colorNil {
 		b.FillColor = s.LineColor
 	}
-	// b.FillColor = style.SmoothBlack
 }
 
 func (s *Sample) IsData() bool {

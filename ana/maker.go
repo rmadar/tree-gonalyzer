@@ -278,7 +278,7 @@ func (ana *Maker) PlotHistos() error {
 				}
 				ana.HplotHistos[iv][isel][is] = ana.Samples[is].CreateHisto(h, hplot.WithBand(withBand))
 				p.Legend.Add(ana.Samples[is].LegLabel, ana.HplotHistos[iv][isel][is])
-
+				
 				// Keep data appart from backgrounds
 				if ana.Samples[is].IsData() {
 					phData = ana.HplotHistos[iv][isel][is]
@@ -293,7 +293,7 @@ func (ana *Maker) PlotHistos() error {
 			}
 
 			// Manage background stack plotting
-			if len(phBkgs) > 1 {
+			if len(phBkgs) > 0 {
 
 				// Reverse the order so that legend and plot order matches
 				for i, j := 0, len(phBkgs)-1; i < j; i, j = i+1, j-1 {
@@ -309,12 +309,13 @@ func (ana *Maker) PlotHistos() error {
 				// Add the stack the plot
 				p.Add(stack)
 			}
-
+			
 			// Add uncertainty band on total prediction for stack only
 			if !ana.DontStack {
 				phBkgTot := hplot.NewH1D(bhBkgTot, hplot.WithBand(true))
-				phBkgTot.LineStyle.Width = 0
-				phBkgTot.Band.FillColor = color.NRGBA{R: 180, G: 180, B: 180, A: 100}
+				phBkgTot.LineStyle.Width = 0.5
+				phBkgTot.LineStyle.Color = color.NRGBA{R: 140, G: 140, B: 140, A: 255}
+				phBkgTot.Band.FillColor = color.NRGBA{R: 180, G: 180, B: 180, A: 255}
 				p.Add(phBkgTot)
 				p.Legend.Add("Uncer.", phBkgTot)
 			}
@@ -347,17 +348,8 @@ func (ana *Maker) PlotHistos() error {
 				plt = rp
 
 				// Compute and store the ratio (type hbook.S2D)
-				if !ana.DontStack {
-					hbs2d_ratio, err := hbook.DivideH1D(bhData, bhBkgTot, hbook.DivIgnoreNaNs())
-					if err != nil {
-						log.Fatal("cannot divide histo for the ratio plot")
-					}
-					hps2d_ratio := hplot.NewS2D(hbs2d_ratio, hplot.WithYErrBars(true),
-						hplot.WithStepsKind(hplot.HiSteps),
-					)
-					style.ApplyToDataS2D(hps2d_ratio)
-					rp.Bottom.Add(hps2d_ratio)
-				} else {
+				switch {
+				case ana.DontStack:
 					// [FIX-ME 0 (rmadar)] Ratio wrt data (or 1 bkg if data is empty) -> to be specied as an option?
 					// [FIX-ME 1 (rmadar)] loop is over bhBkgs_postnorm while 'ana.Samples[is]' runs also over data.
 					for is, h := range bhBkgs_postnorm {
@@ -367,7 +359,7 @@ func (ana *Maker) PlotHistos() error {
 							href = bhBkgs_postnorm[0]
 						}
 						
-						hbs2d_ratio, err := hbook.DivideH1D(href, h, hbook.DivIgnoreNaNs())
+						hbs2d_ratio, err := hbook.DivideH1D(h, href, hbook.DivIgnoreNaNs())
 						if err != nil {
 							log.Fatal("cannot divide histo for the ratio plot")
 						}
@@ -376,10 +368,35 @@ func (ana *Maker) PlotHistos() error {
 						)
 						hps2d_ratio.GlyphStyle.Radius = 0
 						hps2d_ratio.LineStyle.Color = ana.Samples[is].LineColor
-						hps2d_ratio.LineStyle.Width = ana.Samples[is].LineWidth*0.5
 						ana.Samples[is].SetBandStyle(hps2d_ratio.Band)
 						rp.Bottom.Add(hps2d_ratio)
 					}
+				default:
+					// Data to MC
+					hbs2d_ratio, err := hbook.DivideH1D(bhData, bhBkgTot, hbook.DivIgnoreNaNs())
+					if err != nil {
+						log.Fatal("cannot divide histo for the ratio plot")
+					}
+					hps2d_ratio := hplot.NewS2D(hbs2d_ratio, hplot.WithYErrBars(true),
+						hplot.WithStepsKind(hplot.HiSteps),
+					)
+					style.ApplyToDataS2D(hps2d_ratio)
+
+					// MC to MC
+					hbs2d_ratio1, err := hbook.DivideH1D(bhBkgTot, bhBkgTot, hbook.DivIgnoreNaNs())
+					if err != nil {
+						log.Fatal("cannot divide histo for the ratio plot")
+					}
+					hps2d_ratio1 := hplot.NewS2D(hbs2d_ratio1, hplot.WithBand(true),
+						hplot.WithStepsKind(hplot.HiSteps),
+					)
+					style.ApplyToDataS2D(hps2d_ratio1)
+					hps2d_ratio1.GlyphStyle.Radius = 0
+					hps2d_ratio1.LineStyle.Width = 0.0
+					hps2d_ratio1.LineStyle.Color = color.NRGBA{R: 140, G: 140, B: 140, A: 255}
+					hps2d_ratio1.Band.FillColor = color.NRGBA{R: 200, G: 200, B: 200, A: 255}
+					rp.Bottom.Add(hps2d_ratio1)
+					rp.Bottom.Add(hps2d_ratio)
 				}
 
 				// Adjust ratio plot scale

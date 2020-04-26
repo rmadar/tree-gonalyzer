@@ -177,12 +177,12 @@ var (
 		Weight:        "0.5",
 		Cut:           "init_gg",
 		LegLabel:      `$t\bar{t}$ contribution 1 (gg)`,
-		FillColor:     color.NRGBA{R: 0, G: 102, B: 255, A: 230},
-		LineWidth:     3.5,
+		// FillColor:     color.NRGBA{R: 0, G: 102, B: 255, A: 230},
+		LineWidth:     0.0,
 		LineColor:     color.NRGBA{R: 0, G: 102, B: 255, A: 230},
 		CircleMarkers: false,
 		CircleSize:    1.5,
-		WithYErrBars:  true,
+		// WithYErrBars:  true,
 	}
 
 	spl_bkg1bis = ana.Sample{
