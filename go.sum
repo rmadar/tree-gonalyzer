@@ -136,6 +136,10 @@ go-hep.org/x/hep v0.26.1-0.20200421090732-5a84c0078ea0 h1:yQTOyZUHWK+wDp045jzZ7G
 go-hep.org/x/hep v0.26.1-0.20200421090732-5a84c0078ea0/go.mod h1:qe/aUgzSt+ADFnvRwilXExDjZnQ8LqxhDkTD3fp1g6Y=
 go-hep.org/x/hep v0.26.1-0.20200421211236-6dffb3ac62bb h1:8JBefZQdGImUX19IFXjd/YPzh229ukbD8xR3/lPtrh0=
 go-hep.org/x/hep v0.26.1-0.20200421211236-6dffb3ac62bb/go.mod h1:qe/aUgzSt+ADFnvRwilXExDjZnQ8LqxhDkTD3fp1g6Y=
+go-hep.org/x/hep v0.26.1-0.20200426082337-002370ee0917 h1:rFuArMBzNk2IX9gc3C4548nnweBalztyBGqKzG0aeLI=
+go-hep.org/x/hep v0.26.1-0.20200426082337-002370ee0917/go.mod h1:qe/aUgzSt+ADFnvRwilXExDjZnQ8LqxhDkTD3fp1g6Y=
+go-hep.org/x/hep v0.26.1-0.20200426122257-dc78d321e2ab h1:+9o4pAYNnwoYTDPlCiifnlB1DfDAavbfD7G8Qotvd48=
+go-hep.org/x/hep v0.26.1-0.20200426122257-dc78d321e2ab/go.mod h1:qe/aUgzSt+ADFnvRwilXExDjZnQ8LqxhDkTD3fp1g6Y=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
 golang.org/x/crypto v0.0.0-20190510104115-cbcb75029529/go.mod h1:yigFU9vqHzYiE8UmvKecakEJjdnWj3jj499lnFckfCI=
 golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550/go.mod h1:yigFU9vqHzYiE8UmvKecakEJjdnWj3jj499lnFckfCI=

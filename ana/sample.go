@@ -34,10 +34,15 @@ type Sample struct {
 }
 
 // Return a hplot.H1D with the proper style
-func (s Sample) CreateHisto(hdata *hbook.H1D) *hplot.H1D {
+func (s Sample) CreateHisto(hdata *hbook.H1D, opts ...hplot.Options) *hplot.H1D {
 
+	colorNil := color.NRGBA{R: 0, G: 0, B: 0, A: 0}	
+	
+	// Append sample-defined options
+	opts = append(opts, hplot.WithYErrBars(s.WithYErrBars))
+	
 	// Create the plotable histo from histogrammed data
-	h := hplot.NewH1D(hdata, hplot.WithYErrBars(s.WithYErrBars))
+	h := hplot.NewH1D(hdata, opts...)
 
 	// Line and fill cosmetics
 	h.LineStyle.Width = s.LineWidth
@@ -47,33 +52,52 @@ func (s Sample) CreateHisto(hdata *hbook.H1D) *hplot.H1D {
 	// Markers
 	if s.CircleMarkers {
 		style.SetCircleMarkersToHist(h)
-		if &s.CircleColor != nil {
+		if s.CircleColor != colorNil {
 			h.GlyphStyle.Color = s.CircleColor
 		} else {
 			h.GlyphStyle.Color = s.LineColor
 		}
-		if &s.CircleSize != nil {
+		if s.CircleSize != 0.0 {
 			h.GlyphStyle.Radius = s.CircleSize
 		}
 	}
 
 	// Error bars
 	if s.WithYErrBars {
-		if &s.CircleColor != nil {
+		if s.CircleColor != colorNil {
 			h.YErrs.LineStyle.Color = s.CircleColor
 		} else {
 			h.YErrs.LineStyle.Color = s.LineColor
 		}
 
-		if &s.YErrBarsLineWidth != nil {
+		if s.YErrBarsLineWidth != 0.0 {
 			h.YErrs.LineStyle.Width = s.YErrBarsLineWidth
 		}
-
-		if &s.YErrBarsCapWidth != nil {
+		
+		if s.YErrBarsCapWidth != 0.0 {
 			h.YErrs.CapWidth = s.YErrBarsCapWidth
 		}
 	}
+
+	// Band setup
+	if h.Band != nil {
+		s.SetBandStyle(h.Band)
+	}
+	
 	return h
+}
+
+func (s Sample) SetBandStyle(b *hplot.Band) {
+
+	colorNil := color.NRGBA{R: 0, G: 0, B: 0, A: 0}
+
+	if s.FillColor != colorNil {
+		b.FillColor = s.FillColor
+	}
+	if s.LineColor != colorNil {
+		b.FillColor = s.LineColor
+	}
+	// b.FillColor = style.SmoothBlack
 }
 
 func (s *Sample) IsData() bool {

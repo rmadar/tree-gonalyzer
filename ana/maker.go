@@ -3,13 +3,13 @@ package ana
 
 import (
 	"fmt"
+	"image/color"
 	"log"
 	"os"
 	"time"
-	"image/color"
-	
+
 	"gonum.org/v1/plot/vg"
-	
+
 	"go-hep.org/x/hep/groot"
 	"go-hep.org/x/hep/groot/rtree"
 
@@ -22,17 +22,17 @@ import (
 
 // Analyzer type
 type Maker struct {
-	Samples      []Sample          // Sample on which to run
-	SamplesGroup string            // Specify how to group samples together
-	Variables    []*Variable       // List of variables to plot
-	Cuts         []Selection       // List of cuts
-	SaveFormat   string            // Extension of saved figure 'tex', 'pdf', 'png'
-	RatioPlot    bool              // Enable ratio plot
-	CompileLatex bool              // Enable on-the-fly latex compilation of plots
-	HbookHistos   [][][]*hbook.H1D // Currently 3D histo container, later: n-dim [var, sample, cut, syst]
-	HplotHistos   [][][]*hplot.H1D // Currently 3D histo container, later: n-dim [var, sample, cut, syst]
-	DontStack    bool              // Disable histogram stacking (e.g. compare various processes)
-	Normalize    bool              // Normalize distributions to unit area (when stacked, the total is normalized)
+	Samples      []Sample         // Sample on which to run
+	SamplesGroup string           // Specify how to group samples together
+	Variables    []*Variable      // List of variables to plot
+	Cuts         []Selection      // List of cuts
+	SaveFormat   string           // Extension of saved figure 'tex', 'pdf', 'png'
+	RatioPlot    bool             // Enable ratio plot
+	CompileLatex bool             // Enable on-the-fly latex compilation of plots
+	HbookHistos  [][][]*hbook.H1D // Currently 3D histo container, later: n-dim [var, sample, cut, syst]
+	HplotHistos  [][][]*hplot.H1D // Currently 3D histo container, later: n-dim [var, sample, cut, syst]
+	DontStack    bool             // Disable histogram stacking (e.g. compare various processes)
+	Normalize    bool             // Normalize distributions to unit area (when stacked, the total is normalized)
 
 	WithTreeFormula bool // TEMP for benchmarking
 
@@ -184,7 +184,7 @@ func (ana *Maker) PlotHistos() error {
 	if len(ana.HbookHistos) == 0 {
 		log.Fatalf("There is no histograms. Please make sure that 'MakeHistos()' is called before 'PlotHistos()'")
 	}
-	
+
 	// Preparing the final figure
 	var plt hplot.Drawer
 	figWidth, figHeight := 6*vg.Inch, 4.5*vg.Inch
@@ -192,7 +192,7 @@ func (ana *Maker) PlotHistos() error {
 	if ana.SaveFormat != "" {
 		format = ana.SaveFormat
 	}
-	
+
 	// Handle on-the-fly LaTeX compilation
 	var latex htex.Handler = htex.NoopHandler{}
 	if ana.CompileLatex {
@@ -216,18 +216,18 @@ func (ana *Maker) PlotHistos() error {
 
 		// Loop over selections
 		for isel, hsamples := range h_sel_samples {
-			
+
 			var (
-				p = hplot.New()
-				bhBkgTot = hbook.NewH1D(v.Nbins, v.Xmin, v.Xmax)
-				bhData = hbook.NewH1D(v.Nbins, v.Xmin, v.Xmax)
-				norm_histos = make([]float64, 0, len(hsamples))
-				norm_bkgtot = 0.0
+				p               = hplot.New()
+				bhBkgTot        = hbook.NewH1D(v.Nbins, v.Xmin, v.Xmax)
+				bhData          = hbook.NewH1D(v.Nbins, v.Xmin, v.Xmax)
+				norm_histos     = make([]float64, 0, len(hsamples))
+				norm_bkgtot     = 0.0
 				bhBkgs_postnorm []*hbook.H1D
-				phBkgs []*hplot.H1D
-				phData *hplot.H1D
+				phBkgs          []*hplot.H1D
+				phData          *hplot.H1D
 			)
-			
+
 			// Apply common and user-defined style for this variable
 			style.ApplyToPlot(p)
 			v.SetPlotStyle(p)
@@ -237,7 +237,7 @@ func (ana *Maker) PlotHistos() error {
 
 				// Compute the integral of the current histo
 				n := h.Integral()
-				
+
 				// Properly store individual normalization
 				norm_histos = append(norm_histos, n)
 
@@ -256,8 +256,8 @@ func (ana *Maker) PlotHistos() error {
 			// Second sample loop: normalize bh, prepare background stack
 			for is, h := range hsamples {
 
-				// Deal with normalization 
-				// FIX-ME (rmadar): use 'switch' and enum  
+				// Deal with normalization
+				// FIX-ME (rmadar): use 'switch' and enum
 				if ana.Normalize {
 					if ana.Samples[is].IsData() {
 						h.Scale(1 / norm_histos[is])
@@ -270,9 +270,13 @@ func (ana *Maker) PlotHistos() error {
 						}
 					}
 				}
-				
+
 				// Get plottable histogram and add it to the legend
-				ana.HplotHistos[iv][isel][is] = ana.Samples[is].CreateHisto(h)
+				withBand := false
+				if !ana.Samples[is].IsData() && ana.DontStack {
+					withBand = true
+				}
+				ana.HplotHistos[iv][isel][is] = ana.Samples[is].CreateHisto(h, hplot.WithBand(withBand))
 				p.Legend.Add(ana.Samples[is].LegLabel, ana.HplotHistos[iv][isel][is])
 
 				// Keep data appart from backgrounds
@@ -306,8 +310,17 @@ func (ana *Maker) PlotHistos() error {
 				p.Add(stack)
 			}
 
+			// Add uncertainty band on total prediction for stack only
+			if !ana.DontStack {
+				phBkgTot := hplot.NewH1D(bhBkgTot, hplot.WithBand(true))
+				phBkgTot.LineStyle.Width = 0
+				phBkgTot.Band.FillColor = color.NRGBA{R: 180, G: 180, B: 180, A: 100}
+				p.Add(phBkgTot)
+				p.Legend.Add("Uncer.", phBkgTot)
+			}
+			
 			// Adding hplot.H1D data to the plot, set the drawer to the current plot
-			if bhData.Entries()>0 {
+			if bhData.Entries() > 0 {
 				p.Add(phData)
 			}
 			plt = p
@@ -332,14 +345,16 @@ func (ana *Maker) PlotHistos() error {
 				// Update the drawer and figure size
 				figWidth, figHeight = 6*vg.Inch, 4.5*vg.Inch
 				plt = rp
-				
+
 				// Compute and store the ratio (type hbook.S2D)
 				if !ana.DontStack {
 					hbs2d_ratio, err := hbook.DivideH1D(bhData, bhBkgTot, hbook.DivIgnoreNaNs())
 					if err != nil {
 						log.Fatal("cannot divide histo for the ratio plot")
 					}
-					hps2d_ratio := hplot.NewS2D(hbs2d_ratio, hplot.WithYErrBars(true))
+					hps2d_ratio := hplot.NewS2D(hbs2d_ratio, hplot.WithYErrBars(true),
+						hplot.WithStepsKind(hplot.HiSteps),
+					)
 					style.ApplyToDataS2D(hps2d_ratio)
 					rp.Bottom.Add(hps2d_ratio)
 				} else {
@@ -356,18 +371,14 @@ func (ana *Maker) PlotHistos() error {
 						if err != nil {
 							log.Fatal("cannot divide histo for the ratio plot")
 						}
-						hps2d_ratio := hplot.NewS2D(hbs2d_ratio, hplot.WithBand(true))
+						hps2d_ratio := hplot.NewS2D(hbs2d_ratio, hplot.WithBand(true),
+							hplot.WithStepsKind(hplot.HiSteps),
+						)
 						hps2d_ratio.GlyphStyle.Radius = 0
-						empty_color := color.NRGBA{R: 0, G: 0, B: 0, A: 0} 
-						if ana.Samples[is].FillColor == empty_color {
-							hps2d_ratio.LineStyle.Color = ana.Samples[is].LineColor
-							hps2d_ratio.Band.FillColor = ana.Samples[is].LineColor
-						}
-						if ana.Samples[is].LineColor == empty_color {
-							hps2d_ratio.LineStyle.Color = ana.Samples[is].FillColor
-							hps2d_ratio.Band.FillColor = ana.Samples[is].FillColor
-						}
-						rp.Bottom.Add(hps2d_ratio)	
+						hps2d_ratio.LineStyle.Color = ana.Samples[is].LineColor
+						hps2d_ratio.LineStyle.Width = ana.Samples[is].LineWidth*0.5
+						ana.Samples[is].SetBandStyle(hps2d_ratio.Band)
+						rp.Bottom.Add(hps2d_ratio)
 					}
 				}
 
@@ -482,4 +493,3 @@ func fmtDuration(d time.Duration) string {
 	s := d / time.Second
 	return fmt.Sprintf("%02d:%02d:%02d", h, m, s)
 }
-
