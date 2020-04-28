@@ -273,11 +273,12 @@ func (ana *Maker) PlotHistos() error {
 
 				// Get plottable histogram and add it to the legend
 				withBand := false
-				if !ana.Samples[is].IsData() && ana.DontStack {
+				if !ana.Samples[is].IsData() {
 					withBand = true
 				}
-				ana.HplotHistos[iv][isel][is] = ana.Samples[is].CreateHisto(h, hplot.WithBand(withBand))
-				p.Legend.Add(ana.Samples[is].LegLabel, ana.HplotHistos[iv][isel][is])
+				hplt := ana.Samples[is].CreateHisto(h, hplot.WithBand(withBand))
+				p.Legend.Add(ana.Samples[is].LegLabel, hplt)
+				ana.HplotHistos[iv][isel][is] = hplt
 				
 				// Keep data appart from backgrounds
 				if ana.Samples[is].IsData() {
@@ -301,16 +302,23 @@ func (ana *Maker) PlotHistos() error {
 				}
 
 				// Stacking the background histo
-				stack := hplot.NewHStack(phBkgs)
+				stack := hplot.NewHStack(phBkgs, hplot.WithBand(true))
+				stack.Band.FillColor = color.NRGBA{R: 255, G: 255, B: 255, A: 150}
 				if ana.DontStack {
 					stack.Stack = hplot.HStackOff
+				} else {
+					hBand := hplot.NewH1D(hbook.NewH1D(1, 0, 1), hplot.WithBand(true))
+					hBand.Band = stack.Band 
+					p.Legend.Add("Uncer.", hBand)
 				}
 
-				// Add the stack the plot
+				// Add the stack to the plot
 				p.Add(stack)
+				
 			}
 			
 			// Add uncertainty band on total prediction for stack only
+			/*
 			if !ana.DontStack {
 				phBkgTot := hplot.NewH1D(bhBkgTot, hplot.WithBand(true))
 				phBkgTot.LineStyle.Width = 0.5
@@ -319,6 +327,7 @@ func (ana *Maker) PlotHistos() error {
 				p.Add(phBkgTot)
 				p.Legend.Add("Uncer.", phBkgTot)
 			}
+			*/
 			
 			// Adding hplot.H1D data to the plot, set the drawer to the current plot
 			if bhData.Entries() > 0 {

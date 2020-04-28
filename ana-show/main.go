@@ -33,7 +33,7 @@ func main() {
 
 		// Histogram representation
 		Normalize: true,
-		DontStack: true,
+		DontStack: false,
 
 		// Set of cuts
 		Cuts: []ana.Selection{
@@ -55,7 +55,6 @@ func main() {
 			},
 		},
 
-		// FIX-ME [rmadar] : problem when only two samples (Data+ one bkg)
 		// Included samples
 		Samples: []ana.Sample{
 			//spl_data_bench,
@@ -63,10 +62,10 @@ func main() {
 			//spl_bkg1_bench,
 			//spl_bkg2_bench,
 			spl_data,
+			spl_bkg1bis,
 			spl_bkg1,
-			//spl_bkg1bis,
-			//spl_bkg2,
-			//spl_alt,
+			spl_bkg2,
+			spl_alt,
 		},
 
 		// Set of observable to plot
@@ -177,12 +176,12 @@ var (
 		Weight:        "0.5",
 		Cut:           "init_gg",
 		LegLabel:      `$t\bar{t}$ contribution 1 (gg)`,
-		// FillColor:     color.NRGBA{R: 0, G: 102, B: 255, A: 230},
-		LineWidth:     0.0,
-		LineColor:     color.NRGBA{R: 0, G: 102, B: 255, A: 230},
+		FillColor:     color.NRGBA{R: 0, G: 102, B: 255, A: 230},
 		CircleMarkers: false,
 		CircleSize:    1.5,
-		// WithYErrBars:  true,
+		WithYErrBars:  false,
+		YErrBarsLineWidth: 2,
+		YErrBarsCapWidth:  5,
 	}
 
 	spl_bkg1bis = ana.Sample{
@@ -194,10 +193,11 @@ var (
 		Cut:           "init_qq",
 		LegLabel:      `$t\bar{t}$ contribution 1 (qq)`,
 		FillColor:     color.NRGBA{R: 20, G: 20, B: 170, A: 230},
-		LineWidth:     0,
 		CircleMarkers: false,
 		CircleSize:    1.5,
-		WithYErrBars:  true,
+		WithYErrBars:  false,
+		YErrBarsLineWidth: 2,
+		YErrBarsCapWidth:  5,
 	}
 
 	spl_bkg2 = ana.Sample{
@@ -208,10 +208,11 @@ var (
 		Weight:        "0.5",
 		LegLabel:      `$t\bar{t}$ contribution 2`,
 		FillColor:     color.NRGBA{R: 255, G: 102, B: 0, A: 200},
-		LineWidth:     0,
+		//LineColor:     color.NRGBA{R: 255, G: 102, B: 0, A: 200},
+		//LineWidth:     1,
 		CircleMarkers: false,
 		CircleSize:    1.5,
-		WithYErrBars:  true,
+		WithYErrBars:  false,
 	}
 
 	spl_alt = ana.Sample{
