@@ -71,12 +71,12 @@ func main() {
 		// Set of observable to plot
 		Variables: []*ana.Variable{
 			var_m_tt,
-			/*var_pt_lep,
+			var_pt_lep,
 			var_dphi,
 			var_Ckk,
 			var_Crr,
 			var_Cnn,
-			var_pt_lep,
+			/*var_pt_lep,
 			var_eta_lep,
 			var_pt_b,
 			var_eta_b,
