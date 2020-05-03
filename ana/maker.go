@@ -317,17 +317,6 @@ func (ana *Maker) PlotHistos() error {
 				
 			}
 			
-			// Add uncertainty band on total prediction for stack only
-			/*
-			if !ana.DontStack {
-				phBkgTot := hplot.NewH1D(bhBkgTot, hplot.WithBand(true))
-				phBkgTot.LineStyle.Width = 0.5
-				phBkgTot.LineStyle.Color = color.NRGBA{R: 140, G: 140, B: 140, A: 255}
-				phBkgTot.Band.FillColor = color.NRGBA{R: 180, G: 180, B: 180, A: 255}
-				p.Add(phBkgTot)
-				p.Legend.Add("Uncer.", phBkgTot)
-			}
-			*/
 			
 			// Adding hplot.H1D data to the plot, set the drawer to the current plot
 			if bhData.Entries() > 0 {
