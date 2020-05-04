@@ -16,7 +16,8 @@ import (
 func main() {
 
 	var doLatex = flag.Bool("latex", false, "On-the-fly LaTeX compilation of produced figure")
-	var useTreeFormula = flag.Bool("formula", false, "Use TreeFormula for variable")
+	var useFormula = flag.Bool("formula", false, "Use TreeFormula for variable")
+	var useFormulaFunc = flag.Bool("func", false, "Use TreeFormulaFunc for variable")
 	var noRatio = flag.Bool("r", false, "Disable ratio plot")
 	flag.Parse()
 
@@ -24,7 +25,8 @@ func main() {
 	analyzer := ana.Maker{
 
 		// Test Tree formula
-		WithTreeFormula: *useTreeFormula,
+		WithTreeFormula: *useFormula,
+		WithTreeFormulaFunc: *useFormulaFunc,
 
 		// Output figure
 		SaveFormat:   "tex",
@@ -39,33 +41,49 @@ func main() {
 		Cuts: []ana.Selection{
 			ana.Selection{
 				Name:     "cut1",
-				TreeName: "l_pt>0",
+				TreeName: "l_pt>20",
+				TreeFunc: ana.TreeFunc{
+					VarsName: []string{"l_pt"},
+					Fct: func(x float32) bool {return x>20},
+				},
 			},
 			ana.Selection{
 				Name:     "cut2",
 				TreeName: "l_pt>50",
+				TreeFunc: ana.TreeFunc{
+					VarsName: []string{"l_pt"},
+					Fct: func(x float32) bool {return x>50},
+				},
 			},
 			ana.Selection{
 				Name:     "cut3",
 				TreeName: "l_pt>100",
+				TreeFunc: ana.TreeFunc{
+					VarsName: []string{"l_pt"},
+					Fct: func(x float32) bool {return x>100},
+				},
 			},
 			ana.Selection{
 				Name:     "cut4",
 				TreeName: "l_pt>150",
+				TreeFunc: ana.TreeFunc{
+					VarsName: []string{"l_pt"},
+					Fct: func(x float32) bool {return x>150},
+				},
 			},
 		},
 
 		// Included samples
 		Samples: []ana.Sample{
-			//spl_data_bench,
-			//spl_bkg0_bench,
-			//spl_bkg1_bench,
-			//spl_bkg2_bench,
-			spl_data,
-			spl_bkg1bis,
-			spl_bkg1,
-			spl_bkg2,
-			spl_alt,
+			spl_data_bench,
+			spl_bkg0_bench,
+			spl_bkg1_bench,
+			spl_bkg2_bench,
+			//spl_data,
+			//spl_bkg1bis,
+			//spl_bkg1,
+			//spl_bkg2,
+			//spl_alt,
 		},
 
 		// Set of observable to plot
@@ -76,15 +94,16 @@ func main() {
 			var_Ckk,
 			var_Crr,
 			var_Cnn,
-			/*var_pt_lep,
+			var_pt_lep,
 			var_eta_lep,
 			var_pt_b,
 			var_eta_b,
+			var_pt_vsum,
 			var_pt_t,
 			var_eta_t,
-			var_pt_vsum,
 			var_pt_tt,
-			var_x1,*/
+			var_x1,
+			var_x1x2,
 		},
 	}
 
@@ -113,6 +132,10 @@ var (
 		FileName:          "/home/rmadar/cernbox/ATLAS/Analysis/SM-SpinCorr/data/outputs/MC16a.410472.PhPy8EG.TruthOnly.root",
 		TreeName:          "truth",
 		Weight:            "0.8 + 0.1*(t_pt/100)",
+		WeightFunc:         ana.TreeFunc{
+			VarsName: []string{"t_pt"},
+			Fct: func(x float32) float64 {return float64(0.8 + 0.1*(x/100.))},
+		},
 		LegLabel:          `Pseudo-data`,
 		CircleMarkers:     true,
 		CircleColor:       style.SmoothBlack,
@@ -128,6 +151,7 @@ var (
 		FileName:  "/home/rmadar/cernbox/ATLAS/Analysis/SM-SpinCorr/data/outputs/MC16a.410472.PhPy8EG.TruthOnly.root",
 		TreeName:  "truth",
 		Weight:    "0.33",
+		WeightFunc: ana.NewFuncF64(0.33),
 		LegLabel:  `Background 1`,
 		FillColor: color.NRGBA{R: 0, G: 102, B: 255, A: 230},
 	}
@@ -138,6 +162,7 @@ var (
 		FileName:  "/home/rmadar/cernbox/ATLAS/Analysis/SM-SpinCorr/data/outputs/MC16a.410472.PhPy8EG.TruthOnly.root",
 		TreeName:  "truth",
 		Weight:    "0.33",
+		WeightFunc: ana.NewFuncF64(0.33),
 		LegLabel:  `Background 2`,
 		FillColor: color.NRGBA{R: 200, G: 30, B: 60, A: 230},
 	}
@@ -148,6 +173,7 @@ var (
 		FileName:  "/home/rmadar/cernbox/ATLAS/Analysis/SM-SpinCorr/data/outputs/MC16a.410472.PhPy8EG.TruthOnly.root",
 		TreeName:  "truth",
 		Weight:    "0.33",
+		WeightFunc: ana.NewFuncF64(0.33),
 		LegLabel:  `Background 3`,
 		FillColor: color.NRGBA{R: 0, G: 255, B: 102, A: 230},
 	}
@@ -158,7 +184,6 @@ var (
 		Type:              "data",
 		FileName:          "../testdata/ttbar_MadSpinOff.root",
 		TreeName:          "truth",
-		Weight:            "1",
 		LegLabel:          `Pseudo-data`,
 		CircleMarkers:     true,
 		CircleColor:       style.SmoothBlack,
@@ -174,6 +199,7 @@ var (
 		FileName:      "../testdata/ttbar_MadSpinOn_1.root",
 		TreeName:      "truth",
 		Weight:        "0.5",
+		WeightFunc:     ana.NewFuncF64(0.5),
 		Cut:           "init_gg",
 		LegLabel:      `$t\bar{t}$ contribution 1 (gg)`,
 		FillColor:     color.NRGBA{R: 0, G: 102, B: 255, A: 230},
@@ -190,6 +216,7 @@ var (
 		FileName:      "../testdata/ttbar_MadSpinOn_1.root",
 		TreeName:      "truth",
 		Weight:        "0.5",
+		WeightFunc:     ana.NewFuncF64(0.5),
 		Cut:           "init_qq",
 		LegLabel:      `$t\bar{t}$ contribution 1 (qq)`,
 		FillColor:     color.NRGBA{R: 20, G: 20, B: 170, A: 230},
@@ -206,10 +233,9 @@ var (
 		FileName:      "../testdata/ttbar_MadSpinOn_2.root",
 		TreeName:      "truth",
 		Weight:        "0.5",
+		WeightFunc:     ana.NewFuncF64(0.5),
 		LegLabel:      `$t\bar{t}$ contribution 2`,
 		FillColor:     color.NRGBA{R: 255, G: 102, B: 0, A: 200},
-		//LineColor:     color.NRGBA{R: 255, G: 102, B: 0, A: 200},
-		//LineWidth:     1,
 		CircleMarkers: false,
 		CircleSize:    1.5,
 		WithYErrBars:  false,
@@ -233,6 +259,7 @@ var (
 		SaveName:   "truth_dphi_ll",
 		TreeName:   "truth_dphi_ll",
 		Value:      new(float64),
+		TreeFunc:   ana.NewFuncVarF64("truth_dphi_ll"),
 		Nbins:      15,
 		Xmin:       0,
 		Xmax:       math.Pi,
@@ -249,6 +276,7 @@ var (
 		SaveName:   "truth_Ckk",
 		TreeName:   "truth_Ckk",
 		Value:      new(float64),
+		TreeFunc:   ana.NewFuncVarF64("truth_Ckk"),
 		Nbins:      25,
 		Xmin:       -1,
 		Xmax:       1,
@@ -266,6 +294,7 @@ var (
 		SaveName:   "truth_Crr",
 		TreeName:   "truth_Crr",
 		Value:      new(float64),
+		TreeFunc:   ana.NewFuncVarF64("truth_Crr"),
 		Nbins:      25,
 		Xmin:       -1,
 		Xmax:       1,
@@ -283,6 +312,7 @@ var (
 		SaveName:   "truth_Cnn",
 		TreeName:   "truth_Cnn",
 		Value:      new(float64),
+		TreeFunc:   ana.NewFuncVarF64("truth_Cnn"),
 		Nbins:      25,
 		Xmin:       -1,
 		Xmax:       1,
@@ -300,6 +330,7 @@ var (
 		SaveName:   "pt_lep",
 		TreeName:   "l_pt",
 		Value:      new(float32),
+		TreeFunc:   ana.NewFuncVarF32("l_pt"),
 		Nbins:      25,
 		Xmin:       0,
 		Xmax:       500,
@@ -315,6 +346,7 @@ var (
 		SaveName:   "eta_lep",
 		TreeName:   "l_eta",
 		Value:      new(float32),
+		TreeFunc:   ana.NewFuncVarF32("l_eta"),
 		Nbins:      25,
 		Xmin:       -5,
 		Xmax:       5,
@@ -331,6 +363,7 @@ var (
 		SaveName:   "pt_b",
 		TreeName:   "b_pt",
 		Value:      new(float32),
+		TreeFunc:   ana.NewFuncVarF32("b_pt"),
 		Nbins:      25,
 		Xmin:       0,
 		Xmax:       500,
@@ -346,6 +379,7 @@ var (
 		SaveName:   "eta_b",
 		TreeName:   "b_eta",
 		Value:      new(float32),
+		TreeFunc:   ana.NewFuncVarF32("b_eta"),
 		Nbins:      25,
 		Xmin:       -5,
 		Xmax:       5,
@@ -362,6 +396,7 @@ var (
 		SaveName:    "pt_vsum",
 		TreeName:    "vsum_pt",
 		Value:       new(float32),
+		TreeFunc:    ana.NewFuncVarF32("vsum_pt"),
 		Nbins:       25,
 		Xmin:        0,
 		Xmax:        250,
@@ -378,6 +413,7 @@ var (
 		SaveName:  "pt_t",
 		TreeName:  "t_pt",
 		Value:     new(float32),
+		TreeFunc:  ana.NewFuncVarF32("t_pt"),
 		Nbins:     100,
 		Xmin:      0,
 		Xmax:      500,
@@ -395,6 +431,7 @@ var (
 		SaveName:   "eta_t",
 		TreeName:   "t_eta",
 		Value:      new(float32),
+		TreeFunc:    ana.NewFuncVarF32("t_eta"),
 		Nbins:      25,
 		Xmin:       -5,
 		Xmax:       5,
@@ -411,6 +448,7 @@ var (
 		SaveName:   "m_tt",
 		TreeName:   "ttbar_m",
 		Value:      new(float32),
+		TreeFunc:    ana.NewFuncVarF32("ttbar_m"),
 		Nbins:      25,
 		Xmin:       300,
 		Xmax:       1000,
@@ -421,12 +459,13 @@ var (
 		LegPosLeft: false,
 		RangeXmin:  300,
 	}
-
+	
 	var_pt_tt = &ana.Variable{
 		Name:       "pt_tt",
 		SaveName:   "pt_tt",
 		TreeName:   "ttbar_pt",
 		Value:      new(float32),
+		TreeFunc:    ana.NewFuncVarF32("ttbar_pt"),
 		Nbins:      25,
 		Xmin:       0,
 		Xmax:       150,
@@ -441,6 +480,23 @@ var (
 		TreeName: "init_x1",
 		Value:    new(float32),
 		SaveName: "init_x1",
+		TreeFunc:    ana.NewFuncVarF32("init_x1"),
+		Nbins:    25,
+		Xmin:     0,
+		Xmax:     1,
+	}
+
+	var_x1x2 = &ana.Variable{
+		TreeName: "init_x1*init_x2*(1.0 + init_x1/(init_x1*init_x2))",
+		Value:    new(float32),
+		SaveName: "x1x2",
+		TreeFunc: ana.TreeFunc{
+			VarsName: []string{"init_x1", "init_x2"},
+			Fct: func (x1, x2 float32) float64 {
+				res := x1*x2// * (1 + x1/(x1*x2))
+				return float64(res)
+			},
+		},
 		Nbins:    25,
 		Xmin:     0,
 		Xmax:     1,
