@@ -34,8 +34,9 @@ type Maker struct {
 	DontStack    bool             // Disable histogram stacking (e.g. compare various processes)
 	Normalize    bool             // Normalize distributions to unit area (when stacked, the total is normalized)
 
-	WithTreeFormula bool // TEMP for benchmarking
-
+	WithTreeFormula bool     // TEMP for benchmarking
+	WithTreeFormulaFunc bool // TEMP for benchmarking
+	
 	nEvents  int64         // Number of processed events
 	timeLoop time.Duration // Processing time for filling histograms (event loop over samples x cuts x histos)
 	timePlot time.Duration // Processing time for plotting histogram
@@ -60,74 +61,86 @@ func (ana *Maker) MakeHistos() error {
 			// Get the file and tree
 			f, t := getTreeFromFile(s.FileName, s.TreeName)
 			defer f.Close()
-
-			tree := rtree.Chain(t) /*, t, t, t,
-			t, t, t, t, t, t, t, t,
-			t, t, t, t, t, t, t, t,
-			t, t, t, t, t, t, t, t,
-			t, t, t, t, t, t, t, t,
-			t, t, t, t, t, t, t, t,
-			t, t, t, t, t, t, t, t)*/
-
+		
 			var rvars []rtree.ReadVar
-			if !ana.WithTreeFormula {
+			if !ana.WithTreeFormula && !ana.WithTreeFormulaFunc {
 				for _, v := range ana.Variables {
 					rvars = append(rvars, rtree.ReadVar{Name: v.TreeName, Value: v.Value})
 				}
 			}
-
+			
 			// Get the tree reader
-			r, err := rtree.NewReader(tree, rvars)
+			r, err := rtree.NewReader(t, rvars)
 			if err != nil {
-				return fmt.Errorf("could not create tree reader: %w", err)
+				log.Fatal("could not create tree reader: %w", err)
 			}
 			defer r.Close()
 
-			var_formula := make([]rtree.Formula, len(ana.Variables))
+			varFormula := make([]*rtree.Formula, len(ana.Variables))
 			if ana.WithTreeFormula {
 				var errForm error
 				for i, v := range ana.Variables {
-					var_formula[i], errForm = r.Formula("float64("+v.TreeName+")", nil)
+					varFormula[i], errForm = r.Formula("float64("+v.TreeName+")", nil)
 					if errForm != nil {
 						log.Fatalf("could not create formula: %+v", errForm)
 					}
 				}
 			}
 
+			varFormulaFunc := make([]func() float64, len(ana.Variables))
+			if ana.WithTreeFormulaFunc {
+				for i, v := range ana.Variables {
+					varFormulaFunc[i] = v.TreeFunc.GetVarFunc(r)
+				}
+			}
+
 			// Prepare the weight
-			var wform rtree.Formula
+			var wform *rtree.Formula
 			getWeight := func() float64 { return float64(1.0) }
 			if s.Weight != "" {
-				wform, err = r.Formula("float64("+s.Weight+")", nil)
-				if err != nil {
-					log.Fatalf("could not create sample weight formula: %+v", err)
+				if ana.WithTreeFormulaFunc {
+					getWeight = s.WeightFunc.GetVarFunc(r)
+				} else {
+					wform, err = r.Formula("float64("+s.Weight+")", nil)
+					if err != nil {
+						log.Fatalf("could not create sample weight formula: %+v", err)
+					}
+					getWeight = func() float64 { return wform.Eval().(float64) }
 				}
-				getWeight = func() float64 { return wform.Eval().(float64) }
 			}
 
 			// Prepare the sample cut
-			var cutSampleform rtree.Formula
+			var cutSampleform *rtree.Formula
 			passSampleCut := func() bool { return true }
 			if s.Cut != "" {
-				cutSampleform, err = r.Formula("bool("+s.Cut+")", nil)
-				if err != nil {
-					log.Fatalf("could not create sample cut formula: %+v", err)
+				if ana.WithTreeFormulaFunc {
+					passSampleCut = s.CutFunc.GetCutFunc(r)
+				} else {
+					cutSampleform, err = r.Formula("bool("+s.Cut+")", nil)
+					if err != nil {
+						log.Fatalf("could not create sample cut formula: %+v", err)
+					}
+					passSampleCut = func() bool { return cutSampleform.Eval().(bool) }
 				}
-				passSampleCut = func() bool { return cutSampleform.Eval().(bool) }
 			}
 
 			// Prepare the cut string for kinematics
-			cutKinem := make([]rtree.Formula, len(ana.Cuts))
+			cutKinem := make([]*rtree.Formula, len(ana.Cuts))
 			passKinemCut := make([]func() bool, len(ana.Cuts))
 			for ic, cut := range ana.Cuts {
 				passKinemCut[ic] = func() bool { return true }
+				idx := ic
 				if cut.TreeName != "true" {
-					cutKinem[ic], err = r.Formula("bool("+cut.TreeName+")", nil)
-					if err != nil {
-						log.Fatalf("could not create kinem cut formula: %+v", err)
+					if ana.WithTreeFormulaFunc {
+						passKinemCut[idx] = cut.TreeFunc.GetCutFunc(r)
+						
+					} else {
+						cutKinem[ic], err = r.Formula("bool("+cut.TreeName+")", nil)
+						if err != nil {
+							log.Fatalf("could not create kinem cut formula: %+v", err)
+						}
+						passKinemCut[idx] = func() bool { return cutKinem[idx].Eval().(bool) }
 					}
-					idx := ic
-					passKinemCut[idx] = func() bool { return cutKinem[idx].Eval().(bool) }
 				}
 			}
 
@@ -150,9 +163,13 @@ func (ana *Maker) MakeHistos() error {
 					}
 
 					for iv, v := range ana.Variables {
-						val := v.GetValue()
+						val := 0.0
 						if ana.WithTreeFormula {
-							val = var_formula[iv].Eval().(float64)
+							val = varFormula[iv].Eval().(float64)
+						} else if ana.WithTreeFormulaFunc {
+							val = varFormulaFunc[iv]()
+						} else {
+							val = v.GetValue()
 						}
 						ana.HbookHistos[iv][ic][is].Fill(val, w)
 					}
@@ -162,7 +179,7 @@ func (ana *Maker) MakeHistos() error {
 			})
 
 			// Keep track of the number of processed events
-			ana.nEvents += tree.Entries()
+			ana.nEvents += t.Entries()
 
 			return nil
 		}(is)
@@ -451,7 +468,7 @@ func (ana Maker) PrintReport() {
 	str_template += "    - %v histograms filled over %.0f kEvts (%v samples, %v variables, %v selections)\n"
 	str_template += "    - running time: %.1f ms/kEvt (%s for %.0f kEvts)\n"
 	str_template += "    - time fraction: %.0f%% (event loop), %.0f%% (plotting)\n\n"
-
+	
 	fmt.Printf(str_template,
 		nhist, nkevt, nsamples, nvars, ncuts,
 		(dtLoop+dtPlot)/nkevt, fmtDuration(ana.timeLoop+ana.timePlot), nkevt,

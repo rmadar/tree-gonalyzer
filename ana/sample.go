@@ -22,7 +22,9 @@ type Sample struct {
 	FileName          string
 	TreeName          string
 	Weight            string
+	WeightFunc        TreeFunc
 	Cut               string
+	CutFunc           TreeFunc
 	LegLabel          string
 	LineColor         color.NRGBA
 	LineWidth         vg.Length

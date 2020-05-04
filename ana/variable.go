@@ -12,6 +12,7 @@ type Variable struct {
 	SaveName    string
 	TreeName    string
 	Value       interface{}
+	TreeFunc    TreeFunc
 	Nbins       int
 	Xmin, Xmax  float64
 	PlotTitle   string
