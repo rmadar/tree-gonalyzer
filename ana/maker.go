@@ -35,7 +35,6 @@ type Maker struct {
 	Normalize    bool             // Normalize distributions to unit area (when stacked, the total is normalized)
 
 	WithTreeFormula bool     // TEMP for benchmarking
-	WithTreeFormulaFunc bool // TEMP for benchmarking
 	
 	nEvents  int64         // Number of processed events
 	timeLoop time.Duration // Processing time for filling histograms (event loop over samples x cuts x histos)
@@ -63,7 +62,7 @@ func (ana *Maker) MakeHistos() error {
 			defer f.Close()
 		
 			var rvars []rtree.ReadVar
-			if !ana.WithTreeFormula && !ana.WithTreeFormulaFunc {
+			if !ana.WithTreeFormula {
 				for _, v := range ana.Variables {
 					rvars = append(rvars, rtree.ReadVar{Name: v.TreeName, Value: v.Value})
 				}
@@ -76,74 +75,41 @@ func (ana *Maker) MakeHistos() error {
 			}
 			defer r.Close()
 
-			varFormula := make([]*rtree.Formula, len(ana.Variables))
+			varFormula := make([]func() float64, len(ana.Variables))
 			if ana.WithTreeFormula {
-				var errForm error
 				for i, v := range ana.Variables {
-					varFormula[i], errForm = r.Formula("float64("+v.TreeName+")", nil)
-					if errForm != nil {
-						log.Fatalf("could not create formula: %+v", errForm)
-					}
-				}
-			}
-
-			varFormulaFunc := make([]func() float64, len(ana.Variables))
-			if ana.WithTreeFormulaFunc {
-				for i, v := range ana.Variables {
-					varFormulaFunc[i] = v.TreeFunc.GetVarFunc(r)
+					varFormula[i] = v.TreeFunc.GetVarFunc(r)
 				}
 			}
 
 			// Prepare the weight
-			var wform *rtree.Formula
 			getWeight := func() float64 { return float64(1.0) }
 			if s.Weight != "" {
-				if ana.WithTreeFormulaFunc {
+				if ana.WithTreeFormula {
 					getWeight = s.WeightFunc.GetVarFunc(r)
-				} else {
-					wform, err = r.Formula("float64("+s.Weight+")", nil)
-					if err != nil {
-						log.Fatalf("could not create sample weight formula: %+v", err)
-					}
-					getWeight = func() float64 { return wform.Eval().(float64) }
 				}
 			}
-
+			
 			// Prepare the sample cut
-			var cutSampleform *rtree.Formula
 			passSampleCut := func() bool { return true }
 			if s.Cut != "" {
-				if ana.WithTreeFormulaFunc {
+				if ana.WithTreeFormula {
 					passSampleCut = s.CutFunc.GetCutFunc(r)
-				} else {
-					cutSampleform, err = r.Formula("bool("+s.Cut+")", nil)
-					if err != nil {
-						log.Fatalf("could not create sample cut formula: %+v", err)
-					}
-					passSampleCut = func() bool { return cutSampleform.Eval().(bool) }
 				}
 			}
 
 			// Prepare the cut string for kinematics
-			cutKinem := make([]*rtree.Formula, len(ana.Cuts))
 			passKinemCut := make([]func() bool, len(ana.Cuts))
 			for ic, cut := range ana.Cuts {
 				passKinemCut[ic] = func() bool { return true }
 				idx := ic
 				if cut.TreeName != "true" {
-					if ana.WithTreeFormulaFunc {
+					if ana.WithTreeFormula {
 						passKinemCut[idx] = cut.TreeFunc.GetCutFunc(r)
-						
-					} else {
-						cutKinem[ic], err = r.Formula("bool("+cut.TreeName+")", nil)
-						if err != nil {
-							log.Fatalf("could not create kinem cut formula: %+v", err)
-						}
-						passKinemCut[idx] = func() bool { return cutKinem[idx].Eval().(bool) }
 					}
 				}
 			}
-
+			
 			// Read the tree (event loop)
 			err = r.Read(func(ctx rtree.RCtx) error {
 
@@ -151,40 +117,38 @@ func (ana *Maker) MakeHistos() error {
 				if !passSampleCut() {
 					return nil
 				}
-
+				
 				// Get the event weight
 				w := getWeight()
-
+				
 				// Loop over selection and variables
 				for ic := range ana.Cuts {
-
+					
 					if !passKinemCut[ic]() {
 						continue
 					}
-
+					
 					for iv, v := range ana.Variables {
 						val := 0.0
 						if ana.WithTreeFormula {
-							val = varFormula[iv].Eval().(float64)
-						} else if ana.WithTreeFormulaFunc {
-							val = varFormulaFunc[iv]()
+							val = varFormula[iv]()
 						} else {
 							val = v.GetValue()
 						}
 						ana.HbookHistos[iv][ic][is].Fill(val, w)
 					}
 				}
-
+				
 				return nil
 			})
-
+			
 			// Keep track of the number of processed events
 			ana.nEvents += t.Entries()
-
+			
 			return nil
 		}(is)
 	}
-
+	
 	// End timing
 	ana.timeLoop = time.Now().Sub(start)
 

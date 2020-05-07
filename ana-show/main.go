@@ -16,8 +16,7 @@ import (
 func main() {
 
 	var doLatex = flag.Bool("latex", false, "On-the-fly LaTeX compilation of produced figure")
-	var useFormula = flag.Bool("formula", false, "Use TreeFormula for variable")
-	var useFormulaFunc = flag.Bool("func", false, "Use TreeFormulaFunc for variable")
+	var useFormula = flag.Bool("formula", false, "Use TreeFormulaFunc for variable")
 	var noRatio = flag.Bool("r", false, "Disable ratio plot")
 	flag.Parse()
 
@@ -26,7 +25,6 @@ func main() {
 
 		// Test Tree formula
 		WithTreeFormula: *useFormula,
-		WithTreeFormulaFunc: *useFormulaFunc,
 
 		// Output figure
 		SaveFormat:   "tex",
