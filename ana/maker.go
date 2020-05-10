@@ -22,24 +22,52 @@ import (
 
 // Analyzer type
 type Maker struct {
+
+	// Inputs info
 	Samples      []Sample         // Sample on which to run
 	SamplesGroup string           // Specify how to group samples together
 	Variables    []*Variable      // List of variables to plot
 	Cuts         []Selection      // List of cuts
+
+	// Figure related setup
 	SaveFormat   string           // Extension of saved figure 'tex', 'pdf', 'png'
-	RatioPlot    bool             // Enable ratio plot
 	CompileLatex bool             // Enable on-the-fly latex compilation of plots
-	HbookHistos  [][][]*hbook.H1D // Currently 3D histo container, later: n-dim [var, sample, cut, syst]
-	HplotHistos  [][][]*hplot.H1D // Currently 3D histo container, later: n-dim [var, sample, cut, syst]
+
+	// Plot related setup
+	RatioPlot    bool             // Enable ratio plot
 	DontStack    bool             // Disable histogram stacking (e.g. compare various processes)
 	Normalize    bool             // Normalize distributions to unit area (when stacked, the total is normalized)
 
-	WithTreeFormula bool     // TEMP for benchmarking
-	
-	nEvents  int64         // Number of processed events
-	timeLoop time.Duration // Processing time for filling histograms (event loop over samples x cuts x histos)
-	timePlot time.Duration // Processing time for plotting histogram
+	// Histograms
+	HbookHistos  [][][]*hbook.H1D // Currently 3D histo container
+	HplotHistos  [][][]*hplot.H1D // Currently 3D histo container
 
+	// Temp
+	WithTreeFormula bool   // TEMP for benchmarking
+
+	cutIdx        map[string]int // Linking cut name and cut index
+	sampleIdx     map[string]int // Linking sample name and sample index
+	variableIdx   map[string]int // Linking variable name and variable index
+	histoFilled bool           // true if histograms are filled.
+	nEvents  int64             // Number of processed events
+	timeLoop time.Duration     // Processing time for filling histograms (event loop over samples x cuts x histos)
+	timePlot time.Duration     // Processing time for plotting histogram
+
+}
+
+// Creating a new object
+// TO-DO: switch to all pointers []*Sample, []*Variables
+func New(s []Sample, v []*Variable) Maker {
+	return Maker{
+		Samples: s,
+		Variables: v,
+	}
+}
+
+// Helper function creating the mapping between name and objects
+func getNameIndices(obj interface{}) map[string]int {
+	// obj = []variables, []samples, []cuts
+	return make(map[string]int, 10)
 }
 
 // Run the event loop to fill all histo across samples / variables / cuts (and later: systematics)
@@ -148,6 +176,8 @@ func (ana *Maker) MakeHistos() error {
 			return nil
 		}(is)
 	}
+
+	ana.histoFilled = true
 	
 	// End timing
 	ana.timeLoop = time.Now().Sub(start)
@@ -162,7 +192,7 @@ func (ana *Maker) PlotHistos() error {
 	start := time.Now()
 
 	// Return an error if HbookHistos is empty
-	if len(ana.HbookHistos) == 0 {
+	if !ana.histoFilled {
 		log.Fatalf("There is no histograms. Please make sure that 'MakeHistos()' is called before 'PlotHistos()'")
 	}
 
