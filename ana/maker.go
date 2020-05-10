@@ -24,48 +24,60 @@ import (
 type Maker struct {
 
 	// Inputs info
-	Samples      []Sample         // Sample on which to run
-	SamplesGroup string           // Specify how to group samples together
-	Variables    []*Variable      // List of variables to plot
-	Cuts         []Selection      // List of cuts
+	Samples      []Sample    // Sample on which to run
+	SamplesGroup string      // Specify how to group samples together
+	Variables    []*Variable // List of variables to plot
+	Cuts         []Selection // List of cuts
 
 	// Figure related setup
-	SaveFormat   string           // Extension of saved figure 'tex', 'pdf', 'png'
-	CompileLatex bool             // Enable on-the-fly latex compilation of plots
+	SaveFormat   string // Extension of saved figure 'tex', 'pdf', 'png'
+	CompileLatex bool   // Enable on-the-fly latex compilation of plots
 
 	// Plot related setup
-	RatioPlot    bool             // Enable ratio plot
-	DontStack    bool             // Disable histogram stacking (e.g. compare various processes)
-	Normalize    bool             // Normalize distributions to unit area (when stacked, the total is normalized)
+	RatioPlot bool // Enable ratio plot
+	DontStack bool // Disable histogram stacking (e.g. compare various processes)
+	Normalize bool // Normalize distributions to unit area (when stacked, the total is normalized)
 
 	// Histograms
-	HbookHistos  [][][]*hbook.H1D // Currently 3D histo container
-	HplotHistos  [][][]*hplot.H1D // Currently 3D histo container
+	HbookHistos [][][]*hbook.H1D // Currently 3D histo container
+	HplotHistos [][][]*hplot.H1D // Currently 3D histo container
 
 	// Temp
-	WithTreeFormula bool   // TEMP for benchmarking
+	WithTreeFormula bool // TEMP for benchmarking
 
-	cutIdx        map[string]int // Linking cut name and cut index
-	sampleIdx     map[string]int // Linking sample name and sample index
-	variableIdx   map[string]int // Linking variable name and variable index
+	cutIdx      map[string]int // Linking cut name and cut index
+	samIdx      map[string]int // Linking sample name and sample index
+	varIdx     map[string]int // Linking variable name and variable index
 	histoFilled bool           // true if histograms are filled.
-	nEvents  int64             // Number of processed events
-	timeLoop time.Duration     // Processing time for filling histograms (event loop over samples x cuts x histos)
-	timePlot time.Duration     // Processing time for plotting histogram
+	nEvents     int64          // Number of processed events
+	timeLoop    time.Duration  // Processing time for filling histograms (event loop over samples x cuts x histos)
+	timePlot    time.Duration  // Processing time for plotting histogram
 
 }
 
 // Creating a new object
 // TO-DO: switch to all pointers []*Sample, []*Variables
 func New(s []Sample, v []*Variable) Maker {
-	return Maker{
-		Samples: s,
+
+	// Create the object
+	ana := Maker{
+		Samples:   s,
 		Variables: v,
 	}
+
+	// Check all required field a filled
+	// ...
+
+	// Get the mapping
+	ana.samIdx = getIdxMap(ana.Samples)
+	ana.varIdx = getIdxMap(ana.Variables)
+	ana.cutIdx = getIdxMap(ana.Cuts)
+
+	return ana
 }
 
 // Helper function creating the mapping between name and objects
-func getNameIndices(obj interface{}) map[string]int {
+func getIdxMap(obj interface{}) map[string]int {
 	// obj = []variables, []samples, []cuts
 	return make(map[string]int, 10)
 }
@@ -88,14 +100,14 @@ func (ana *Maker) MakeHistos() error {
 			// Get the file and tree
 			f, t := getTreeFromFile(s.FileName, s.TreeName)
 			defer f.Close()
-		
+
 			var rvars []rtree.ReadVar
 			if !ana.WithTreeFormula {
 				for _, v := range ana.Variables {
 					rvars = append(rvars, rtree.ReadVar{Name: v.TreeName, Value: v.Value})
 				}
 			}
-			
+
 			// Get the tree reader
 			r, err := rtree.NewReader(t, rvars)
 			if err != nil {
@@ -117,7 +129,7 @@ func (ana *Maker) MakeHistos() error {
 					getWeight = s.WeightFunc.GetVarFunc(r)
 				}
 			}
-			
+
 			// Prepare the sample cut
 			passSampleCut := func() bool { return true }
 			if s.Cut != "" {
@@ -137,7 +149,7 @@ func (ana *Maker) MakeHistos() error {
 					}
 				}
 			}
-			
+
 			// Read the tree (event loop)
 			err = r.Read(func(ctx rtree.RCtx) error {
 
@@ -145,17 +157,17 @@ func (ana *Maker) MakeHistos() error {
 				if !passSampleCut() {
 					return nil
 				}
-				
+
 				// Get the event weight
 				w := getWeight()
-				
+
 				// Loop over selection and variables
 				for ic := range ana.Cuts {
-					
+
 					if !passKinemCut[ic]() {
 						continue
 					}
-					
+
 					for iv, v := range ana.Variables {
 						val := 0.0
 						if ana.WithTreeFormula {
@@ -166,19 +178,19 @@ func (ana *Maker) MakeHistos() error {
 						ana.HbookHistos[iv][ic][is].Fill(val, w)
 					}
 				}
-				
+
 				return nil
 			})
-			
+
 			// Keep track of the number of processed events
 			ana.nEvents += t.Entries()
-			
+
 			return nil
 		}(is)
 	}
 
 	ana.histoFilled = true
-	
+
 	// End timing
 	ana.timeLoop = time.Now().Sub(start)
 
@@ -290,7 +302,7 @@ func (ana *Maker) PlotHistos() error {
 				hplt := ana.Samples[is].CreateHisto(h, hplot.WithBand(withBand))
 				p.Legend.Add(ana.Samples[is].LegLabel, hplt)
 				ana.HplotHistos[iv][isel][is] = hplt
-				
+
 				// Keep data appart from backgrounds
 				if ana.Samples[is].IsData() {
 					phData = ana.HplotHistos[iv][isel][is]
@@ -319,16 +331,15 @@ func (ana *Maker) PlotHistos() error {
 					stack.Stack = hplot.HStackOff
 				} else {
 					hBand := hplot.NewH1D(hbook.NewH1D(1, 0, 1), hplot.WithBand(true))
-					hBand.Band = stack.Band 
+					hBand.Band = stack.Band
 					p.Legend.Add("Uncer.", hBand)
 				}
 
 				// Add the stack to the plot
 				p.Add(stack)
-				
+
 			}
-			
-			
+
 			// Adding hplot.H1D data to the plot, set the drawer to the current plot
 			if bhData.Entries() > 0 {
 				p.Add(phData)
@@ -367,7 +378,7 @@ func (ana *Maker) PlotHistos() error {
 						if bhData.Entries() == 0 {
 							href = bhBkgs_postnorm[0]
 						}
-						
+
 						hbs2d_ratio, err := hbook.DivideH1D(h, href, hbook.DivIgnoreNaNs())
 						if err != nil {
 							log.Fatal("cannot divide histo for the ratio plot")
@@ -462,7 +473,7 @@ func (ana Maker) PrintReport() {
 	str_template += "    - %v histograms filled over %.0f kEvts (%v samples, %v variables, %v selections)\n"
 	str_template += "    - running time: %.1f ms/kEvt (%s for %.0f kEvts)\n"
 	str_template += "    - time fraction: %.0f%% (event loop), %.0f%% (plotting)\n\n"
-	
+
 	fmt.Printf(str_template,
 		nhist, nkevt, nsamples, nvars, ncuts,
 		(dtLoop+dtPlot)/nkevt, fmtDuration(ana.timeLoop+ana.timePlot), nkevt,
