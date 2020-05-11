@@ -14,7 +14,7 @@ import (
 	"github.com/rmadar/hplot-style/style"
 )
 
-var colorNil = color.NRGBA{R: 0, G: 0, B: 0, A: 0}	
+var colorNil = color.NRGBA{R: 0, G: 0, B: 0, A: 0}
 
 type Sample struct {
 	Name              string
@@ -39,10 +39,10 @@ type Sample struct {
 
 // Return a hplot.H1D with the proper style
 func (s Sample) CreateHisto(hdata *hbook.H1D, opts ...hplot.Options) *hplot.H1D {
-	
+
 	// Append sample-defined options
 	opts = append(opts, hplot.WithYErrBars(s.WithYErrBars))
-	
+
 	// Create the plotable histo from histogrammed data
 	h := hplot.NewH1D(hdata, opts...)
 
@@ -75,7 +75,7 @@ func (s Sample) CreateHisto(hdata *hbook.H1D, opts ...hplot.Options) *hplot.H1D 
 		if s.YErrBarsLineWidth != 0.0 {
 			h.YErrs.LineStyle.Width = s.YErrBarsLineWidth
 		}
-		
+
 		if s.YErrBarsCapWidth != 0.0 {
 			h.YErrs.CapWidth = s.YErrBarsCapWidth
 		}
@@ -85,7 +85,7 @@ func (s Sample) CreateHisto(hdata *hbook.H1D, opts ...hplot.Options) *hplot.H1D 
 	if h.Band != nil {
 		s.SetBandStyle(h.Band)
 	}
-	
+
 	return h
 }
 

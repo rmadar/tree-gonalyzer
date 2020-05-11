@@ -47,7 +47,7 @@ type Maker struct {
 
 	cutIdx      map[string]int // Linking cut name and cut index
 	samIdx      map[string]int // Linking sample name and sample index
-	varIdx     map[string]int // Linking variable name and variable index
+	varIdx      map[string]int // Linking variable name and variable index
 	histoFilled bool           // true if histograms are filled.
 	nEvents     int64          // Number of processed events
 	timeLoop    time.Duration  // Processing time for filling histograms (event loop over samples x cuts x histos)
@@ -203,6 +203,9 @@ func (ana *Maker) PlotHistos() error {
 	// Start timing
 	start := time.Now()
 
+	// Error Band color
+	errBandColor := color.NRGBA{R: 255, G: 0, B: 0, A: 80}
+
 	// Return an error if HbookHistos is empty
 	if !ana.histoFilled {
 		log.Fatalf("There is no histograms. Please make sure that 'MakeHistos()' is called before 'PlotHistos()'")
@@ -326,12 +329,13 @@ func (ana *Maker) PlotHistos() error {
 
 				// Stacking the background histo
 				stack := hplot.NewHStack(phBkgs, hplot.WithBand(true))
-				stack.Band.FillColor = color.NRGBA{R: 255, G: 255, B: 255, A: 150}
+				stack.Band.FillColor = errBandColor
 				if ana.DontStack {
 					stack.Stack = hplot.HStackOff
 				} else {
 					hBand := hplot.NewH1D(hbook.NewH1D(1, 0, 1), hplot.WithBand(true))
 					hBand.Band = stack.Band
+					hBand.LineStyle.Width = 0
 					p.Legend.Add("Uncer.", hBand)
 				}
 
@@ -414,7 +418,7 @@ func (ana *Maker) PlotHistos() error {
 					hps2d_ratio1.GlyphStyle.Radius = 0
 					hps2d_ratio1.LineStyle.Width = 0.0
 					hps2d_ratio1.LineStyle.Color = color.NRGBA{R: 140, G: 140, B: 140, A: 255}
-					hps2d_ratio1.Band.FillColor = color.NRGBA{R: 200, G: 200, B: 200, A: 255}
+					hps2d_ratio1.Band.FillColor = errBandColor
 					rp.Bottom.Add(hps2d_ratio1)
 					rp.Bottom.Add(hps2d_ratio)
 				}

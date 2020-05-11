@@ -73,21 +73,21 @@ func main() {
 
 		// Included samples
 		Samples: []ana.Sample{
-			spl_data_bench,
-			spl_bkg0_bench,
-			spl_bkg1_bench,
-			spl_bkg2_bench,
-			//spl_data,
-			//spl_bkg1bis,
-			//spl_bkg1,
-			//spl_bkg2,
-			//spl_alt,
+			//spl_data_bench,
+			//spl_bkg0_bench,
+			//spl_bkg1_bench,
+			//spl_bkg2_bench,
+			spl_data,
+			spl_bkg1bis,
+			spl_bkg1,
+			spl_bkg2,
+			spl_alt,
 		},
 
 		// Set of observable to plot
 		Variables: []*ana.Variable{
 			var_m_tt,
-			var_pt_lep,
+			/*var_pt_lep,
 			var_dphi,
 			var_Ckk,
 			var_Crr,
@@ -100,8 +100,8 @@ func main() {
 			var_pt_t,
 			var_eta_t,
 			var_pt_tt,
-			var_x1,
-			var_x1x2,
+			var_x1,*/
+			//var_x1x2,
 		},
 	}
 
