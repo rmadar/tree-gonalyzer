@@ -17,13 +17,11 @@ import (
 var colorNil = color.NRGBA{R: 0, G: 0, B: 0, A: 0}
 
 type Sample struct {
-	Name              string
-	Type              string
-	FileName          string
-	TreeName          string
-	Weight            string
-	WeightFunc        TreeFunc
-	Cut               string
+	Name     string
+	Type     string
+	FileName string
+	TreeName string
+	WeightFunc TreeFunc
 	CutFunc           TreeFunc
 	LegLabel          string
 	LineColor         color.NRGBA

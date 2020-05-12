@@ -486,7 +486,6 @@ func (ana *Maker) initHbookHistos() {
 		ana.Cuts = append(ana.Cuts,
 			Selection{
 				Name:     "No-cut",
-				TreeName: "true",
 				TreeFunc: TreeFunc{
 					VarsName: []string{},
 					Fct:      func() bool { return true },
