@@ -103,6 +103,7 @@ func (ana *Maker) MakeHistos() error {
 			f, t := getTreeFromFile(s.FileName, s.TreeName)
 			defer f.Close()
 
+			// Prepare variables to explicitely load
 			var rvars []rtree.ReadVar
 			if !ana.WithTreeFormula {
 				for _, v := range ana.Variables {
@@ -246,11 +247,7 @@ func (ana *Maker) PlotHistos() error {
 				phBkgs          []*hplot.H1D
 				phData          *hplot.H1D
 			)
-
-			// Apply common and user-defined style for this variable
-			style.ApplyToPlot(p)
-			v.SetPlotStyle(p)
-
+			
 			// First sample loop: compute normalisation, sum bkg bh, keep data bh
 			for is, h := range hsamples {
 
@@ -341,8 +338,15 @@ func (ana *Maker) PlotHistos() error {
 			if bhData.Entries() > 0 {
 				p.Add(phData)
 			}
+			
+			// Apply common and user-defined style for this variable
+			// FIX-ME (rmadar): the v.SetPlotStyle(v) command doesn't update
+			//                  y-axis scale if it is put before the samples
+			//                  loop and I am not sure why.
+			style.ApplyToPlot(p)
+			v.SetPlotStyle(p)
 			plt = p
-
+			
 			// Addition of the ratio plot
 			if ana.RatioPlot {
 

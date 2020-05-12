@@ -32,7 +32,7 @@ func main() {
 		RatioPlot:    !*noRatio,
 
 		// Histogram representation
-		Normalize: true,
+		Normalize: false,
 		DontStack: true,
 
 		// Set of cuts
@@ -83,6 +83,7 @@ func main() {
 		// Set of observable to plot
 		Variables: []*ana.Variable{
 			var_m_tt,
+			var_eta_t,
 			/*var_pt_lep,
 			var_dphi,
 			var_Ckk,
@@ -94,7 +95,6 @@ func main() {
 			var_eta_b,
 			var_pt_vsum,
 			var_pt_t,
-			var_eta_t,
 			var_pt_tt,
 			var_x1,*/
 			//var_x1x2,
@@ -430,6 +430,7 @@ var (
 		LegPosTop:  true,
 		LegPosLeft: false,
 		RangeXmax:  8,
+		RangeYmax:  100,
 	}
 
 	var_m_tt = &ana.Variable{
@@ -447,8 +448,11 @@ var (
 		LegPosTop:  true,
 		LegPosLeft: false,
 		RangeXmin:  300,
+		RangeXmax:  1500,
+		RangeYmin:  500,
+		RangeYmax:  1000,
 	}
-
+	
 	var_pt_tt = &ana.Variable{
 		Name:       "pt_tt",
 		SaveName:   "pt_tt",
@@ -464,7 +468,7 @@ var (
 		LegPosTop:  true,
 		LegPosLeft: false,
 	}
-
+	
 	var_x1 = &ana.Variable{
 		TreeName: "init_x1",
 		Value:    new(float32),
@@ -476,14 +480,11 @@ var (
 	}
 
 	var_x1x2 = &ana.Variable{
-		TreeName: "init_x1*init_x2*(1.0 + init_x1/(init_x1*init_x2))",
-		Value:    new(float32),
 		SaveName: "x1x2",
 		TreeFunc: ana.TreeFunc{
 			VarsName: []string{"init_x1", "init_x2"},
 			Fct: func(x1, x2 float32) float64 {
-				res := x1 * x2 // * (1 + x1/(x1*x2))
-				return float64(res)
+				return float64(x1 * x2)
 			},
 		},
 		Nbins: 25,

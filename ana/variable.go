@@ -53,22 +53,26 @@ func (v Variable) GetValue() float64 {
 func (v Variable) SetPlotStyle(p *hplot.Plot) {
 
 	// Plot labels
-	if &v.PlotTitle != nil {
+	if v.PlotTitle != "" {
 		p.Title.Text = v.PlotTitle
 	}
-	if &v.XLabel != nil {
+	if v.XLabel != "" {
 		p.X.Label.Text = v.XLabel
 	}
-	if &v.YLabel != nil {
+	if v.YLabel != "" {
 		p.Y.Label.Text = v.YLabel
 	}
 
 	// Axis ranges
-	p.X.Min = v.RangeXmin
-	p.X.Max = v.RangeXmax
-	p.X.Min = v.RangeXmin
-	p.X.Max = v.RangeXmax
-
+	if v.RangeXmin != v.RangeXmax {
+		p.X.Min = v.RangeXmin
+		p.X.Max = v.RangeXmax
+	}
+	if v.RangeYmin != v.RangeYmax {
+		p.Y.Min = v.RangeYmin
+		p.Y.Max = v.RangeYmax
+	}
+	
 	// Axis ticks tuning
 	if v.XTickFormat != "" {
 		p.X.Tick.Marker = hplot.Ticks{N: 10, Format: v.XTickFormat}
@@ -77,14 +81,16 @@ func (v Variable) SetPlotStyle(p *hplot.Plot) {
 		p.Y.Tick.Marker = hplot.Ticks{N: 10, Format: v.YTickFormat}
 	}
 
-	// Legend setup
+	// Legend position: basic
 	p.Legend.Top = v.LegPosTop
+	p.Legend.Left = v.LegPosLeft
+
+	// Legend position: fine tuning
 	if p.Legend.Top {
 		p.Legend.YOffs = -5
 	} else {
 		p.Legend.YOffs = 5
 	}
-	p.Legend.Left = v.LegPosLeft
 	if p.Legend.Left {
 		p.Legend.XOffs = 5
 	} else {
