@@ -69,7 +69,7 @@ func New(s []Sample, v []*Variable) Maker {
 	// ...
 
 	// Setup defaults values e.g cuts
-	
+
 	// Get the mapping
 	ana.samIdx = getIdxMap(ana.Samples)
 	ana.varIdx = getIdxMap(ana.Variables)
@@ -120,27 +120,27 @@ func (ana *Maker) MakeHistos() error {
 			varFormula := make([]func() float64, len(ana.Variables))
 			if ana.WithTreeFormula {
 				for i, v := range ana.Variables {
-					varFormula[i] = v.TreeFunc.GetF64(r)
+					varFormula[i] = v.TreeFunc.GetFuncF64(r)
 				}
 			}
 
 			// Prepare the weight
 			getWeight := func() float64 { return float64(1.0) }
 			if s.WeightFunc.Fct != nil {
-				getWeight = s.WeightFunc.GetF64(r)
+				getWeight = s.WeightFunc.GetFuncF64(r)
 			}
-			
+
 			// Prepare the sample cut
 			passSampleCut := func() bool { return true }
 			if s.CutFunc.Fct != nil {
-				passSampleCut = s.CutFunc.GetBool(r)
+				passSampleCut = s.CutFunc.GetFuncBool(r)
 			}
 
 			// Prepare the cut string for kinematics
 			passKinemCut := make([]func() bool, len(ana.Cuts))
 			for ic, cut := range ana.Cuts {
 				idx := ic
-				passKinemCut[idx] = cut.TreeFunc.GetBool(r)
+				passKinemCut[idx] = cut.TreeFunc.GetFuncBool(r)
 			}
 
 			// Read the tree (event loop)
@@ -150,7 +150,7 @@ func (ana *Maker) MakeHistos() error {
 				if !passSampleCut() {
 					return nil
 				}
-				
+
 				// Get the event weight
 				w := getWeight()
 
@@ -485,7 +485,7 @@ func (ana *Maker) initHbookHistos() {
 	if len(ana.Cuts) == 0 {
 		ana.Cuts = append(ana.Cuts,
 			Selection{
-				Name: "No-cut",
+				Name:     "No-cut",
 				TreeName: "true",
 				TreeFunc: TreeFunc{
 					VarsName: []string{},

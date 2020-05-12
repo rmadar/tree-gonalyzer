@@ -1,8 +1,9 @@
 package ana
 
 import (
-	"go-hep.org/x/hep/groot/rtree"
 	"log"
+
+	"go-hep.org/x/hep/groot/rtree"
 )
 
 type TreeFunc struct {
@@ -10,39 +11,44 @@ type TreeFunc struct {
 	Fct      interface{}
 }
 
-// NewVarF64 returns a TreeFunc to get a single float64 variable.
-func NewFuncVarBool(v string) TreeFunc {
+// NewTreeFuncVarBool returns a TreeFunc to get
+// a single boolean branch-based variable.
+func NewTreeFuncVarBool(v string) TreeFunc {
 	return TreeFunc{
 		VarsName: []string{v},
 		Fct:      func(x bool) bool { return x },
 	}
 }
 
-// NewVarF64 returns a TreeFunc to get a single float64 variable.
-func NewFuncVarF64(v string) TreeFunc {
+// NewTreeFuncVarF64 returns a TreeFunc to get a single
+// float64 branch-based variable.
+func NewTreeFuncVarF64(v string) TreeFunc {
 	return TreeFunc{
 		VarsName: []string{v},
 		Fct:      func(x float64) float64 { return x },
 	}
 }
 
-// NewFuncF64 returns a floats number, ie not a variable from a branch.
-func NewFuncF64(v float64) TreeFunc {
+// NewTreeFuncValF64 returns a TreeFunc to get float value,
+// ie not a branch-based variable.
+func NewTreeFuncValF64(v float64) TreeFunc {
 	return TreeFunc{
 		VarsName: []string{},
 		Fct:      func() float64 { return v },
 	}
 }
 
-// NewVarF64 returns a TreeFunc F64 from a single float32 branch
-func NewFuncVarF32(v string) TreeFunc {
+// NewTreeFuncVarF32 returns a TreeFunc to get a float64 output
+// from a single float32 branch-based variable.
+func NewTreeFuncVarF32(v string) TreeFunc {
 	return TreeFunc{
 		VarsName: []string{v},
 		Fct:      func(x float32) float64 { return float64(x) },
 	}
 }
 
-// Get the rtree.FormulaFunc function from the reader
+// NewFormulaFunc returns the rtree.FormulaFunc function associated
+// to the TreeFunc f, from a give rtree.Reader r.
 func (f *TreeFunc) NewFormulaFunc(r *rtree.Reader) *rtree.FormulaFunc {
 	ff, err := r.FormulaFunc(f.VarsName, f.Fct)
 	if err != nil {
@@ -51,14 +57,22 @@ func (f *TreeFunc) NewFormulaFunc(r *rtree.Reader) *rtree.FormulaFunc {
 	return ff
 }
 
-// Get the function to be called in the event loop to get
-// 'Var' float64 value, from the reader
-func (f *TreeFunc) GetF64(r *rtree.Reader) func() float64 {
-	return f.NewFormulaFunc(r).Func().(func() float64)
+// GetFuncF64 returns a function to be called in the event loop to get
+// the float64 value computed in f.Fct function.
+func (f *TreeFunc) GetFuncF64(r *rtree.Reader) func() float64 {
+	if len(f.VarsName) > 0 {
+		return f.NewFormulaFunc(r).Func().(func() float64)
+	} else {
+		return f.Fct.(func() float64)
+	}
 }
 
-// Get the function to be called in the event loop to get
-// 'Cut' boolean value, from the reader
-func (f *TreeFunc) GetBool(r *rtree.Reader) func() bool {
-	return f.NewFormulaFunc(r).Func().(func() bool)
+// GetFuncBool returns the function to be called in the event loop to get
+// the boolean value computed in f.Fct function.
+func (f *TreeFunc) GetFuncBool(r *rtree.Reader) func() bool {
+	if len(f.VarsName) > 0 {
+		return f.NewFormulaFunc(r).Func().(func() bool)
+	} else {
+		return f.Fct.(func() bool)
+	}
 }

@@ -61,7 +61,7 @@ func (v Variable) SetPlotStyle(p *hplot.Plot) {
 	p.X.Max = v.RangeXmax
 	p.X.Min = v.RangeXmin
 	p.X.Max = v.RangeXmax
-	
+
 	// Axis ticks tuning
 	if v.XTickFormat != "" {
 		p.X.Tick.Marker = hplot.Ticks{N: 10, Format: v.XTickFormat}
@@ -76,7 +76,7 @@ func (v Variable) SetPlotStyle(p *hplot.Plot) {
 		p.Legend.YOffs = -5
 	} else {
 		p.Legend.YOffs = 5
-	}	
+	}
 	p.Legend.Left = v.LegPosLeft
 	if p.Legend.Left {
 		p.Legend.XOffs = 5
