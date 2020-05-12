@@ -57,19 +57,11 @@ func (v Variable) SetPlotStyle(p *hplot.Plot) {
 	}
 
 	// Axis ranges
-	if &v.RangeXmin != nil {
-		p.X.Min = v.RangeXmin
-	}
-	if &v.RangeXmax != nil {
-		p.X.Max = v.RangeXmax
-	}
-	if &v.RangeYmin != nil {
-		p.X.Min = v.RangeXmin
-	}
-	if &v.RangeYmax != nil {
-		p.X.Max = v.RangeXmax
-	}
-
+	p.X.Min = v.RangeXmin
+	p.X.Max = v.RangeXmax
+	p.X.Min = v.RangeXmin
+	p.X.Max = v.RangeXmax
+	
 	// Axis ticks tuning
 	if v.XTickFormat != "" {
 		p.X.Tick.Marker = hplot.Ticks{N: 10, Format: v.XTickFormat}
@@ -79,20 +71,17 @@ func (v Variable) SetPlotStyle(p *hplot.Plot) {
 	}
 
 	// Legend setup
-	if &v.LegPosTop != nil {
-		p.Legend.Top = v.LegPosTop
-		if p.Legend.Top {
-			p.Legend.YOffs = -5
-		} else {
-			p.Legend.YOffs = 5
-		}
+	p.Legend.Top = v.LegPosTop
+	if p.Legend.Top {
+		p.Legend.YOffs = -5
+	} else {
+		p.Legend.YOffs = 5
+	}	
+	p.Legend.Left = v.LegPosLeft
+	if p.Legend.Left {
+		p.Legend.XOffs = 5
+	} else {
+		p.Legend.XOffs = -5
 	}
-	if &p.Legend.Left != nil {
-		p.Legend.Left = v.LegPosLeft
-		if p.Legend.Left {
-			p.Legend.XOffs = 5
-		} else {
-			p.Legend.XOffs = -5
-		}
-	}
+
 }

@@ -68,6 +68,8 @@ func New(s []Sample, v []*Variable) Maker {
 	// Check all required field a filled
 	// ...
 
+	// Setup defaults values e.g cuts
+	
 	// Get the mapping
 	ana.samIdx = getIdxMap(ana.Samples)
 	ana.varIdx = getIdxMap(ana.Variables)
@@ -118,36 +120,27 @@ func (ana *Maker) MakeHistos() error {
 			varFormula := make([]func() float64, len(ana.Variables))
 			if ana.WithTreeFormula {
 				for i, v := range ana.Variables {
-					varFormula[i] = v.TreeFunc.GetVarFunc(r)
+					varFormula[i] = v.TreeFunc.GetF64(r)
 				}
 			}
 
 			// Prepare the weight
 			getWeight := func() float64 { return float64(1.0) }
-			if s.Weight != "" {
-				if ana.WithTreeFormula {
-					getWeight = s.WeightFunc.GetVarFunc(r)
-				}
+			if s.WeightFunc.Fct != nil {
+				getWeight = s.WeightFunc.GetF64(r)
 			}
-
+			
 			// Prepare the sample cut
 			passSampleCut := func() bool { return true }
-			if s.Cut != "" {
-				if ana.WithTreeFormula {
-					passSampleCut = s.CutFunc.GetCutFunc(r)
-				}
+			if s.CutFunc.Fct != nil {
+				passSampleCut = s.CutFunc.GetBool(r)
 			}
 
 			// Prepare the cut string for kinematics
 			passKinemCut := make([]func() bool, len(ana.Cuts))
 			for ic, cut := range ana.Cuts {
-				passKinemCut[ic] = func() bool { return true }
 				idx := ic
-				if cut.TreeName != "true" {
-					if ana.WithTreeFormula {
-						passKinemCut[idx] = cut.TreeFunc.GetCutFunc(r)
-					}
-				}
+				passKinemCut[idx] = cut.TreeFunc.GetBool(r)
 			}
 
 			// Read the tree (event loop)
@@ -157,7 +150,7 @@ func (ana *Maker) MakeHistos() error {
 				if !passSampleCut() {
 					return nil
 				}
-
+				
 				// Get the event weight
 				w := getWeight()
 
@@ -488,8 +481,18 @@ func (ana Maker) PrintReport() {
 // Initialize histograms container shape
 func (ana *Maker) initHbookHistos() {
 
+	// TO-DO: this part should be in a New() with default values.
 	if len(ana.Cuts) == 0 {
-		ana.Cuts = append(ana.Cuts, Selection{Name: "No-cut", TreeName: "true"})
+		ana.Cuts = append(ana.Cuts,
+			Selection{
+				Name: "No-cut",
+				TreeName: "true",
+				TreeFunc: TreeFunc{
+					VarsName: []string{},
+					Fct:      func() bool { return true },
+				},
+			},
+		)
 	}
 
 	ana.HbookHistos = make([][][]*hbook.H1D, len(ana.Variables))

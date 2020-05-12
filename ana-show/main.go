@@ -33,7 +33,7 @@ func main() {
 
 		// Histogram representation
 		Normalize: true,
-		DontStack: false,
+		DontStack: true,
 
 		// Set of cuts
 		Cuts: []ana.Selection{
@@ -78,10 +78,10 @@ func main() {
 			//spl_bkg1_bench,
 			//spl_bkg2_bench,
 			spl_data,
-			spl_bkg1bis,
+			//spl_bkg1bis,
 			spl_bkg1,
-			spl_bkg2,
-			spl_alt,
+			//spl_bkg2,
+			//spl_alt,
 		},
 
 		// Set of observable to plot
@@ -198,9 +198,11 @@ var (
 		TreeName:      "truth",
 		Weight:        "0.5",
 		WeightFunc:     ana.NewFuncF64(0.5),
-		Cut:           "init_gg",
+		CutFunc:        ana.NewFuncVarBool("init_gg"),
 		LegLabel:      `$t\bar{t}$ contribution 1 (gg)`,
-		FillColor:     color.NRGBA{R: 0, G: 102, B: 255, A: 230},
+		//FillColor:     color.NRGBA{R: 0, G: 102, B: 255, A: 230},
+		LineColor:     color.NRGBA{R: 0, G: 102, B: 255, A: 230},
+		LineWidth:     2,
 		CircleMarkers: false,
 		CircleSize:    1.5,
 		WithYErrBars:  false,
@@ -463,7 +465,7 @@ var (
 		SaveName:   "pt_tt",
 		TreeName:   "ttbar_pt",
 		Value:      new(float32),
-		TreeFunc:    ana.NewFuncVarF32("ttbar_pt"),
+		TreeFunc:   ana.NewFuncVarF32("ttbar_pt"),
 		Nbins:      25,
 		Xmin:       0,
 		Xmax:       150,

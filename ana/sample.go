@@ -46,10 +46,18 @@ func (s Sample) CreateHisto(hdata *hbook.H1D, opts ...hplot.Options) *hplot.H1D 
 	// Create the plotable histo from histogrammed data
 	h := hplot.NewH1D(hdata, opts...)
 
-	// Line and fill cosmetics
+	// Line width
 	h.LineStyle.Width = s.LineWidth
-	h.LineStyle.Color = s.LineColor
-	h.FillColor = s.FillColor
+
+	// Line color
+	if s.LineColor != colorNil {
+		h.LineStyle.Color = s.LineColor
+	}
+
+	// Fill color
+	if s.FillColor != colorNil {
+		h.FillColor = s.FillColor
+	}
 
 	// Markers
 	if s.CircleMarkers {
@@ -92,10 +100,10 @@ func (s Sample) CreateHisto(hdata *hbook.H1D, opts ...hplot.Options) *hplot.H1D 
 func (s Sample) SetBandStyle(b *hplot.Band) {
 
 	if s.FillColor != colorNil {
-		b.FillColor = s.FillColor
+		b.FillColor = style.ChangeOpacity(s.FillColor, 150)
 	}
 	if s.LineColor != colorNil {
-		b.FillColor = s.LineColor
+		b.FillColor = style.ChangeOpacity(s.LineColor, 150)
 	}
 }
 

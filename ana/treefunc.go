@@ -10,7 +10,15 @@ type TreeFunc struct {
 	Fct      interface{}
 }
 
-// NewVarF64 return a TreeFunc to get a single float64 variable
+// NewVarF64 returns a TreeFunc to get a single float64 variable.
+func NewFuncVarBool(v string) TreeFunc {
+	return TreeFunc{
+		VarsName: []string{v},
+		Fct:      func(x bool) bool { return x },
+	}
+}
+
+// NewVarF64 returns a TreeFunc to get a single float64 variable.
 func NewFuncVarF64(v string) TreeFunc {
 	return TreeFunc{
 		VarsName: []string{v},
@@ -18,7 +26,7 @@ func NewFuncVarF64(v string) TreeFunc {
 	}
 }
 
-// Return a
+// NewFuncF64 returns a floats number, ie not a variable from a branch.
 func NewFuncF64(v float64) TreeFunc {
 	return TreeFunc{
 		VarsName: []string{},
@@ -26,7 +34,7 @@ func NewFuncF64(v float64) TreeFunc {
 	}
 }
 
-// NewVarF64 return a TreeFunc to get a single float32 variable
+// NewVarF64 returns a TreeFunc F64 from a single float32 branch
 func NewFuncVarF32(v string) TreeFunc {
 	return TreeFunc{
 		VarsName: []string{v},
@@ -45,12 +53,12 @@ func (f *TreeFunc) NewFormulaFunc(r *rtree.Reader) *rtree.FormulaFunc {
 
 // Get the function to be called in the event loop to get
 // 'Var' float64 value, from the reader
-func (f *TreeFunc) GetVarFunc(r *rtree.Reader) func() float64 {
+func (f *TreeFunc) GetF64(r *rtree.Reader) func() float64 {
 	return f.NewFormulaFunc(r).Func().(func() float64)
 }
 
 // Get the function to be called in the event loop to get
 // 'Cut' boolean value, from the reader
-func (f *TreeFunc) GetCutFunc(r *rtree.Reader) func() bool {
+func (f *TreeFunc) GetBool(r *rtree.Reader) func() bool {
 	return f.NewFormulaFunc(r).Func().(func() bool)
 }
