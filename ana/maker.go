@@ -30,6 +30,7 @@ type Maker struct {
 	Cuts         []Selection // List of cuts
 
 	// Figure related setup
+	SavePath     string // Path to which plot will be saved
 	SaveFormat   string // Extension of saved figure 'tex', 'pdf', 'png'
 	CompileLatex bool   // Enable on-the-fly latex compilation of plots
 
@@ -69,7 +70,8 @@ func New(s []Sample, v []*Variable) Maker {
 	// ...
 
 	// Setup defaults values e.g cuts
-
+	ana.SavePath = "results"
+	
 	// Get the mapping
 	ana.samIdx = getIdxMap(ana.Samples)
 	ana.varIdx = getIdxMap(ana.Variables)
@@ -430,7 +432,7 @@ func (ana *Maker) PlotHistos() error {
 			style.ApplyToFigure(f)
 			f.Latex = latex
 
-			path := "results/" + ana.Cuts[isel].Name
+			path := ana.SavePath + "/" + ana.Cuts[isel].Name
 			if _, err := os.Stat(path); os.IsNotExist(err) {
 				os.MkdirAll(path, 0755)
 			}
@@ -480,6 +482,28 @@ func (ana Maker) PrintReport() {
 		(dtLoop+dtPlot)/nkevt, fmtDuration(ana.timeLoop+ana.timePlot), nkevt,
 		dtLoop/(dtLoop+dtPlot)*100., dtPlot/(dtLoop+dtPlot)*100.,
 	)
+}
+
+// Run the analysis in one function
+func (ana *Maker) Run() error {
+	
+	// Create histograms via an event loop
+	err := ana.MakeHistos()
+	if err != nil {
+		return err
+	}
+	
+	// Plot them on the same canvas
+	err = ana.PlotHistos()
+	if err != nil {
+		return err
+	}
+
+	// Print processing report
+	ana.PrintReport()
+
+	// Return 
+	return nil
 }
 
 // Initialize histograms container shape

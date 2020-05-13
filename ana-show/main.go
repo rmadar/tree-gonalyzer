@@ -27,6 +27,7 @@ func main() {
 		WithTreeFormula: *useFormula,
 
 		// Output figure
+		SavePath:     "plots",
 		SaveFormat:   "tex",
 		CompileLatex: *doLatex,
 		RatioPlot:    !*noRatio,
