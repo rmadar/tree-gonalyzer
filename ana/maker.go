@@ -35,11 +35,11 @@ type Maker struct {
 	CompileLatex bool   // Enable on-the-fly latex compilation of plots
 
 	// Plot related setup
-	RatioPlot bool // Enable ratio plot
-	DontStack bool // Disable histogram stacking (e.g. compare various processes)
-	Normalize bool // Normalize distributions to unit area (when stacked, the total is normalized)
+	RatioPlot    bool        // Enable ratio plot
+	DontStack    bool        // Disable histogram stacking (e.g. compare various processes)
+	Normalize    bool        // Normalize distributions to unit area (when stacked, the total is normalized)
 	ErrBandColor color.NRGBA // Color for the uncertainty band.
-	
+
 	// Histograms
 	HbookHistos [][][]*hbook.H1D // Currently 3D histo container
 	HplotHistos [][][]*hplot.H1D // Currently 3D histo container
@@ -322,9 +322,9 @@ func (ana *Maker) PlotHistos() error {
 					if ana.Samples[is].DataStyle {
 						style.ApplyToDataHist(phData)
 					}
-					
+
 				}
-				
+
 				// Sum-up normalized bkg and store all bkgs in a slice for the stack
 				if ana.Samples[is].IsBkg() {
 					bhBkgs_postnorm = append(bhBkgs_postnorm, h)
@@ -429,7 +429,7 @@ func (ana *Maker) PlotHistos() error {
 					//if ana.Samples[is].DataStyle {
 					style.ApplyToDataS2D(hps2d_ratio)
 					//}
-					
+
 					// MC to MC
 					hbs2d_ratio1, err := hbook.DivideH1D(bhBkgTot, bhBkgTot, hbook.DivIgnoreNaNs())
 					if err != nil {

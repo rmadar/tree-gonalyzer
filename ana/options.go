@@ -21,7 +21,7 @@ type config struct {
 	DontStack    bool        // Disable histogram stacking (e.g. compare various processes)
 	Normalize    bool        // Normalize distributions to unit area (when stacked, the total is normalized)
 	ErrBandColor color.NRGBA // Color for the uncertainty band.
-	
+
 	// Sample options
 	Weight            TreeFunc    // Weight applied to the sample
 	Cut               TreeFunc    // Cut applied to the sample

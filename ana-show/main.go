@@ -128,27 +128,27 @@ func main() {
 // Define all samples and variables of the analysis
 var (
 	path = "/home/rmadar/cernbox/ATLAS/Analysis/SM-SpinCorr/data/outputs/"
-	
-	spl_data_bench = ana.NewSample("data", "data", `Pseudo-data`, path + "MC16a.410472.PhPy8EG.TruthOnly.root", "truth")
-	
-	spl_bkg0_bench = ana.NewSample("bkg1", "bkg", `Background 1`, path + "MC16a.410472.PhPy8EG.TruthOnly.root", "truth",
+
+	spl_data_bench = ana.NewSample("data", "data", `Pseudo-data`, path+"MC16a.410472.PhPy8EG.TruthOnly.root", "truth")
+
+	spl_bkg0_bench = ana.NewSample("bkg1", "bkg", `Background 1`, path+"MC16a.410472.PhPy8EG.TruthOnly.root", "truth",
 		ana.WithWeight(ana.NewTreeFuncValF64(0.33)),
 		ana.WithLineWidth(0),
 		ana.WithFillColor(color.NRGBA{R: 0, G: 102, B: 255, A: 230}),
 	)
-	
-	spl_bkg1_bench = ana.NewSample("bkg2", "bkg", `Background 2`, path + "MC16a.410472.PhPy8EG.TruthOnly.root", "truth",
+
+	spl_bkg1_bench = ana.NewSample("bkg2", "bkg", `Background 2`, path+"MC16a.410472.PhPy8EG.TruthOnly.root", "truth",
 		ana.WithWeight(ana.NewTreeFuncValF64(0.33)),
 		ana.WithLineWidth(0),
 		ana.WithFillColor(color.NRGBA{R: 200, G: 30, B: 60, A: 230}),
 	)
 
-	spl_bkg2_bench = ana.NewSample("bkg3", "bkg", `Background 3`, path + "MC16a.410472.PhPy8EG.TruthOnly.root", "truth",
+	spl_bkg2_bench = ana.NewSample("bkg3", "bkg", `Background 3`, path+"MC16a.410472.PhPy8EG.TruthOnly.root", "truth",
 		ana.WithWeight(ana.NewTreeFuncValF64(0.33)),
 		ana.WithLineWidth(0),
 		ana.WithFillColor(color.NRGBA{R: 0, G: 255, B: 102, A: 230}),
 	)
-	
+
 	// samples
 	spl_data = ana.Sample{
 		Name:              "data",

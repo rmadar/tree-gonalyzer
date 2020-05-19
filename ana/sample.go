@@ -53,7 +53,7 @@ func NewSample(sname, stype, sleg, fname, tname string, opts ...Options) Sample 
 		WithLineColor(style.SmoothBlack),
 		WithDataStyle(s.IsData()),
 	)
-	
+
 	// Update the configuration looping over functional options
 	for _, opt := range opts {
 		opt(cfg)
@@ -72,7 +72,7 @@ func NewSample(sname, stype, sleg, fname, tname string, opts ...Options) Sample 
 	s.YErrBarsLineWidth = cfg.YErrBarsLineWidth
 	s.YErrBarsCapWidth = cfg.YErrBarsCapWidth
 	s.DataStyle = cfg.DataStyle
-	
+
 	return s
 }
 
