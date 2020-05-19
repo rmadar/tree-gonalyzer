@@ -8,31 +8,30 @@ import (
 )
 
 type Variable struct {
+	Name     string
+	SaveName string
 
-	Name        string
-	SaveName    string
-	
-	TreeName    string
-	Value       interface{}
+	TreeName string
+	Value    interface{}
 
-	TreeFunc    TreeFunc
-	Nbins       int
-	Xmin, Xmax  float64
+	TreeFunc   TreeFunc
+	Nbins      int
+	Xmin, Xmax float64
 
-	PlotTitle   string
+	PlotTitle string
 
 	XLabel      string
 	YLabel      string
 	XTickFormat string
 	YTickFormat string
 
-	RangeXmin   float64
-	RangeXmax   float64
-	RangeYmin   float64
-	RangeYmax   float64
+	RangeXmin float64
+	RangeXmax float64
+	RangeYmin float64
+	RangeYmax float64
 
-	LegPosTop   bool
-	LegPosLeft  bool
+	LegPosTop  bool
+	LegPosLeft bool
 }
 
 // Get a value according to it's type
@@ -72,7 +71,7 @@ func (v Variable) SetPlotStyle(p *hplot.Plot) {
 		p.Y.Min = v.RangeYmin
 		p.Y.Max = v.RangeYmax
 	}
-	
+
 	// Axis ticks tuning
 	if v.XTickFormat != "" {
 		p.X.Tick.Marker = hplot.Ticks{N: 10, Format: v.XTickFormat}
