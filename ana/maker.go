@@ -25,9 +25,9 @@ type Maker struct {
 
 	// Inputs info
 	Samples      []Sample    // Sample on which to run
-	SamplesGroup string      // Specify how to group samples together
 	Variables    []*Variable // List of variables to plot
 	Cuts         []Selection // List of cuts
+	SamplesGroup string      // Specify how to group samples together
 
 	// Figure related setup
 	SavePath     string // Path to which plot will be saved
@@ -38,13 +38,16 @@ type Maker struct {
 	RatioPlot bool // Enable ratio plot
 	DontStack bool // Disable histogram stacking (e.g. compare various processes)
 	Normalize bool // Normalize distributions to unit area (when stacked, the total is normalized)
-
+	ErrBandColor color.NRGBA // Color for the uncertainty band.
+	
 	// Histograms
 	HbookHistos [][][]*hbook.H1D // Currently 3D histo container
 	HplotHistos [][][]*hplot.H1D // Currently 3D histo container
 
-	// Temp
-	WithTreeFormula bool // TEMP for benchmarking
+	// Temporary for benchmarking
+	WithVarsTreeFormula bool
+	NoTreeFormula       bool
+	NoFuncCall          bool
 
 	cutIdx      map[string]int // Linking cut name and cut index
 	samIdx      map[string]int // Linking sample name and sample index
@@ -71,7 +74,7 @@ func New(s []Sample, v []*Variable) Maker {
 
 	// Setup defaults values e.g cuts
 	ana.SavePath = "results"
-	
+
 	// Get the mapping
 	ana.samIdx = getIdxMap(ana.Samples)
 	ana.varIdx = getIdxMap(ana.Variables)
@@ -107,7 +110,7 @@ func (ana *Maker) MakeHistos() error {
 
 			// Prepare variables to explicitely load
 			var rvars []rtree.ReadVar
-			if !ana.WithTreeFormula {
+			if !ana.WithVarsTreeFormula {
 				for _, v := range ana.Variables {
 					rvars = append(rvars, rtree.ReadVar{Name: v.TreeName, Value: v.Value})
 				}
@@ -121,7 +124,7 @@ func (ana *Maker) MakeHistos() error {
 			defer r.Close()
 
 			varFormula := make([]func() float64, len(ana.Variables))
-			if ana.WithTreeFormula {
+			if ana.WithVarsTreeFormula {
 				for i, v := range ana.Variables {
 					varFormula[i] = v.TreeFunc.GetFuncF64(r)
 				}
@@ -129,13 +132,13 @@ func (ana *Maker) MakeHistos() error {
 
 			// Prepare the weight
 			getWeight := func() float64 { return float64(1.0) }
-			if s.WeightFunc.Fct != nil {
+			if s.WeightFunc.Fct != nil && !ana.NoTreeFormula {
 				getWeight = s.WeightFunc.GetFuncF64(r)
 			}
 
 			// Prepare the sample cut
 			passSampleCut := func() bool { return true }
-			if s.CutFunc.Fct != nil {
+			if s.CutFunc.Fct != nil && !ana.NoTreeFormula {
 				passSampleCut = s.CutFunc.GetFuncBool(r)
 			}
 
@@ -143,35 +146,50 @@ func (ana *Maker) MakeHistos() error {
 			passKinemCut := make([]func() bool, len(ana.Cuts))
 			for ic, cut := range ana.Cuts {
 				idx := ic
-				passKinemCut[idx] = cut.TreeFunc.GetFuncBool(r)
+				if !ana.NoTreeFormula {
+					passKinemCut[idx] = cut.TreeFunc.GetFuncBool(r)
+				} else {
+					_, passKinemCut[idx] = cut, func() bool { return true }
+				}
 			}
 
 			// Read the tree (event loop)
 			err = r.Read(func(ctx rtree.RCtx) error {
 
-				// Sample-level cut
-				if !passSampleCut() {
-					return nil
-				}
-
-				// Get the event weight
-				w := getWeight()
-
-				// Loop over selection and variables
-				for ic := range ana.Cuts {
-
-					if !passKinemCut[ic]() {
-						continue
+				// No call to function at all
+				if ana.NoFuncCall {
+					for ic := range ana.Cuts {
+						for iv, v := range ana.Variables {
+							ana.HbookHistos[iv][ic][is].Fill(v.GetValue(), 1.0)
+						}
 					}
 
-					for iv, v := range ana.Variables {
-						val := 0.0
-						if ana.WithTreeFormula {
-							val = varFormula[iv]()
-						} else {
-							val = v.GetValue()
+				} else {
+
+					// Sample-level cut
+					if !passSampleCut() {
+						return nil
+					}
+
+					// Get the event weight
+					w := getWeight()
+
+					// Loop over selection and variables
+					for ic := range ana.Cuts {
+
+						if !passKinemCut[ic]() {
+							continue
 						}
-						ana.HbookHistos[iv][ic][is].Fill(val, w)
+
+						for iv, v := range ana.Variables {
+							val := 0.0
+							if ana.WithVarsTreeFormula {
+								val = varFormula[iv]()
+							} else {
+								val = v.GetValue()
+							}
+							ana.HbookHistos[iv][ic][is].Fill(val, w)
+						}
 					}
 				}
 
@@ -249,7 +267,7 @@ func (ana *Maker) PlotHistos() error {
 				phBkgs          []*hplot.H1D
 				phData          *hplot.H1D
 			)
-			
+
 			// First sample loop: compute normalisation, sum bkg bh, keep data bh
 			for is, h := range hsamples {
 
@@ -301,8 +319,12 @@ func (ana *Maker) PlotHistos() error {
 				// Keep data appart from backgrounds
 				if ana.Samples[is].IsData() {
 					phData = ana.HplotHistos[iv][isel][is]
+					if ana.Samples[is].DataStyle {
+						style.ApplyToDataHist(phData)
+					}
+					
 				}
-
+				
 				// Sum-up normalized bkg and store all bkgs in a slice for the stack
 				if ana.Samples[is].IsBkg() {
 					bhBkgs_postnorm = append(bhBkgs_postnorm, h)
@@ -340,7 +362,7 @@ func (ana *Maker) PlotHistos() error {
 			if bhData.Entries() > 0 {
 				p.Add(phData)
 			}
-			
+
 			// Apply common and user-defined style for this variable
 			// FIX-ME (rmadar): the v.SetPlotStyle(v) command doesn't update
 			//                  y-axis scale if it is put before the samples
@@ -348,7 +370,7 @@ func (ana *Maker) PlotHistos() error {
 			style.ApplyToPlot(p)
 			v.SetPlotStyle(p)
 			plt = p
-			
+
 			// Addition of the ratio plot
 			if ana.RatioPlot {
 
@@ -403,8 +425,11 @@ func (ana *Maker) PlotHistos() error {
 					hps2d_ratio := hplot.NewS2D(hbs2d_ratio, hplot.WithYErrBars(true),
 						hplot.WithStepsKind(hplot.HiSteps),
 					)
+					// TODO: copy style from bhData when a function hplot-style will be ready.
+					//if ana.Samples[is].DataStyle {
 					style.ApplyToDataS2D(hps2d_ratio)
-
+					//}
+					
 					// MC to MC
 					hbs2d_ratio1, err := hbook.DivideH1D(bhBkgTot, bhBkgTot, hbook.DivIgnoreNaNs())
 					if err != nil {
@@ -413,7 +438,9 @@ func (ana *Maker) PlotHistos() error {
 					hps2d_ratio1 := hplot.NewS2D(hbs2d_ratio1, hplot.WithBand(true),
 						hplot.WithStepsKind(hplot.HiSteps),
 					)
-					style.ApplyToDataS2D(hps2d_ratio1)
+					//if ana.Samples[is].DataStyle {
+					//style.ApplyToDataS2D(hps2d_ratio1)
+					//}
 					hps2d_ratio1.GlyphStyle.Radius = 0
 					hps2d_ratio1.LineStyle.Width = 0.0
 					hps2d_ratio1.LineStyle.Color = color.NRGBA{R: 140, G: 140, B: 140, A: 255}
@@ -486,13 +513,13 @@ func (ana Maker) PrintReport() {
 
 // Run the analysis in one function
 func (ana *Maker) Run() error {
-	
+
 	// Create histograms via an event loop
 	err := ana.MakeHistos()
 	if err != nil {
 		return err
 	}
-	
+
 	// Plot them on the same canvas
 	err = ana.PlotHistos()
 	if err != nil {
@@ -502,7 +529,7 @@ func (ana *Maker) Run() error {
 	// Print processing report
 	ana.PrintReport()
 
-	// Return 
+	// Return
 	return nil
 }
 
@@ -513,7 +540,7 @@ func (ana *Maker) initHbookHistos() {
 	if len(ana.Cuts) == 0 {
 		ana.Cuts = append(ana.Cuts,
 			Selection{
-				Name:     "No-cut",
+				Name: "No-cut",
 				TreeFunc: TreeFunc{
 					VarsName: []string{},
 					Fct:      func() bool { return true },

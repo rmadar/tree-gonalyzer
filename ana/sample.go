@@ -17,29 +17,70 @@ import (
 var colorNil = color.NRGBA{R: 0, G: 0, B: 0, A: 0}
 
 type Sample struct {
-	Name     string
-	Type     string
-	FileName string
-	TreeName string
-	WeightFunc TreeFunc
-	CutFunc           TreeFunc
+	Name              string
+	Type              string
+	FileName          string
+	TreeName          string
 	LegLabel          string
+	WeightFunc        TreeFunc
+	CutFunc           TreeFunc
 	LineColor         color.NRGBA
 	LineWidth         vg.Length
 	FillColor         color.NRGBA
 	CircleMarkers     bool
 	CircleSize        vg.Length
 	CircleColor       color.NRGBA
-	WithYErrBars      bool
+	YErrBars          bool
 	YErrBarsLineWidth vg.Length
 	YErrBarsCapWidth  vg.Length
+	DataStyle         bool
+}
+
+func NewSample(sname, stype, sleg, fname, tname string, opts ...Options) Sample {
+
+	// Required fields
+	s := Sample{
+		Name:     sname,
+		Type:     stype,
+		LegLabel: sleg,
+		FileName: fname,
+		TreeName: tname,
+	}
+
+	// Configuration with defaults values for all optional fields
+	cfg := newConfig(
+		WithLineWidth(1.5),
+		WithLineColor(style.SmoothBlack),
+		WithDataStyle(s.IsData()),
+	)
+	
+	// Update the configuration looping over functional options
+	for _, opt := range opts {
+		opt(cfg)
+	}
+
+	// Set all fields with the updated configuration
+	s.WeightFunc = cfg.Weight
+	s.CutFunc = cfg.Cut
+	s.LineColor = cfg.LineColor
+	s.LineWidth = cfg.LineWidth
+	s.FillColor = cfg.FillColor
+	s.CircleMarkers = cfg.CircleMarkers
+	s.CircleSize = cfg.CircleSize
+	s.CircleColor = cfg.CircleColor
+	s.YErrBars = cfg.YErrBars
+	s.YErrBarsLineWidth = cfg.YErrBarsLineWidth
+	s.YErrBarsCapWidth = cfg.YErrBarsCapWidth
+	s.DataStyle = cfg.DataStyle
+	
+	return s
 }
 
 // Return a hplot.H1D with the proper style
 func (s Sample) CreateHisto(hdata *hbook.H1D, opts ...hplot.Options) *hplot.H1D {
 
 	// Append sample-defined options
-	opts = append(opts, hplot.WithYErrBars(s.WithYErrBars))
+	opts = append(opts, hplot.WithYErrBars(s.YErrBars))
 
 	// Create the plotable histo from histogrammed data
 	h := hplot.NewH1D(hdata, opts...)
@@ -71,7 +112,7 @@ func (s Sample) CreateHisto(hdata *hbook.H1D, opts ...hplot.Options) *hplot.H1D 
 	}
 
 	// Error bars
-	if s.WithYErrBars {
+	if s.YErrBars {
 		if s.CircleColor != colorNil {
 			h.YErrs.LineStyle.Color = s.CircleColor
 		} else {
