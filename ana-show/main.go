@@ -16,7 +16,10 @@ import (
 func main() {
 
 	var doLatex = flag.Bool("latex", false, "On-the-fly LaTeX compilation of produced figure")
-	var useFormula = flag.Bool("formula", false, "Use TreeFormulaFunc for variable")
+	var useVarFormula = flag.Bool("varFormula", false, "Use TreeFormulaFunc for variables")
+	var dontUseCutWeightFormula = flag.Bool("noCutFormula", false, "Disable cuts and weights, avoiding TreeFormulaFunc")
+	var dontUseFunctions = flag.Bool("noFunc", false, "Disable all 'dummy' function calls")
+
 	var noRatio = flag.Bool("r", false, "Disable ratio plot")
 	flag.Parse()
 
@@ -24,7 +27,9 @@ func main() {
 	analyzer := ana.Maker{
 
 		// Test Tree formula
-		WithTreeFormula: *useFormula,
+		WithVarsTreeFormula: *useVarFormula,
+		NoTreeFormula:       *dontUseCutWeightFormula,
+		NoFuncCall:          *dontUseFunctions,
 
 		// Output figure
 		SavePath:     "plots",
@@ -34,58 +39,59 @@ func main() {
 
 		// Histogram representation
 		Normalize: false,
-		DontStack: true,
+		DontStack: false,
 
 		// Set of cuts
-		Cuts: []ana.Selection{
-			ana.Selection{
-				Name: "cut1",
-				TreeFunc: ana.TreeFunc{
-					VarsName: []string{"l_pt"},
-					Fct:      func(pt float32) bool { return pt > 20 },
+		/*
+			Cuts: []ana.Selection{
+				ana.Selection{
+					Name: "cut1",
+					TreeFunc: ana.TreeFunc{
+						VarsName: []string{"l_pt"},
+						Fct:      func(pt float32) bool { return pt > 20 },
+					},
 				},
-			},
-			ana.Selection{
-				Name: "cut2",
-				TreeFunc: ana.TreeFunc{
-					VarsName: []string{"l_pt"},
-					Fct:      func(pt float32) bool { return pt > 50 },
+				ana.Selection{
+					Name: "cut2",
+					TreeFunc: ana.TreeFunc{
+						VarsName: []string{"l_pt"},
+						Fct:      func(pt float32) bool { return pt > 50 },
+					},
 				},
-			},
-			ana.Selection{
-				Name: "cut3",
-				TreeFunc: ana.TreeFunc{
-					VarsName: []string{"l_pt"},
-					Fct:      func(pt float32) bool { return pt > 100 },
+				ana.Selection{
+					Name: "cut3",
+					TreeFunc: ana.TreeFunc{
+						VarsName: []string{"l_pt"},
+						Fct:      func(pt float32) bool { return pt > 100 },
+					},
 				},
-			},
-			ana.Selection{
-				Name: "cut4",
-				TreeFunc: ana.TreeFunc{
-					VarsName: []string{"l_pt"},
-					Fct:      func(pt float32) bool { return pt > 150 },
+				ana.Selection{
+					Name: "cut4",
+					TreeFunc: ana.TreeFunc{
+						VarsName: []string{"l_pt"},
+						Fct:      func(pt float32) bool { return pt > 150 },
+					},
 				},
-			},
-		},
+			},*/
 
 		// Included samples
 		Samples: []ana.Sample{
-			//spl_data_bench,
-			//spl_bkg0_bench,
-			//spl_bkg1_bench,
-			//spl_bkg2_bench,
+			spl_data_bench,
+			spl_bkg0_bench,
+			spl_bkg1_bench,
+			spl_bkg2_bench,
 			//spl_data,
 			//spl_bkg1bis,
-			spl_bkg1,
-			spl_bkg2,
-			spl_alt,
+			//spl_bkg1,
+			//spl_bkg2,
+			//spl_alt,
 		},
 
 		// Set of observable to plot
 		Variables: []*ana.Variable{
 			var_m_tt,
 			var_eta_t,
-			/*var_pt_lep,
+			var_pt_lep,
 			var_dphi,
 			var_Ckk,
 			var_Crr,
@@ -97,7 +103,7 @@ func main() {
 			var_pt_vsum,
 			var_pt_t,
 			var_pt_tt,
-			var_x1,*/
+			var_x1,
 			//var_x1x2,
 		},
 	}
@@ -121,54 +127,28 @@ func main() {
 
 // Define all samples and variables of the analysis
 var (
-	spl_data_bench = ana.Sample{
-		Name:     "data",
-		Type:     "data",
-		FileName: "/home/rmadar/cernbox/ATLAS/Analysis/SM-SpinCorr/data/outputs/MC16a.410472.PhPy8EG.TruthOnly.root",
-		TreeName: "truth",
-		WeightFunc: ana.TreeFunc{
-			VarsName: []string{"t_pt"},
-			Fct:      func(pt float32) float64 { return float64(0.8 + 0.1*(pt/100.)) },
-		},
-		LegLabel:          `Pseudo-data`,
-		CircleMarkers:     true,
-		CircleColor:       style.SmoothBlack,
-		CircleSize:        3,
-		WithYErrBars:      true,
-		YErrBarsLineWidth: 2,
-		YErrBarsCapWidth:  5,
-	}
+	path = "/home/rmadar/cernbox/ATLAS/Analysis/SM-SpinCorr/data/outputs/"
+	
+	spl_data_bench = ana.NewSample("data", "data", `Pseudo-data`, path + "MC16a.410472.PhPy8EG.TruthOnly.root", "truth")
+	
+	spl_bkg0_bench = ana.NewSample("bkg1", "bkg", `Background 1`, path + "MC16a.410472.PhPy8EG.TruthOnly.root", "truth",
+		ana.WithWeight(ana.NewTreeFuncValF64(0.33)),
+		ana.WithLineWidth(0),
+		ana.WithFillColor(color.NRGBA{R: 0, G: 102, B: 255, A: 230}),
+	)
+	
+	spl_bkg1_bench = ana.NewSample("bkg2", "bkg", `Background 2`, path + "MC16a.410472.PhPy8EG.TruthOnly.root", "truth",
+		ana.WithWeight(ana.NewTreeFuncValF64(0.33)),
+		ana.WithLineWidth(0),
+		ana.WithFillColor(color.NRGBA{R: 200, G: 30, B: 60, A: 230}),
+	)
 
-	spl_bkg0_bench = ana.Sample{
-		Name:       "bkg1",
-		Type:       "bkg",
-		FileName:   "/home/rmadar/cernbox/ATLAS/Analysis/SM-SpinCorr/data/outputs/MC16a.410472.PhPy8EG.TruthOnly.root",
-		TreeName:   "truth",
-		WeightFunc: ana.NewTreeFuncValF64(0.33),
-		LegLabel:   `Background 1`,
-		FillColor:  color.NRGBA{R: 0, G: 102, B: 255, A: 230},
-	}
-
-	spl_bkg1_bench = ana.Sample{
-		Name:       "bkg2",
-		Type:       "bkg",
-		FileName:   "/home/rmadar/cernbox/ATLAS/Analysis/SM-SpinCorr/data/outputs/MC16a.410472.PhPy8EG.TruthOnly.root",
-		TreeName:   "truth",
-		WeightFunc: ana.NewTreeFuncValF64(0.33),
-		LegLabel:   `Background 2`,
-		FillColor:  color.NRGBA{R: 200, G: 30, B: 60, A: 230},
-	}
-
-	spl_bkg2_bench = ana.Sample{
-		Name:       "bkg3",
-		Type:       "bkg",
-		FileName:   "/home/rmadar/cernbox/ATLAS/Analysis/SM-SpinCorr/data/outputs/MC16a.410472.PhPy8EG.TruthOnly.root",
-		TreeName:   "truth",
-		WeightFunc: ana.NewTreeFuncValF64(0.33),
-		LegLabel:   `Background 3`,
-		FillColor:  color.NRGBA{R: 0, G: 255, B: 102, A: 230},
-	}
-
+	spl_bkg2_bench = ana.NewSample("bkg3", "bkg", `Background 3`, path + "MC16a.410472.PhPy8EG.TruthOnly.root", "truth",
+		ana.WithWeight(ana.NewTreeFuncValF64(0.33)),
+		ana.WithLineWidth(0),
+		ana.WithFillColor(color.NRGBA{R: 0, G: 255, B: 102, A: 230}),
+	)
+	
 	// samples
 	spl_data = ana.Sample{
 		Name:              "data",
@@ -179,40 +159,40 @@ var (
 		CircleMarkers:     true,
 		CircleColor:       style.SmoothBlack,
 		CircleSize:        3,
-		WithYErrBars:      true,
+		YErrBars:          true,
 		YErrBarsLineWidth: 2,
 		YErrBarsCapWidth:  5,
 	}
 
 	spl_bkg1 = ana.Sample{
-		Name:              "bkg1",
-		Type:              "bkg",
-		FileName:          "../testdata/ttbar_MadSpinOn_1.root",
-		TreeName:          "truth",
-		WeightFunc:        ana.NewTreeFuncValF64(0.5),
-		CutFunc:           ana.NewTreeFuncVarBool("init_gg"),
+		Name:       "bkg1",
+		Type:       "bkg",
+		FileName:   "../testdata/ttbar_MadSpinOn_1.root",
+		TreeName:   "truth",
+		WeightFunc: ana.NewTreeFuncValF64(0.5),
+		//CutFunc:           ana.NewTreeFuncVarBool("init_gg"),
 		LegLabel:          `$t\bar{t}$ contribution 1 (gg)`,
 		LineColor:         color.NRGBA{R: 0, G: 102, B: 255, A: 230},
 		LineWidth:         2,
 		CircleMarkers:     false,
 		CircleSize:        1.5,
-		WithYErrBars:      false,
+		YErrBars:          false,
 		YErrBarsLineWidth: 2,
 		YErrBarsCapWidth:  5,
 	}
 
 	spl_bkg1bis = ana.Sample{
-		Name:              "bkg1bis",
-		Type:              "bkg",
-		FileName:          "../testdata/ttbar_MadSpinOn_1.root",
-		TreeName:          "truth",
-		WeightFunc:        ana.NewTreeFuncValF64(0.5),
-		CutFunc:           ana.NewTreeFuncVarBool("init_qq"),
+		Name:       "bkg1bis",
+		Type:       "bkg",
+		FileName:   "../testdata/ttbar_MadSpinOn_1.root",
+		TreeName:   "truth",
+		WeightFunc: ana.NewTreeFuncValF64(0.5),
+		//CutFunc:           ana.NewTreeFuncVarBool("init_qq"),
 		LegLabel:          `$t\bar{t}$ contribution 1 (qq)`,
 		FillColor:         color.NRGBA{R: 20, G: 20, B: 170, A: 230},
 		CircleMarkers:     false,
 		CircleSize:        1.5,
-		WithYErrBars:      false,
+		YErrBars:          false,
 		YErrBarsLineWidth: 2,
 		YErrBarsCapWidth:  5,
 	}
@@ -228,7 +208,7 @@ var (
 		LineWidth:     2,
 		CircleMarkers: false,
 		CircleSize:    1.5,
-		WithYErrBars:  false,
+		YErrBars:      false,
 	}
 
 	spl_alt = ana.Sample{
@@ -241,7 +221,7 @@ var (
 		LineWidth:     2,
 		CircleMarkers: false,
 		CircleSize:    1.5,
-		WithYErrBars:  false,
+		YErrBars:      false,
 	}
 
 	var_dphi = &ana.Variable{
@@ -453,7 +433,7 @@ var (
 		RangeYmin:  500,
 		RangeYmax:  1000,
 	}
-	
+
 	var_pt_tt = &ana.Variable{
 		Name:       "pt_tt",
 		SaveName:   "pt_tt",
@@ -469,7 +449,7 @@ var (
 		LegPosTop:  true,
 		LegPosLeft: false,
 	}
-	
+
 	var_x1 = &ana.Variable{
 		TreeName: "init_x1",
 		Value:    new(float32),
