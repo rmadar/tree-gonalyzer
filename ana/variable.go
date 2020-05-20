@@ -8,27 +8,23 @@ import (
 )
 
 type Variable struct {
-	Name     string
-	SaveName string
-	TreeName string
-	Value    interface{}
-
-	TreeVar    TreeFunc
-	Nbins      int
-	Xmin, Xmax float64
-
+	Name        string
+	SaveName    string
+	TreeName    string
+	Value       interface{}
+	TreeVar     TreeFunc
+	Nbins       int
+	Xmin, Xmax  float64
 	XLabel      string
 	YLabel      string
 	XTickFormat string
 	YTickFormat string
-
-	RangeXmin float64
-	RangeXmax float64
-	RangeYmin float64
-	RangeYmax float64
-
-	LegPosTop  bool
-	LegPosLeft bool
+	RangeXmin   float64
+	RangeXmax   float64
+	RangeYmin   float64
+	RangeYmax   float64
+	LegPosTop   bool
+	LegPosLeft  bool
 }
 
 // Create a new type variable
@@ -46,7 +42,11 @@ func NewVariable(name, tname string, value interface{},
 	}
 
 	// Configuration with default values for all optional fields
-	cfg := newConfig(WithSaveName(v.Name))
+	cfg := newConfig(
+		WithSaveName(v.Name),
+		WithAxisLabels(`Variable`, `Events`),
+		WithLegPosition(true, false),
+	)
 
 	// Update the configuration looping over functional options
 	for _, opt := range opts {
@@ -55,6 +55,17 @@ func NewVariable(name, tname string, value interface{},
 
 	// Set fields with updaded configuration
 	v.SaveName = cfg.SaveName
+	v.TreeVar = cfg.TreeVar
+	v.XLabel = cfg.XLabel
+	v.YLabel = cfg.YLabel
+	v.XTickFormat = cfg.XTickFormat
+	v.YTickFormat = cfg.YTickFormat
+	v.RangeXmin = cfg.RangeXmin
+	v.RangeXmax = cfg.RangeXmax
+	v.RangeYmin = cfg.RangeYmin
+	v.RangeYmax = cfg.RangeYmax
+	v.LegPosTop = cfg.LegPosTop
+	v.LegPosLeft = cfg.LegPosLeft
 
 	return v
 }
