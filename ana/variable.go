@@ -34,6 +34,28 @@ type Variable struct {
 	LegPosLeft bool
 }
 
+// Create a new type variable
+func NewVariable(opts ...Options) *Variable {
+
+	// Create the object
+	v := &Variable{
+		
+	}
+	
+	// Configuration with default values for all optional fields
+	cfg := newConfig()
+	
+	// Update the configuration looping over functional options
+	for _, opt := range opts {
+		opt(cfg)
+	}
+	
+	// Set fields with updaded configuration
+	
+	
+	return v
+}
+
 // Get a value according to it's type
 func (v Variable) GetValue() float64 {
 	switch v := v.Value.(type) {
