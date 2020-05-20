@@ -78,7 +78,7 @@ func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 		WithHistoStack(true),
 		WithHistoNorm(false),
 		WithRatioPlot(true),
-		WithErrBandColor(color.NRGBA{A: 180}),
+		WithErrBandColor(color.NRGBA{A: 100}),
 		WithKinemCuts([]*Selection{NewSelection()}),
 	)
 
