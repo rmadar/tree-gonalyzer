@@ -6,16 +6,16 @@ func ExampleNew() {
 }
 
 // Creation of the Stack analysis maker type
-func ExampleMaker_Stack() {
+func ExampleMaker_stack() {
 
 }
 
 // Creation of the normalized analysis maker type
-func ExampleMaker_Norm() {
+func ExampleMaker_norm() {
 
 }
 
 // Creation of the auto-styled analysis maker type
-func ExampleMaker_AutoStyle() {
+func ExampleMaker_autoStyle() {
 
 }
