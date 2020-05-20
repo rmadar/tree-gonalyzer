@@ -47,9 +47,9 @@ func NewTreeFuncVarF32(v string) TreeFunc {
 	}
 }
 
-// NewFormulaFunc returns the rtree.FormulaFunc function associated
+// FormulaFuncFromReader returns the rtree.FormulaFunc function associated
 // to the TreeFunc f, from a give rtree.Reader r.
-func (f *TreeFunc) NewFormulaFunc(r *rtree.Reader) *rtree.FormulaFunc {
+func (f *TreeFunc) FormulaFuncFromReader(r *rtree.Reader) *rtree.FormulaFunc {
 	ff, err := r.FormulaFunc(f.VarsName, f.Fct)
 	if err != nil {
 		log.Fatalf("could not create formulaFunc: %+v", err)
@@ -61,7 +61,7 @@ func (f *TreeFunc) NewFormulaFunc(r *rtree.Reader) *rtree.FormulaFunc {
 // the float64 value computed in f.Fct function.
 func (f *TreeFunc) GetFuncF64(r *rtree.Reader) func() float64 {
 	if len(f.VarsName) > 0 {
-		return f.NewFormulaFunc(r).Func().(func() float64)
+		return f.FormulaFuncFromReader(r).Func().(func() float64)
 	} else {
 		return f.Fct.(func() float64)
 	}
@@ -71,7 +71,7 @@ func (f *TreeFunc) GetFuncF64(r *rtree.Reader) func() float64 {
 // the boolean value computed in f.Fct function.
 func (f *TreeFunc) GetFuncBool(r *rtree.Reader) func() bool {
 	if len(f.VarsName) > 0 {
-		return f.NewFormulaFunc(r).Func().(func() bool)
+		return f.FormulaFuncFromReader(r).Func().(func() bool)
 	} else {
 		return f.Fct.(func() bool)
 	}
