@@ -36,10 +36,10 @@ type Sample struct {
 	DataStyle         bool
 }
 
-func NewSample(sname, stype, sleg, fname, tname string, opts ...SampleOptions) Sample {
+func NewSample(sname, stype, sleg, fname, tname string, opts ...SampleOptions) *Sample {
 
 	// Required fields
-	s := Sample{
+	s := &Sample{
 		Name:     sname,
 		Type:     stype,
 		LegLabel: sleg,
@@ -49,16 +49,15 @@ func NewSample(sname, stype, sleg, fname, tname string, opts ...SampleOptions) S
 
 	// Configuration with defaults values for all optional fields
 	cfg := newConfig(
-		WithLineWidth(1.5),
-		WithLineColor(style.SmoothBlack),
+		WithFillColor(color.NRGBA{R:20, G: 20, B: 180, A: 200}),
 		WithDataStyle(s.IsData()),
 	)
-
+	
 	// Update the configuration looping over functional options
 	for _, opt := range opts {
 		opt(cfg)
 	}
-
+	
 	// Set all fields with the updated configuration
 	s.WeightFunc = cfg.Weight
 	s.CutFunc = cfg.Cut

@@ -9,7 +9,8 @@ import (
 	"time"
 
 	"gonum.org/v1/plot/vg"
-
+	"gonum.org/v1/plot/plotutil"
+	
 	"go-hep.org/x/hep/groot"
 	"go-hep.org/x/hep/groot/rtree"
 
@@ -27,7 +28,7 @@ type Maker struct {
 	Samples      []*Sample    // Sample on which to run
 	Variables    []*Variable  // List of variables to plot
 	KinemCuts    []*Selection // List of cuts
-	SamplesGroup string       // Specify how to group samples together
+	SamplesGroup string       // TODO: specify how to group samples together
 
 	// Figure related setup
 	SavePath     string // Path to which plot will be saved
@@ -35,17 +36,18 @@ type Maker struct {
 	CompileLatex bool   // Enable on-the-fly latex compilation of plots
 
 	// Plot related setup
-	PlotTitle    string      // General plot title
-	RatioPlot    bool        // Enable ratio plot
-	DontStack    bool        // Disable histogram stacking (e.g. compare various processes)
-	Normalize    bool        // Normalize distributions to unit area (when stacked, the total is normalized)
-	ErrBandColor color.NRGBA // Color for the uncertainty band.
-
+	AutoStyle     bool        // Enable automatic histo style: colors, fill, etc ... 
+	PlotTitle     string      // General plot title
+	RatioPlot     bool        // Enable ratio plot
+	HistoStack    bool        // Enable histogram stacking 
+	HistoNorm     bool        // Normalize distributions to unit area (when stacked, the total is normalized)
+	ErrBandColor  color.NRGBA // Color for the uncertainty band.
+	
 	// Histograms
 	HbookHistos [][][]*hbook.H1D // Currently 3D histo container
 	HplotHistos [][][]*hplot.H1D // Currently 3D histo container
 
-	// Temporary for benchmarking
+	// Temporary fields for benchmarking
 	WithVarsTreeFormula bool
 	NoTreeFormula       bool
 	NoFuncCall          bool
@@ -71,9 +73,9 @@ func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 
 	// Configuration with default values for all optional fields
 	cfg := newConfig(
-		WithSavePath("results"),
+		WithSavePath("plots"),
 		WithSaveFormat("tex"),
-		WithPlotTitle(`{\tt TTree} {\bf GO}nalyzer}`),
+		WithPlotTitle(`TTree GOnalyzer`),
 		WithCompileLatex(true),
 		WithHistoStack(true),
 		WithHistoNorm(false),
@@ -91,13 +93,14 @@ func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 	a.KinemCuts = cfg.KinemCuts
 	a.SavePath = cfg.SavePath
 	a.SaveFormat = cfg.SaveFormat
+	a.AutoStyle = cfg.AutoStyle
 	a.PlotTitle = cfg.PlotTitle
 	a.CompileLatex = cfg.CompileLatex
 	a.RatioPlot = cfg.RatioPlot
-	a.DontStack = cfg.DontStack
-	a.Normalize = cfg.Normalize
+	a.HistoStack = cfg.HistoStack
+	a.HistoNorm = cfg.HistoNorm
 	a.ErrBandColor = cfg.ErrBandColor
-
+	
 	// Get mappings between slice indices and object names
 	a.samIdx = getIdxMap(a.Samples)
 	a.varIdx = getIdxMap(a.Variables)
@@ -105,7 +108,7 @@ func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 
 	// Build hbook and hplot H1D containers
 	a.initHistoContainers()
-
+		
 	return a
 }
 
@@ -240,6 +243,11 @@ func (ana *Maker) PlotHistos() error {
 	// Start timing
 	start := time.Now()
 
+	// Set histogram styles
+	if ana.AutoStyle {
+		ana.setAutoStyle()
+	}
+	
 	// Return an error if HbookHistos is empty
 	if !ana.histoFilled {
 		log.Fatalf("There is no histograms. Please make sure that 'MakeHistos()' is called before 'PlotHistos()'")
@@ -304,15 +312,15 @@ func (ana *Maker) PlotHistos() error {
 
 				// Deal with normalization
 				// FIX-ME (rmadar): use 'switch' and enum
-				if ana.Normalize {
+				if ana.HistoNorm {
 					if ana.Samples[is].IsData() {
 						h.Scale(1 / norm_histos[is])
 					}
 					if ana.Samples[is].IsBkg() {
-						if ana.DontStack {
-							h.Scale(1. / norm_histos[is])
+						if ana.HistoStack {
+							h.Scale(1. / norm_bkgtot)							
 						} else {
-							h.Scale(1. / norm_bkgtot)
+							h.Scale(1. / norm_histos[is])
 						}
 					}
 				}
@@ -354,13 +362,13 @@ func (ana *Maker) PlotHistos() error {
 				// Stacking the background histo
 				stack := hplot.NewHStack(phBkgs, hplot.WithBand(true))
 				stack.Band.FillColor = ana.ErrBandColor
-				if ana.DontStack {
-					stack.Stack = hplot.HStackOff
-				} else {
+				if ana.HistoStack {
 					hBand := hplot.NewH1D(hbook.NewH1D(1, 0, 1), hplot.WithBand(true))
 					hBand.Band = stack.Band
 					hBand.LineStyle.Width = 0
 					p.Legend.Add("Uncer.", hBand)
+				} else {
+					stack.Stack = hplot.HStackOff
 				}
 
 				// Add the stack to the plot
@@ -404,30 +412,8 @@ func (ana *Maker) PlotHistos() error {
 
 				// Compute and store the ratio (type hbook.S2D)
 				switch {
-				case ana.DontStack:
-					// [FIX-ME 0 (rmadar)] Ratio wrt data (or 1 bkg if data is empty) -> to be specied as an option?
-					// [FIX-ME 1 (rmadar)] loop is over bhBkgs_postnorm while 'ana.Samples[is]' runs also over data.
-					for is, h := range bhBkgs_postnorm {
-
-						href := bhData
-						if bhData.Entries() == 0 {
-							href = bhBkgs_postnorm[0]
-						}
-
-						hbs2d_ratio, err := hbook.DivideH1D(h, href, hbook.DivIgnoreNaNs())
-						if err != nil {
-							log.Fatal("cannot divide histo for the ratio plot")
-						}
-						hps2d_ratio := hplot.NewS2D(hbs2d_ratio, hplot.WithBand(true),
-							hplot.WithStepsKind(hplot.HiSteps),
-						)
-						hps2d_ratio.GlyphStyle.Radius = 0
-						hps2d_ratio.LineStyle.Color = ana.Samples[is].LineColor
-						ana.Samples[is].SetBandStyle(hps2d_ratio.Band)
-						rp.Bottom.Add(hps2d_ratio)
-					}
-				default:
-					// Data to MC
+				case ana.HistoStack:
+										// Data to MC
 					hbs2d_ratio, err := hbook.DivideH1D(bhData, bhBkgTot, hbook.DivIgnoreNaNs())
 					if err != nil {
 						log.Fatal("cannot divide histo for the ratio plot")
@@ -456,6 +442,29 @@ func (ana *Maker) PlotHistos() error {
 					hps2d_ratio1.Band.FillColor = ana.ErrBandColor
 					rp.Bottom.Add(hps2d_ratio1)
 					rp.Bottom.Add(hps2d_ratio)
+					
+				default:
+					// [FIX-ME 0 (rmadar)] Ratio wrt data (or 1 bkg if data is empty) -> to be specied as an option?
+					// [FIX-ME 1 (rmadar)] loop is over bhBkgs_postnorm while 'ana.Samples[is]' runs also over data.
+					for is, h := range bhBkgs_postnorm {
+
+						href := bhData
+						if bhData.Entries() == 0 {
+							href = bhBkgs_postnorm[0]
+						}
+
+						hbs2d_ratio, err := hbook.DivideH1D(h, href, hbook.DivIgnoreNaNs())
+						if err != nil {
+							log.Fatal("cannot divide histo for the ratio plot")
+						}
+						hps2d_ratio := hplot.NewS2D(hbs2d_ratio, hplot.WithBand(true),
+							hplot.WithStepsKind(hplot.HiSteps),
+						)
+						hps2d_ratio.GlyphStyle.Radius = 0
+						hps2d_ratio.LineStyle.Color = ana.Samples[is].LineColor
+						ana.Samples[is].SetBandStyle(hps2d_ratio.Band)
+						rp.Bottom.Add(hps2d_ratio)
+					}
 				}
 
 				// Adjust ratio plot scale
@@ -567,6 +576,32 @@ func (ana *Maker) initHistoContainers() {
 		}
 	}
 
+}
+
+
+func (ana *Maker) setAutoStyle() {
+
+	for i, s := range ana.Samples {
+
+		// Color
+		r, g, b, a := plotutil.Color(i).RGBA()
+		c := color.NRGBA{R: uint8(r), G: uint8(g), B: uint8(b), A: uint8(a)}
+
+		// Apply data style automatically
+		if s.IsData() {
+			s.DataStyle = true
+		}
+
+		// Fill for stacked histo, lines otherwise
+		if ana.HistoStack {
+			s.FillColor = c
+			s.LineWidth = 0.
+		} else {
+			s.FillColor = color.NRGBA{}
+			s.LineColor = c
+			s.LineWidth = 2.
+		}		
+	}
 }
 
 // Helper to get a tree from a file

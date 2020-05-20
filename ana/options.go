@@ -23,10 +23,11 @@ type config struct {
 	SavePath     string       // Path to which plot will be saved
 	SaveFormat   string       // Extension of saved figure 'tex', 'pdf', 'png'
 	CompileLatex bool         // Enable on-the-fly latex compilation of plots
+	AutoStyle    bool         // Enable auto style of the histogram
 	PlotTitle    string       // General plot title
 	RatioPlot    bool         // Enable ratio plot
-	DontStack    bool         // Disable histogram stacking (e.g. compare various processes)
-	Normalize    bool         // Normalize distributions to unit area (when stacked, the total is normalized)
+	HistoStack   bool         // Disable histogram stacking (e.g. compare various processes)
+	HistoNorm    bool         // Normalize distributions to unit area (when stacked, the total is normalized)
 	ErrBandColor color.NRGBA  // Color for the uncertainty band.
 
 	// Sample options
@@ -83,10 +84,17 @@ func WithSaveFormat(f string) Options {
 	}
 }
 
-// CompileLatex enables automatic latex compilation.
+// WithCompileLatex enables automatic latex compilation.
 func WithCompileLatex(b bool) Options {
 	return func(cfg *config) {
 		cfg.CompileLatex = b
+	}
+}
+
+// WithAutoStyle enables automatic styling of the histograms.
+func WithAutoStyle(b bool) Options {
+	return func(cfg *config) {
+		cfg.AutoStyle = b
 	}
 }
 
@@ -107,14 +115,14 @@ func WithRatioPlot(b bool) Options {
 // WithHistoStack enables histogram stacking for bkg-typed samples.
 func WithHistoStack(b bool) Options {
 	return func(cfg *config) {
-		cfg.DontStack = !b
+		cfg.HistoStack = b
 	}
 }
 
 // WithHistoNorm enables histogram normalization to unity, to compare shapes.
 func WithHistoNorm(b bool) Options {
 	return func(cfg *config) {
-		cfg.Normalize = b
+		cfg.HistoNorm = b
 	}
 }
 
