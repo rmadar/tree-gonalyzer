@@ -1,4 +1,3 @@
-// Package managing the variables to plot
 package ana
 
 import (

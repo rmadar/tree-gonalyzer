@@ -1,4 +1,3 @@
-// Manage included samples
 package ana
 
 import (
