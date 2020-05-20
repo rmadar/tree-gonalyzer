@@ -35,6 +35,7 @@ type Maker struct {
 	CompileLatex bool   // Enable on-the-fly latex compilation of plots
 
 	// Plot related setup
+	PlotTitle    string      // General plot title
 	RatioPlot    bool        // Enable ratio plot
 	DontStack    bool        // Disable histogram stacking (e.g. compare various processes)
 	Normalize    bool        // Normalize distributions to unit area (when stacked, the total is normalized)
@@ -67,41 +68,42 @@ func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 		Samples:   s,
 		Variables: v,
 	}
-	
+
 	// Configuration with default values for all optional fields
 	cfg := newConfig(
 		WithSavePath("results"),
 		WithSaveFormat("tex"),
+		WithPlotTitle(`{\tt TTree} {\bf GO}nalyzer}`),
 		WithCompileLatex(true),
 		WithHistoStack(true),
 		WithHistoNorm(false),
 		WithRatioPlot(true),
 		WithErrBandColor(color.NRGBA{A: 180}),
-		WithKinemCuts([]*Selection{ NewSelection() }),
+		WithKinemCuts([]*Selection{NewSelection()}),
 	)
-	
+
 	// Update the configuration looping over functional options
 	for _, opt := range opts {
 		opt(cfg)
 	}
-	
+
 	// Set fields with updaded configuration
 	a.KinemCuts = cfg.KinemCuts
 	a.SavePath = cfg.SavePath
 	a.SaveFormat = cfg.SaveFormat
 	a.CompileLatex = cfg.CompileLatex
 	a.RatioPlot = cfg.RatioPlot
-	a.DontStack = cfg.DontStack 
+	a.DontStack = cfg.DontStack
 	a.Normalize = cfg.Normalize
 	a.ErrBandColor = cfg.ErrBandColor
-	
+
 	// Get mappings between slice indices and object names
 	a.samIdx = getIdxMap(a.Samples)
 	a.varIdx = getIdxMap(a.Variables)
 	a.cutIdx = getIdxMap(a.KinemCuts)
 
-	// Build hbook histograms container
-	a.initHbookHistos()
+	// Build hbook and hplot H1D containers
+	a.initHistoContainers()
 
 	return a
 }
@@ -146,7 +148,7 @@ func (ana *Maker) MakeHistos() error {
 			varFormula := make([]func() float64, len(ana.Variables))
 			if ana.WithVarsTreeFormula {
 				for i, v := range ana.Variables {
-					varFormula[i] = v.TreeFunc.GetFuncF64(r)
+					varFormula[i] = v.TreeVar.GetFuncF64(r)
 				}
 			}
 
@@ -245,24 +247,11 @@ func (ana *Maker) PlotHistos() error {
 	// Preparing the final figure
 	var plt hplot.Drawer
 	figWidth, figHeight := 6*vg.Inch, 4.5*vg.Inch
-	format := "tex"
-	if ana.SaveFormat != "" {
-		format = ana.SaveFormat
-	}
 
 	// Handle on-the-fly LaTeX compilation
 	var latex htex.Handler = htex.NoopHandler{}
 	if ana.CompileLatex {
 		latex = htex.NewGoHandler(-1, "pdflatex")
-	}
-
-	// Inititialize all hplot.H1D histograms
-	ana.HplotHistos = make([][][]*hplot.H1D, len(ana.Variables))
-	for iv := range ana.HplotHistos {
-		ana.HplotHistos[iv] = make([][]*hplot.H1D, len(ana.KinemCuts))
-		for isel := range ana.KinemCuts {
-			ana.HplotHistos[iv][isel] = make([]*hplot.H1D, len(ana.Samples))
-		}
 	}
 
 	// Loop over variables
@@ -284,6 +273,9 @@ func (ana *Maker) PlotHistos() error {
 				phBkgs          []*hplot.H1D
 				phData          *hplot.H1D
 			)
+
+			// Add plot title
+			p.Title.Text = ana.PlotTitle
 
 			// First sample loop: compute normalisation, sum bkg bh, keep data bh
 			for is, h := range hsamples {
@@ -479,7 +471,7 @@ func (ana *Maker) PlotHistos() error {
 			if _, err := os.Stat(path); os.IsNotExist(err) {
 				os.MkdirAll(path, 0755)
 			}
-			outputname := path + "/" + v.SaveName + "." + format
+			outputname := path + "/" + v.SaveName + "." + ana.SaveFormat
 			if err := hplot.Save(f, figWidth, figHeight, outputname); err != nil {
 				log.Fatalf("error saving plot: %v\n", err)
 			}
@@ -549,9 +541,10 @@ func (ana *Maker) Run() error {
 	return nil
 }
 
-// Initialize histograms container shape
-func (ana *Maker) initHbookHistos() {
+// Initialize histogram containers
+func (ana *Maker) initHistoContainers() {
 
+	// Initialize hbook H1D
 	ana.HbookHistos = make([][][]*hbook.H1D, len(ana.Variables))
 	for iv := range ana.HbookHistos {
 		ana.HbookHistos[iv] = make([][]*hbook.H1D, len(ana.KinemCuts))
@@ -563,6 +556,16 @@ func (ana *Maker) initHbookHistos() {
 			}
 		}
 	}
+
+	// Inititialize hplot H1D
+	ana.HplotHistos = make([][][]*hplot.H1D, len(ana.Variables))
+	for iv := range ana.HplotHistos {
+		ana.HplotHistos[iv] = make([][]*hplot.H1D, len(ana.KinemCuts))
+		for isel := range ana.KinemCuts {
+			ana.HplotHistos[iv][isel] = make([]*hplot.H1D, len(ana.Samples))
+		}
+	}
+
 }
 
 // Helper to get a tree from a file

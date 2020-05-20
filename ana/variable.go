@@ -10,15 +10,12 @@ import (
 type Variable struct {
 	Name     string
 	SaveName string
-
 	TreeName string
 	Value    interface{}
 
-	TreeFunc   TreeFunc
+	TreeVar    TreeFunc
 	Nbins      int
 	Xmin, Xmax float64
-
-	PlotTitle string
 
 	XLabel      string
 	YLabel      string
@@ -35,24 +32,38 @@ type Variable struct {
 }
 
 // Create a new type variable
-func NewVariable(opts ...Options) *Variable {
+func NewVariable(name, tname string, value interface{},
+	nbins int, xmin, xmax float64, opts ...Options) *Variable {
 
 	// Create the object
 	v := &Variable{
-		
+		Name:     name,
+		TreeName: tname,
+		Value:    value,
+		Nbins:    nbins,
+		Xmin:     xmin,
+		Xmax:     xmax,
 	}
-	
+
 	// Configuration with default values for all optional fields
-	cfg := newConfig()
-	
+	cfg := newConfig(WithSaveName(v.Name))
+
 	// Update the configuration looping over functional options
 	for _, opt := range opts {
 		opt(cfg)
 	}
-	
+
 	// Set fields with updaded configuration
-	
-	
+	v.SaveName = cfg.SaveName
+
+	return v
+}
+
+// Create a new variable from a TreeFunc object
+func NewVariableFromTreeFunc(name string, f TreeFunc, nbins int,
+	xmin, xmax float64, opts ...Options) *Variable {
+	v := NewVariable(name, "", nil, nbins, xmin, xmax, opts...)
+	v.TreeVar = f
 	return v
 }
 
@@ -74,9 +85,6 @@ func (v Variable) GetValue() float64 {
 func (v Variable) SetPlotStyle(p *hplot.Plot) {
 
 	// Plot labels
-	if v.PlotTitle != "" {
-		p.Title.Text = v.PlotTitle
-	}
 	if v.XLabel != "" {
 		p.X.Label.Text = v.XLabel
 	}

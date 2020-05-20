@@ -17,6 +17,7 @@ type config struct {
 	SavePath     string       // Path to which plot will be saved
 	SaveFormat   string       // Extension of saved figure 'tex', 'pdf', 'png'
 	CompileLatex bool         // Enable on-the-fly latex compilation of plots
+	PlotTitle    string       // General plot title
 	RatioPlot    bool         // Enable ratio plot
 	DontStack    bool         // Disable histogram stacking (e.g. compare various processes)
 	Normalize    bool         // Normalize distributions to unit area (when stacked, the total is normalized)
@@ -35,6 +36,15 @@ type config struct {
 	YErrBarsLineWidth vg.Length   // Line width of the y error bar
 	YErrBarsCapWidth  vg.Length   // Width of the y error bar caps
 	DataStyle         bool        // Use default data style histogram
+
+	// Variables options
+	SaveName                 string   // Filename for a variable plot
+	TreeVar                  TreeFunc // TreeFunc for a computed variable (ie not a single branch)
+	XLabel, YLabel           string   // Axis labels
+	XTickFormat, YTickFormat string   // Ticks formating
+	RangeXmin, RangeXmax     float64  // X-axis ranges
+	RangeYmin, RangeYmax     float64  // Y-axis ranges
+	LegPosTop, LegPosLeft    bool     // Legend position
 }
 
 // newConfig returns a config type with a set of passed options.
@@ -159,6 +169,13 @@ func WithCompileLatex(b bool) Options {
 	}
 }
 
+// WithPlotTitle sets the general plot title.
+func WithPlotTitle(t string) Options {
+	return func(cfg *config) {
+		cfg.PlotTitle = t
+	}
+}
+
 // WithRatioPlot enables the ratio plot panel.
 func WithRatioPlot(b bool) Options {
 	return func(cfg *config) {
@@ -180,9 +197,63 @@ func WithHistoNorm(b bool) Options {
 	}
 }
 
-// WithHistoNorm enables histogram normalization to unity, to compare shapes.
+// WithErrBandColor sets the color for the error band of total histogram (and ratio).
 func WithErrBandColor(c color.NRGBA) Options {
 	return func(cfg *config) {
 		cfg.ErrBandColor = c
+	}
+}
+
+// WithSaveName sets the file name of the plot for a variable.
+func WithSaveName(n string) Options {
+	return func(cfg *config) {
+		cfg.SaveName = n
+	}
+}
+
+// WithTreeVar sets a TreeFunc object for an on-the-fly computed variable.
+func WithTreeVar(f TreeFunc) Options {
+	return func(cfg *config) {
+		cfg.TreeVar = f
+	}
+}
+
+// WithAxisLabels sets the x- and y-axis labels for a variable
+func WithAxisLabels(xlab, ylab string) Options {
+	return func(cfg *config) {
+		cfg.XLabel = xlab
+		cfg.YLabel = ylab
+	}
+}
+
+// WithAxisLabels sets the x- and y-axis labels for a variable.
+func WithTickFormats(xticks, yticks string) Options {
+	return func(cfg *config) {
+		cfg.XTickFormat = xticks
+		cfg.YTickFormat = yticks
+	}
+}
+
+// WithXRange sets the x-axis min and max for a variable.
+func WithXRange(min, max float64) Options {
+	return func(cfg *config) {
+		cfg.RangeXmin = min
+		cfg.RangeXmax = max
+	}
+}
+
+// WithYRange sets the y-axis min and max for a variable.
+func WithYRange(min, max float64) Options {
+	return func(cfg *config) {
+		cfg.RangeYmin = min
+		cfg.RangeYmax = max
+	}
+}
+
+// WithLegPosition sets the legend position on the plot for a variable.
+func WithLegPosition(top, left bool) Options {
+	return func(cfg *config) {
+		cfg.LegPosTop = top
+		cfg.LegPosLeft = left
 	}
 }
