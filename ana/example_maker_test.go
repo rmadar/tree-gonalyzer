@@ -19,3 +19,9 @@ func ExampleMaker_norm() {
 func ExampleMaker_autoStyle() {
 
 }
+
+// Creation of an analysis maker type including cuts
+func ExampleMaker_kinematicCuts() {
+
+}
+
