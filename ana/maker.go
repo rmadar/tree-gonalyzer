@@ -609,15 +609,13 @@ func getTreeFromFile(filename, treename string) (*groot.File, rtree.Tree) {
 	// Get the file
 	f, err := groot.Open(filename)
 	if err != nil {
-		err := fmt.Sprintf("could not open ROOT file %q: %w", filename, err)
-		panic(err)
+		log.Fatal("could not open ROOT file: %w", err)
 	}
 
 	// Get the tree
 	obj, err := f.Get(treename)
 	if err != nil {
-		err := fmt.Sprintf("could not retrieve object: %w", err)
-		panic(err)
+		log.Fatal("could not retrieve object: %w", err)
 	}
 
 	return f, obj.(rtree.Tree)
