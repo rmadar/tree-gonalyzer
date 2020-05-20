@@ -10,7 +10,7 @@ import (
 	"github.com/rmadar/tree-gonalyzer/ana"
 )
 
-func Example_NewTreeFuncVarBool() {
+func ExampleNewTreeFuncVarBool() {
 
 	// Get a reader for the example
 	r := getReader(5)
