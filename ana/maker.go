@@ -20,14 +20,14 @@ import (
 	"github.com/rmadar/hplot-style/style"
 )
 
-// Analyzer type
+// Analysis maker type
 type Maker struct {
 
 	// Inputs info
-	Samples      []Sample    // Sample on which to run
-	Variables    []*Variable // List of variables to plot
-	Cuts         []Selection // List of cuts
-	SamplesGroup string      // Specify how to group samples together
+	Samples      []*Sample    // Sample on which to run
+	Variables    []*Variable  // List of variables to plot
+	KinemCuts    []*Selection // List of cuts
+	SamplesGroup string       // Specify how to group samples together
 
 	// Figure related setup
 	SavePath     string // Path to which plot will be saved
@@ -60,32 +60,55 @@ type Maker struct {
 }
 
 // Creating a new object
-// TO-DO: switch to all pointers []*Sample, []*Variables
-func New(s []Sample, v []*Variable) Maker {
+func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 
 	// Create the object
-	ana := Maker{
+	a := Maker{
 		Samples:   s,
 		Variables: v,
 	}
+	
+	// Configuration with default values for all optional fields
+	cfg := newConfig(
+		WithSavePath("results"),
+		WithSaveFormat("tex"),
+		WithCompileLatex(true),
+		WithHistoStack(true),
+		WithHistoNorm(false),
+		WithRatioPlot(true),
+		WithErrBandColor(color.NRGBA{A: 180}),
+		WithKinemCuts([]*Selection{ NewSelection() }),
+	)
+	
+	// Update the configuration looping over functional options
+	for _, opt := range opts {
+		opt(cfg)
+	}
+	
+	// Set fields with updaded configuration
+	a.KinemCuts = cfg.KinemCuts
+	a.SavePath = cfg.SavePath
+	a.SaveFormat = cfg.SaveFormat
+	a.CompileLatex = cfg.CompileLatex
+	a.RatioPlot = cfg.RatioPlot
+	a.DontStack = cfg.DontStack 
+	a.Normalize = cfg.Normalize
+	a.ErrBandColor = cfg.ErrBandColor
+	
+	// Get mappings between slice indices and object names
+	a.samIdx = getIdxMap(a.Samples)
+	a.varIdx = getIdxMap(a.Variables)
+	a.cutIdx = getIdxMap(a.KinemCuts)
 
-	// Check all required field a filled
-	// ...
+	// Build hbook histograms container
+	a.initHbookHistos()
 
-	// Setup defaults values e.g cuts
-	ana.SavePath = "results"
-
-	// Get the mapping
-	ana.samIdx = getIdxMap(ana.Samples)
-	ana.varIdx = getIdxMap(ana.Variables)
-	ana.cutIdx = getIdxMap(ana.Cuts)
-
-	return ana
+	return a
 }
 
 // Helper function creating the mapping between name and objects
 func getIdxMap(obj interface{}) map[string]int {
-	// obj = []variables, []samples, []cuts
+	// obj = []*Variables, []*Sample, []*Selections
 	return make(map[string]int, 10)
 }
 
@@ -94,9 +117,6 @@ func (ana *Maker) MakeHistos() error {
 
 	// Start timing
 	start := time.Now()
-
-	// Build hbook histograms container
-	ana.initHbookHistos()
 
 	// Loop over the samples
 	for is, s := range ana.Samples {
@@ -143,8 +163,8 @@ func (ana *Maker) MakeHistos() error {
 			}
 
 			// Prepare the cut string for kinematics
-			passKinemCut := make([]func() bool, len(ana.Cuts))
-			for ic, cut := range ana.Cuts {
+			passKinemCut := make([]func() bool, len(ana.KinemCuts))
+			for ic, cut := range ana.KinemCuts {
 				idx := ic
 				if !ana.NoTreeFormula {
 					passKinemCut[idx] = cut.TreeFunc.GetFuncBool(r)
@@ -158,7 +178,7 @@ func (ana *Maker) MakeHistos() error {
 
 				// No call to function at all
 				if ana.NoFuncCall {
-					for ic := range ana.Cuts {
+					for ic := range ana.KinemCuts {
 						for iv, v := range ana.Variables {
 							ana.HbookHistos[iv][ic][is].Fill(v.GetValue(), 1.0)
 						}
@@ -175,7 +195,7 @@ func (ana *Maker) MakeHistos() error {
 					w := getWeight()
 
 					// Loop over selection and variables
-					for ic := range ana.Cuts {
+					for ic := range ana.KinemCuts {
 
 						if !passKinemCut[ic]() {
 							continue
@@ -217,9 +237,6 @@ func (ana *Maker) PlotHistos() error {
 	// Start timing
 	start := time.Now()
 
-	// Error Band color
-	errBandColor := color.NRGBA{R: 255, G: 0, B: 0, A: 80}
-
 	// Return an error if HbookHistos is empty
 	if !ana.histoFilled {
 		log.Fatalf("There is no histograms. Please make sure that 'MakeHistos()' is called before 'PlotHistos()'")
@@ -242,8 +259,8 @@ func (ana *Maker) PlotHistos() error {
 	// Inititialize all hplot.H1D histograms
 	ana.HplotHistos = make([][][]*hplot.H1D, len(ana.Variables))
 	for iv := range ana.HplotHistos {
-		ana.HplotHistos[iv] = make([][]*hplot.H1D, len(ana.Cuts))
-		for isel := range ana.Cuts {
+		ana.HplotHistos[iv] = make([][]*hplot.H1D, len(ana.KinemCuts))
+		for isel := range ana.KinemCuts {
 			ana.HplotHistos[iv][isel] = make([]*hplot.H1D, len(ana.Samples))
 		}
 	}
@@ -343,7 +360,7 @@ func (ana *Maker) PlotHistos() error {
 
 				// Stacking the background histo
 				stack := hplot.NewHStack(phBkgs, hplot.WithBand(true))
-				stack.Band.FillColor = errBandColor
+				stack.Band.FillColor = ana.ErrBandColor
 				if ana.DontStack {
 					stack.Stack = hplot.HStackOff
 				} else {
@@ -443,8 +460,7 @@ func (ana *Maker) PlotHistos() error {
 					//}
 					hps2d_ratio1.GlyphStyle.Radius = 0
 					hps2d_ratio1.LineStyle.Width = 0.0
-					hps2d_ratio1.LineStyle.Color = color.NRGBA{R: 140, G: 140, B: 140, A: 255}
-					hps2d_ratio1.Band.FillColor = errBandColor
+					hps2d_ratio1.Band.FillColor = ana.ErrBandColor
 					rp.Bottom.Add(hps2d_ratio1)
 					rp.Bottom.Add(hps2d_ratio)
 				}
@@ -459,7 +475,7 @@ func (ana *Maker) PlotHistos() error {
 			style.ApplyToFigure(f)
 			f.Latex = latex
 
-			path := ana.SavePath + "/" + ana.Cuts[isel].Name
+			path := ana.SavePath + "/" + ana.KinemCuts[isel].Name
 			if _, err := os.Stat(path); os.IsNotExist(err) {
 				os.MkdirAll(path, 0755)
 			}
@@ -487,7 +503,7 @@ func (ana *Maker) PlotHistos() error {
 func (ana Maker) PrintReport() {
 
 	// Event, histo info
-	nvars, nsamples, ncuts := len(ana.Variables), len(ana.Samples), len(ana.Cuts)
+	nvars, nsamples, ncuts := len(ana.Variables), len(ana.Samples), len(ana.KinemCuts)
 	nhist := nvars * nsamples
 	if ncuts > 0 {
 		nhist *= ncuts
@@ -536,23 +552,10 @@ func (ana *Maker) Run() error {
 // Initialize histograms container shape
 func (ana *Maker) initHbookHistos() {
 
-	// TO-DO: this part should be in a New() with default values.
-	if len(ana.Cuts) == 0 {
-		ana.Cuts = append(ana.Cuts,
-			Selection{
-				Name: "No-cut",
-				TreeFunc: TreeFunc{
-					VarsName: []string{},
-					Fct:      func() bool { return true },
-				},
-			},
-		)
-	}
-
 	ana.HbookHistos = make([][][]*hbook.H1D, len(ana.Variables))
 	for iv := range ana.HbookHistos {
-		ana.HbookHistos[iv] = make([][]*hbook.H1D, len(ana.Cuts))
-		for isel := range ana.Cuts {
+		ana.HbookHistos[iv] = make([][]*hbook.H1D, len(ana.KinemCuts))
+		for isel := range ana.KinemCuts {
 			ana.HbookHistos[iv][isel] = make([]*hbook.H1D, len(ana.Samples))
 			v := ana.Variables[iv]
 			for isample := range ana.HbookHistos[iv][isel] {

@@ -13,14 +13,14 @@ type Options func(cfg *config)
 type config struct {
 
 	// ana.Maker options
-	Cuts         []Selection // List of cuts
-	SavePath     string      // Path to which plot will be saved
-	SaveFormat   string      // Extension of saved figure 'tex', 'pdf', 'png'
-	CompileLatex bool        // Enable on-the-fly latex compilation of plots
-	RatioPlot    bool        // Enable ratio plot
-	DontStack    bool        // Disable histogram stacking (e.g. compare various processes)
-	Normalize    bool        // Normalize distributions to unit area (when stacked, the total is normalized)
-	ErrBandColor color.NRGBA // Color for the uncertainty band.
+	KinemCuts    []*Selection // List of cuts
+	SavePath     string       // Path to which plot will be saved
+	SaveFormat   string       // Extension of saved figure 'tex', 'pdf', 'png'
+	CompileLatex bool         // Enable on-the-fly latex compilation of plots
+	RatioPlot    bool         // Enable ratio plot
+	DontStack    bool         // Disable histogram stacking (e.g. compare various processes)
+	Normalize    bool         // Normalize distributions to unit area (when stacked, the total is normalized)
+	ErrBandColor color.NRGBA  // Color for the uncertainty band.
 
 	// Sample options
 	Weight            TreeFunc    // Weight applied to the sample
@@ -128,5 +128,61 @@ func WithYErrBarsCapWidth(w vg.Length) Options {
 func WithDataStyle(b bool) Options {
 	return func(cfg *config) {
 		cfg.DataStyle = b
+	}
+}
+
+// WithKinemCuts sets the list of kinematic cuts to run on.
+func WithKinemCuts(c []*Selection) Options {
+	return func(cfg *config) {
+		cfg.KinemCuts = c
+	}
+}
+
+// WithSavePath sets the path to save plots.
+func WithSavePath(p string) Options {
+	return func(cfg *config) {
+		cfg.SavePath = p
+	}
+}
+
+// WithSaveFormat sets the format for the plots.
+func WithSaveFormat(f string) Options {
+	return func(cfg *config) {
+		cfg.SaveFormat = f
+	}
+}
+
+// CompileLatex enables automatic latex compilation.
+func WithCompileLatex(b bool) Options {
+	return func(cfg *config) {
+		cfg.CompileLatex = b
+	}
+}
+
+// WithRatioPlot enables the ratio plot panel.
+func WithRatioPlot(b bool) Options {
+	return func(cfg *config) {
+		cfg.RatioPlot = b
+	}
+}
+
+// WithHistoStack enables histogram stacking for bkg-typed samples.
+func WithHistoStack(b bool) Options {
+	return func(cfg *config) {
+		cfg.DontStack = !b
+	}
+}
+
+// WithHistoNorm enables histogram normalization to unity, to compare shapes.
+func WithHistoNorm(b bool) Options {
+	return func(cfg *config) {
+		cfg.Normalize = b
+	}
+}
+
+// WithHistoNorm enables histogram normalization to unity, to compare shapes.
+func WithErrBandColor(c color.NRGBA) Options {
+	return func(cfg *config) {
+		cfg.ErrBandColor = c
 	}
 }

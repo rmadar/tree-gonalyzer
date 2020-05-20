@@ -15,99 +15,60 @@ import (
 // Run the analyzer
 func main() {
 
+	// Options passed by command lines.
 	var doLatex = flag.Bool("latex", false, "On-the-fly LaTeX compilation of produced figure")
 	var useVarFormula = flag.Bool("varFormula", false, "Use TreeFormulaFunc for variables")
 	var dontUseCutWeightFormula = flag.Bool("noCutFormula", false, "Disable cuts and weights, avoiding TreeFormulaFunc")
 	var dontUseFunctions = flag.Bool("noFunc", false, "Disable all 'dummy' function calls")
-
 	var noRatio = flag.Bool("r", false, "Disable ratio plot")
 	flag.Parse()
-
-	// Create analyzer object
-	analyzer := ana.Maker{
-
-		// Test Tree formula
-		WithVarsTreeFormula: *useVarFormula,
-		NoTreeFormula:       *dontUseCutWeightFormula,
-		NoFuncCall:          *dontUseFunctions,
-
-		// Output figure
-		SavePath:     "plots",
-		SaveFormat:   "tex",
-		CompileLatex: *doLatex,
-		RatioPlot:    !*noRatio,
-
-		// Histogram representation
-		Normalize: false,
-		DontStack: false,
-
-		// Set of cuts
-		/*
-			Cuts: []ana.Selection{
-				ana.Selection{
-					Name: "cut1",
-					TreeFunc: ana.TreeFunc{
-						VarsName: []string{"l_pt"},
-						Fct:      func(pt float32) bool { return pt > 20 },
-					},
-				},
-				ana.Selection{
-					Name: "cut2",
-					TreeFunc: ana.TreeFunc{
-						VarsName: []string{"l_pt"},
-						Fct:      func(pt float32) bool { return pt > 50 },
-					},
-				},
-				ana.Selection{
-					Name: "cut3",
-					TreeFunc: ana.TreeFunc{
-						VarsName: []string{"l_pt"},
-						Fct:      func(pt float32) bool { return pt > 100 },
-					},
-				},
-				ana.Selection{
-					Name: "cut4",
-					TreeFunc: ana.TreeFunc{
-						VarsName: []string{"l_pt"},
-						Fct:      func(pt float32) bool { return pt > 150 },
-					},
-				},
-			},*/
-
-		// Included samples
-		Samples: []ana.Sample{
-			spl_data_bench,
-			spl_bkg0_bench,
-			spl_bkg1_bench,
-			spl_bkg2_bench,
-			//spl_data,
-			//spl_bkg1bis,
-			//spl_bkg1,
-			//spl_bkg2,
-			//spl_alt,
-		},
-
-		// Set of observable to plot
-		Variables: []*ana.Variable{
-			var_m_tt,
-			var_eta_t,
-			var_pt_lep,
-			var_dphi,
-			var_Ckk,
-			var_Crr,
-			var_Cnn,
-			var_pt_lep,
-			var_eta_lep,
-			var_pt_b,
-			var_eta_b,
-			var_pt_vsum,
-			var_pt_t,
-			var_pt_tt,
-			var_x1,
-			//var_x1x2,
-		},
+	
+	// Samples
+	samples :=  []*ana.Sample{
+		&spl_data_bench,
+		&spl_bkg0_bench,
+		&spl_bkg1_bench,
+		&spl_bkg2_bench,
+		//&spl_data,
+		//&spl_bkg1bis,
+		//&spl_bkg1,
+		//&spl_bkg2,
+		//&spl_alt,
 	}
 
+	// Variables
+	variables := []*ana.Variable{
+		var_m_tt,
+		var_eta_t,
+		var_pt_lep,
+		var_dphi,
+		var_Ckk,
+		var_Crr,
+		var_Cnn,
+		var_pt_lep,
+		var_eta_lep,
+		var_pt_b,
+		var_eta_b,
+		var_pt_vsum,
+		var_pt_t,
+		var_pt_tt,
+		var_x1,
+	}
+
+	// Create analyzer object with options
+	analyzer := ana.New(samples, variables,
+		ana.WithSavePath("plots"),
+		ana.WithCompileLatex(*doLatex),
+		ana.WithRatioPlot(!*noRatio),
+		ana.WithHistoNorm(false),
+		ana.WithHistoStack(false),
+	)
+
+	// Few handles for benchmarking
+	analyzer.WithVarsTreeFormula = *useVarFormula
+	analyzer.NoTreeFormula = *dontUseCutWeightFormula
+	analyzer.NoFuncCall = *dontUseFunctions
+	
 	// Create histograms via an event loop
 	err := analyzer.MakeHistos()
 	if err != nil {
@@ -472,4 +433,38 @@ var (
 		Xmin:  0,
 		Xmax:  1,
 	}
+	
+	
+	sel1 = &ana.Selection{
+		Name: "cut1",
+		TreeFunc: ana.TreeFunc{
+			VarsName: []string{"l_pt"},
+			Fct:      func(pt float32) bool { return pt > 20 },
+		},
+	}
+	
+	sel2 = &ana.Selection{
+		Name: "cut2",
+		TreeFunc: ana.TreeFunc{
+			VarsName: []string{"l_pt"},
+			Fct:      func(pt float32) bool { return pt > 50 },
+		},
+	}
+
+	sel3 = &ana.Selection{
+		Name: "cut3",
+		TreeFunc: ana.TreeFunc{
+			VarsName: []string{"l_pt"},
+			Fct:      func(pt float32) bool { return pt > 100 },
+		},
+	}
+	
+	sel4 = &ana.Selection{
+		Name: "cut4",
+		TreeFunc: ana.TreeFunc{
+			VarsName: []string{"l_pt"},
+			Fct:      func(pt float32) bool { return pt > 150 },
+		},
+	}
+	
 )
