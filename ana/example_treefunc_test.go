@@ -1,12 +1,12 @@
 package ana_test
 
 import (
-	"log"
 	"fmt"
+	"log"
 
 	"go-hep.org/x/hep/groot"
 	"go-hep.org/x/hep/groot/rtree"
-	
+
 	"github.com/rmadar/tree-gonalyzer/ana"
 )
 
@@ -15,22 +15,22 @@ func ExampleTreeFunc() {
 
 	// Get a reader for the example
 	r := getReader(5)
-	
+
 	// TreeFunc object computing t_pt*t_eta
 	treeFunc := ana.TreeFunc{
 		VarsName: []string{"t_pt", "t_eta"},
 		Fct: func(pt, eta float32) float64 {
 			fmt.Printf("pt=%.2f, eta=%.2f,", pt, eta)
-			return float64(pt*eta)
+			return float64(pt * eta)
 		},
 	}
 
-	// rtree.FormulaFunc object 
+	// rtree.FormulaFunc object
 	formFunc := treeFunc.FormulaFuncFromReader(r)
 
 	// Go function to be called in the event loop
 	getValue := formFunc.Func().(func() float64)
-	
+
 	// Event loop
 	r.Read(func(ctx rtree.RCtx) error {
 		fmt.Printf(" pt*eta=%.2f\n", getValue())
@@ -51,19 +51,19 @@ func ExampleNewTreeFuncVarBool() {
 
 	// Get a reader for the example
 	r := getReader(5)
-	
+
 	// branch name of a boolean variable in the TTree
 	varName := "init_qq"
 
 	// TreeFunc object
 	treeFunc := ana.NewTreeFuncVarBool(varName)
 
-	// rtree.FormulaFunc object 
+	// rtree.FormulaFunc object
 	formFunc := treeFunc.FormulaFuncFromReader(r)
 
 	// Go function to be called in the event loop
 	getValue := treeFunc.GetFuncBool(r)
-	
+
 	// Event loop
 	r.Read(func(ctx rtree.RCtx) error {
 		vTreeFunc := getValue()
@@ -86,19 +86,19 @@ func ExampleNewTreeFuncVarF64() {
 
 	// Get a reader for the example
 	r := getReader(5)
-	
+
 	// branch name of a boolean variable in the TTree
 	varName := "truth_dphi_ll"
 
 	// TreeFunc object
 	treeFunc := ana.NewTreeFuncVarF64(varName)
 
-	// rtree.FormulaFunc object 
+	// rtree.FormulaFunc object
 	formFunc := treeFunc.FormulaFuncFromReader(r)
 
 	// Go function to be called in the event loop
 	getValue := treeFunc.GetFuncF64(r)
-	
+
 	// Event loop
 	r.Read(func(ctx rtree.RCtx) error {
 		vTreeFunc := getValue()
@@ -120,13 +120,13 @@ func ExampleNewTreeFuncValF64() {
 
 	// Get a reader for the example
 	r := getReader(5)
-	
+
 	// TreeFunc object
 	treeFunc := ana.NewTreeFuncValF64(0.33)
 
 	// Go function to be called in the event loop
 	getValue := treeFunc.GetFuncF64(r)
-	
+
 	// Event loop
 	r.Read(func(ctx rtree.RCtx) error {
 		vTreeFunc := getValue()
@@ -150,14 +150,14 @@ func getReader(nmax int64) *rtree.Reader {
 	if err != nil {
 		log.Fatal("could not open ROOT file ../testdata/ttbar_ME.root: %w", err)
 	}
-	
+
 	// Get the tree
 	obj, err := f.Get("truth")
 	if err != nil {
 		log.Fatal("could not retrieve object: %w", err)
 	}
 	t := obj.(rtree.Tree)
-	
+
 	// Get Reader
 	r, err := rtree.NewReader(t, []rtree.ReadVar{}, rtree.WithRange(0, nmax))
 	if err != nil {

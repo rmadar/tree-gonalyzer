@@ -1,5 +1,6 @@
 package ana_test
 
-func ExampleNewVariabe() {
-	
+// Creation of a variable with a couple of options
+func ExampleNewVariable() {
+
 }
