@@ -1,21 +1,21 @@
 package ana_test
 
 // Creation of the default analysis maker type
-func ExampleNew_Default() {
+func Example_New() {
 
 }
 
 // Creation of the Stack analysis maker type
-func ExampleNew_Stack() {
+func ExampleMaker_Stack() {
 
 }
 
 // Creation of the normalized analysis maker type
-func ExampleNew_Norm() {
+func ExampleMaker_Norm() {
 
 }
 
 // Creation of the auto-styled analysis maker type
-func ExampleNew_AutoStyle() {
+func ExampleMaker_AutoStyle() {
 
 }
