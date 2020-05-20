@@ -6,8 +6,14 @@ import (
 	"gonum.org/v1/plot/vg"
 )
 
-// Options encodes various options to pass to ana types (maker, sample, variable).
+// Options encodes various options to pass to ana.Maker type.
 type Options func(cfg *config)
+
+// VariableOptions encodes various options to pass to ana.Variable type.
+type VariableOptions func(cfg *config)
+
+// SampleOptions encodes various options to pass to ana.Sample type.
+type SampleOptions func(cfg *config)
 
 // config contains all the possible options than can be enable or not.
 type config struct {
@@ -48,97 +54,12 @@ type config struct {
 }
 
 // newConfig returns a config type with a set of passed options.
-func newConfig(opts ...Options) *config {
+func newConfig(opts ...func(cfg *config)) *config {
 	cfg := new(config)
 	for _, opt := range opts {
 		opt(cfg)
 	}
 	return cfg
-}
-
-// WithWeight sets the weight to be used, as defined by the TreeFunc f.
-func WithWeight(f TreeFunc) Options {
-	return func(cfg *config) {
-		cfg.Weight = f
-	}
-}
-
-// WithCut sets the cut to be applied, as defined by the TreeFunc f.
-func WithCut(f TreeFunc) Options {
-	return func(cfg *config) {
-		cfg.Cut = f
-	}
-}
-
-// WithLineColor sets line color of the sample histogram.
-func WithLineColor(c color.NRGBA) Options {
-	return func(cfg *config) {
-		cfg.LineColor = c
-	}
-}
-
-// WithLineWidth sets line width of the sample histogram.
-func WithLineWidth(w vg.Length) Options {
-	return func(cfg *config) {
-		cfg.LineWidth = w
-	}
-
-}
-
-// WithFillColor sets the color with which the histo will be filled.
-func WithFillColor(c color.NRGBA) Options {
-	return func(cfg *config) {
-		cfg.FillColor = c
-	}
-}
-
-// WithCircleMarkers enables the use of circle markers (as for data histogram).
-func WithCircleMarkers(b bool) Options {
-	return func(cfg *config) {
-		cfg.CircleMarkers = b
-	}
-}
-
-// WithCircleSize sets the size of circle markers.
-func WithCircleSize(s vg.Length) Options {
-	return func(cfg *config) {
-		cfg.CircleSize = s
-	}
-}
-
-// WithCircleColor sets the color of circle markers.
-func WithCircleColor(c color.NRGBA) Options {
-	return func(cfg *config) {
-		cfg.CircleColor = c
-	}
-}
-
-// WithYErrBars enables y error bars.
-func WithYErrBars(b bool) Options {
-	return func(cfg *config) {
-		cfg.YErrBars = b
-	}
-}
-
-// WithYErrBarsLineWidth sets the width of the error bars line
-func WithYErrBarsLineWidth(w vg.Length) Options {
-	return func(cfg *config) {
-		cfg.YErrBarsLineWidth = w
-	}
-}
-
-// WithYErrBarsCapsWidth sets the width of the y error bars caps.
-func WithYErrBarsCapWidth(w vg.Length) Options {
-	return func(cfg *config) {
-		cfg.YErrBarsCapWidth = w
-	}
-}
-
-// WithDataStyle enables the default data histogram style.
-func WithDataStyle(b bool) Options {
-	return func(cfg *config) {
-		cfg.DataStyle = b
-	}
 }
 
 // WithKinemCuts sets the list of kinematic cuts to run on.
@@ -204,22 +125,107 @@ func WithErrBandColor(c color.NRGBA) Options {
 	}
 }
 
+// WithWeight sets the weight to be used, as defined by the TreeFunc f.
+func WithWeight(f TreeFunc) SampleOptions {
+	return func(cfg *config) {
+		cfg.Weight = f
+	}
+}
+
+// WithCut sets the cut to be applied, as defined by the TreeFunc f.
+func WithCut(f TreeFunc) SampleOptions {
+	return func(cfg *config) {
+		cfg.Cut = f
+	}
+}
+
+// WithLineColor sets line color of the sample histogram.
+func WithLineColor(c color.NRGBA) SampleOptions {
+	return func(cfg *config) {
+		cfg.LineColor = c
+	}
+}
+
+// WithLineWidth sets line width of the sample histogram.
+func WithLineWidth(w vg.Length) SampleOptions {
+	return func(cfg *config) {
+		cfg.LineWidth = w
+	}
+
+}
+
+// WithFillColor sets the color with which the histo will be filled.
+func WithFillColor(c color.NRGBA) SampleOptions {
+	return func(cfg *config) {
+		cfg.FillColor = c
+	}
+}
+
+// WithCircleMarkers enables the use of circle markers (as for data histogram).
+func WithCircleMarkers(b bool) SampleOptions {
+	return func(cfg *config) {
+		cfg.CircleMarkers = b
+	}
+}
+
+// WithCircleSize sets the size of circle markers.
+func WithCircleSize(s vg.Length) SampleOptions {
+	return func(cfg *config) {
+		cfg.CircleSize = s
+	}
+}
+
+// WithCircleColor sets the color of circle markers.
+func WithCircleColor(c color.NRGBA) SampleOptions {
+	return func(cfg *config) {
+		cfg.CircleColor = c
+	}
+}
+
+// WithYErrBars enables y error bars.
+func WithYErrBars(b bool) SampleOptions {
+	return func(cfg *config) {
+		cfg.YErrBars = b
+	}
+}
+
+// WithYErrBarsLineWidth sets the width of the error bars line
+func WithYErrBarsLineWidth(w vg.Length) SampleOptions {
+	return func(cfg *config) {
+		cfg.YErrBarsLineWidth = w
+	}
+}
+
+// WithYErrBarsCapsWidth sets the width of the y error bars caps.
+func WithYErrBarsCapWidth(w vg.Length) SampleOptions {
+	return func(cfg *config) {
+		cfg.YErrBarsCapWidth = w
+	}
+}
+
+// WithDataStyle enables the default data histogram style.
+func WithDataStyle(b bool) SampleOptions {
+	return func(cfg *config) {
+		cfg.DataStyle = b
+	}
+}
+
 // WithSaveName sets the file name of the plot for a variable.
-func WithSaveName(n string) Options {
+func WithSaveName(n string) VariableOptions {
 	return func(cfg *config) {
 		cfg.SaveName = n
 	}
 }
 
 // WithTreeVar sets a TreeFunc object for an on-the-fly computed variable.
-func WithTreeVar(f TreeFunc) Options {
+func WithTreeVar(f TreeFunc) VariableOptions {
 	return func(cfg *config) {
 		cfg.TreeVar = f
 	}
 }
 
 // WithAxisLabels sets the x- and y-axis labels for a variable
-func WithAxisLabels(xlab, ylab string) Options {
+func WithAxisLabels(xlab, ylab string) VariableOptions {
 	return func(cfg *config) {
 		cfg.XLabel = xlab
 		cfg.YLabel = ylab
@@ -227,7 +233,7 @@ func WithAxisLabels(xlab, ylab string) Options {
 }
 
 // WithAxisLabels sets the x- and y-axis labels for a variable.
-func WithTickFormats(xticks, yticks string) Options {
+func WithTickFormats(xticks, yticks string) VariableOptions {
 	return func(cfg *config) {
 		cfg.XTickFormat = xticks
 		cfg.YTickFormat = yticks
@@ -235,7 +241,7 @@ func WithTickFormats(xticks, yticks string) Options {
 }
 
 // WithXRange sets the x-axis min and max for a variable.
-func WithXRange(min, max float64) Options {
+func WithXRange(min, max float64) VariableOptions {
 	return func(cfg *config) {
 		cfg.RangeXmin = min
 		cfg.RangeXmax = max
@@ -243,7 +249,7 @@ func WithXRange(min, max float64) Options {
 }
 
 // WithYRange sets the y-axis min and max for a variable.
-func WithYRange(min, max float64) Options {
+func WithYRange(min, max float64) VariableOptions {
 	return func(cfg *config) {
 		cfg.RangeYmin = min
 		cfg.RangeYmax = max
@@ -251,7 +257,7 @@ func WithYRange(min, max float64) Options {
 }
 
 // WithLegPosition sets the legend position on the plot for a variable.
-func WithLegPosition(top, left bool) Options {
+func WithLegPosition(top, left bool) VariableOptions {
 	return func(cfg *config) {
 		cfg.LegPosTop = top
 		cfg.LegPosLeft = left

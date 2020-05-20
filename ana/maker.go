@@ -91,6 +91,7 @@ func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 	a.KinemCuts = cfg.KinemCuts
 	a.SavePath = cfg.SavePath
 	a.SaveFormat = cfg.SaveFormat
+	a.PlotTitle = cfg.PlotTitle
 	a.CompileLatex = cfg.CompileLatex
 	a.RatioPlot = cfg.RatioPlot
 	a.DontStack = cfg.DontStack

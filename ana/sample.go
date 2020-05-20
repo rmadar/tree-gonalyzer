@@ -36,7 +36,7 @@ type Sample struct {
 	DataStyle         bool
 }
 
-func NewSample(sname, stype, sleg, fname, tname string, opts ...Options) Sample {
+func NewSample(sname, stype, sleg, fname, tname string, opts ...SampleOptions) Sample {
 
 	// Required fields
 	s := Sample{

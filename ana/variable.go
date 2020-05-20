@@ -29,7 +29,7 @@ type Variable struct {
 
 // Create a new type variable
 func NewVariable(name, tname string, value interface{},
-	nbins int, xmin, xmax float64, opts ...Options) *Variable {
+	nbins int, xmin, xmax float64, opts ...VariableOptions) *Variable {
 
 	// Create the object
 	v := &Variable{
@@ -72,7 +72,7 @@ func NewVariable(name, tname string, value interface{},
 
 // Create a new variable from a TreeFunc object
 func NewVariableFromTreeFunc(name string, f TreeFunc, nbins int,
-	xmin, xmax float64, opts ...Options) *Variable {
+	xmin, xmax float64, opts ...VariableOptions) *Variable {
 	v := NewVariable(name, "", nil, nbins, xmin, xmax, opts...)
 	v.TreeVar = f
 	return v
