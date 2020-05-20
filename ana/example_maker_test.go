@@ -1,7 +1,7 @@
 package ana_test
 
 // Creation of the default analysis maker type
-func ExampleNew() {
+func ExampleMaker_default() {
 
 }
 
