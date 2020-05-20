@@ -10,6 +10,8 @@ import (
 	"github.com/rmadar/tree-gonalyzer/ana"
 )
 
+// Example showing how NewTreeFuncVarBool() works and compares
+// to the rtree.FormulaFunc.
 func ExampleNewTreeFuncVarBool() {
 
 	// Get a reader for the example
