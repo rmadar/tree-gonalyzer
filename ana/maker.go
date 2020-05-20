@@ -8,9 +8,9 @@ import (
 	"os"
 	"time"
 
-	"gonum.org/v1/plot/vg"
 	"gonum.org/v1/plot/plotutil"
-	
+	"gonum.org/v1/plot/vg"
+
 	"go-hep.org/x/hep/groot"
 	"go-hep.org/x/hep/groot/rtree"
 
@@ -36,13 +36,13 @@ type Maker struct {
 	CompileLatex bool   // Enable on-the-fly latex compilation of plots
 
 	// Plot related setup
-	AutoStyle     bool        // Enable automatic histo style: colors, fill, etc ... 
-	PlotTitle     string      // General plot title
-	RatioPlot     bool        // Enable ratio plot
-	HistoStack    bool        // Enable histogram stacking 
-	HistoNorm     bool        // Normalize distributions to unit area (when stacked, the total is normalized)
-	ErrBandColor  color.NRGBA // Color for the uncertainty band.
-	
+	AutoStyle    bool        // Enable automatic histo style: colors, fill, etc ...
+	PlotTitle    string      // General plot title
+	RatioPlot    bool        // Enable ratio plot
+	HistoStack   bool        // Enable histogram stacking
+	HistoNorm    bool        // Normalize distributions to unit area (when stacked, the total is normalized)
+	ErrBandColor color.NRGBA // Color for the uncertainty band.
+
 	// Histograms
 	HbookHistos [][][]*hbook.H1D // Currently 3D histo container
 	HplotHistos [][][]*hplot.H1D // Currently 3D histo container
@@ -100,7 +100,7 @@ func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 	a.HistoStack = cfg.HistoStack
 	a.HistoNorm = cfg.HistoNorm
 	a.ErrBandColor = cfg.ErrBandColor
-	
+
 	// Get mappings between slice indices and object names
 	a.samIdx = getIdxMap(a.Samples)
 	a.varIdx = getIdxMap(a.Variables)
@@ -108,7 +108,7 @@ func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 
 	// Build hbook and hplot H1D containers
 	a.initHistoContainers()
-		
+
 	return a
 }
 
@@ -247,7 +247,7 @@ func (ana *Maker) PlotHistos() error {
 	if ana.AutoStyle {
 		ana.setAutoStyle()
 	}
-	
+
 	// Return an error if HbookHistos is empty
 	if !ana.histoFilled {
 		log.Fatalf("There is no histograms. Please make sure that 'MakeHistos()' is called before 'PlotHistos()'")
@@ -318,7 +318,7 @@ func (ana *Maker) PlotHistos() error {
 					}
 					if ana.Samples[is].IsBkg() {
 						if ana.HistoStack {
-							h.Scale(1. / norm_bkgtot)							
+							h.Scale(1. / norm_bkgtot)
 						} else {
 							h.Scale(1. / norm_histos[is])
 						}
@@ -413,7 +413,7 @@ func (ana *Maker) PlotHistos() error {
 				// Compute and store the ratio (type hbook.S2D)
 				switch {
 				case ana.HistoStack:
-										// Data to MC
+					// Data to MC
 					hbs2d_ratio, err := hbook.DivideH1D(bhData, bhBkgTot, hbook.DivIgnoreNaNs())
 					if err != nil {
 						log.Fatal("cannot divide histo for the ratio plot")
@@ -442,7 +442,7 @@ func (ana *Maker) PlotHistos() error {
 					hps2d_ratio1.Band.FillColor = ana.ErrBandColor
 					rp.Bottom.Add(hps2d_ratio1)
 					rp.Bottom.Add(hps2d_ratio)
-					
+
 				default:
 					// [FIX-ME 0 (rmadar)] Ratio wrt data (or 1 bkg if data is empty) -> to be specied as an option?
 					// [FIX-ME 1 (rmadar)] loop is over bhBkgs_postnorm while 'ana.Samples[is]' runs also over data.
@@ -578,7 +578,6 @@ func (ana *Maker) initHistoContainers() {
 
 }
 
-
 func (ana *Maker) setAutoStyle() {
 
 	for i, s := range ana.Samples {
@@ -600,7 +599,7 @@ func (ana *Maker) setAutoStyle() {
 			s.FillColor = color.NRGBA{}
 			s.LineColor = c
 			s.LineWidth = 2.
-		}		
+		}
 	}
 }
 

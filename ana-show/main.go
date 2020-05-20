@@ -1,4 +1,4 @@
-// Showing how gonalyzer/ana package works 
+// Showing how gonalyzer/ana package works
 package main
 
 import (
@@ -16,7 +16,7 @@ func main() {
 	var doLatex = flag.Bool("l", false, "On-the-fly LaTeX compilation to produce figures")
 	var doRatio = flag.Bool("r", false, "Enable ratio plot")
 	var doStack = flag.Bool("s", false, "Enable histogram stacking")
-	var doNorm  = flag.Bool("n", false, "Enable histogram normalization")
+	var doNorm = flag.Bool("n", false, "Enable histogram normalization")
 	flag.Parse()
 
 	// Samples
@@ -33,7 +33,7 @@ func main() {
 			"../testdata/ttbar_MadSpinOn_1.root", "truth",
 			ana.WithWeight(ana.NewTreeFuncValF64(0.33))),
 	}
-	
+
 	// Variables
 	variables := []*ana.Variable{
 		ana.NewVariable("truth_dphi_ll", "truth_dphi_ll", new(float64), 15, 0, math.Pi),
@@ -52,7 +52,7 @@ func main() {
 	analyzer.RatioPlot = *doRatio
 	analyzer.HistoNorm = *doNorm
 	analyzer.HistoStack = *doStack
-	
+
 	// Run the analyzer and produce all plots
 	if err := analyzer.Run(); err != nil {
 		panic(err)
