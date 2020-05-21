@@ -1,6 +1,6 @@
 package ana_test
 
-func ExampleNewSample() {
+func ExampleSample_default() {
 	// Data sample
 	sData := ana.NewSample("DATA", "data", `pp data`, "myfile.root", "mytree")
 
@@ -14,7 +14,7 @@ func ExampleNewSample() {
 
 func ExampleSample_withWeight() {
 	// Define a weight from a single branch
-	s1 := ana.NewSample("Htt", "sig", `Higgs prod.`, "myfile.root", "mytree",
+	s1 := ana.NewSample("proc", "bkg", `leg`, "myfile.root", "mytree",
 		ana.WithWeight(ana.NewTreeFruncF64("evt_weight")),
 	)
 
@@ -25,7 +25,7 @@ func ExampleSample_withWeight() {
 			return w1*w2*w3
 		},
 	}
-	s2 := ana.NewSample("Htt", "sig", `Higgs prod.`, "myfile.root", "mytree",
+	s2 := ana.NewSample("proc", "bkg", `leg`, "myfile.root", "mytree",
 		ana.WithWeight(w),
 	)
 }
