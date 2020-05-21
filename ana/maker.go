@@ -21,15 +21,17 @@ import (
 	"github.com/rmadar/hplot-style/style"
 )
 
-// Analysis maker type is the main object of the ana pacakge.
-// It contains all samples, variables and selection on which
-// to loop to produce and plot histograms. 
+// Analysis maker type is the main object of the ana package.
+// It contains all samples and variables on which
+// to loop to produce and plot histograms. Several options
+// can be specified to normalize and/or stack histograms,
+// add a ratio plot, or a list of kinematic selections.
 type Maker struct {
 
 	// Inputs
 	Samples      []*Sample    // List of samples on which to run.
 	Variables    []*Variable  // List of variables to plot.
-	KinemCuts    []*Selection // List of cuts to apply.
+	KinemCuts    []*Selection // List of cuts to apply (default: no cut).
 
 	// Figures
 	SavePath     string // Path to which plot will be saved (default: 'plots').
