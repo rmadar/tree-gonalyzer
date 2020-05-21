@@ -6,16 +6,19 @@ import (
 	"gonum.org/v1/plot/vg"
 )
 
-// Options encodes various options to pass to ana.Maker type.
+// Options encodes the various settings to pass to
+// an analysis, ie a Maker, as arguements of ana.New().
 type Options func(cfg *config)
 
-// VariableOptions encodes various options to pass to ana.Variable type.
+// VariableOptions encodes various settings to pass
+// to a Variable type, as arguments of ana.NewVariable().
 type VariableOptions func(cfg *config)
 
-// SampleOptions encodes various options to pass to ana.Sample type.
+// SampleOptions encodes the various settings to pass
+// to a Sample type, as arguements of ana.NewSample().
 type SampleOptions func(cfg *config)
 
-// config contains all the possible options than can be enable or not.
+// config contains all the possible options and their values.
 type config struct {
 
 	// ana.Maker options
@@ -112,42 +115,46 @@ func WithRatioPlot(b bool) Options {
 	}
 }
 
-// WithHistoStack enables histogram stacking for bkg-typed samples.
+// WithHistoStack enables histogram stacking for
+// bkg-typed samples.
 func WithHistoStack(b bool) Options {
 	return func(cfg *config) {
 		cfg.HistoStack = b
 	}
 }
 
-// WithHistoNorm enables histogram normalization to unity, to compare shapes.
+// WithHistoNorm enables histogram normalization to unity.
 func WithHistoNorm(b bool) Options {
 	return func(cfg *config) {
 		cfg.HistoNorm = b
 	}
 }
 
-// WithErrBandColor sets the color for the error band of total histogram (and ratio).
+// WithErrBandColor sets the color for the error band of
+// total histogram (and ratio).
 func WithErrBandColor(c color.NRGBA) Options {
 	return func(cfg *config) {
 		cfg.ErrBandColor = c
 	}
 }
 
-// WithWeight sets the weight to be used, as defined by the TreeFunc f.
+// WithWeight sets the weight to be used for this sample,
+// as defined by the TreeFunc f.
 func WithWeight(f TreeFunc) SampleOptions {
 	return func(cfg *config) {
 		cfg.Weight = f
 	}
 }
 
-// WithCut sets the cut to be applied, as defined by the TreeFunc f.
+// WithCut sets the cut to be applied to the sample, as
+// defined by the TreeFunc f.
 func WithCut(f TreeFunc) SampleOptions {
 	return func(cfg *config) {
 		cfg.Cut = f
 	}
 }
 
-// WithLineColor sets line color of the sample histogram.
+// WithLineColor sets the line color of the histogram.
 func WithLineColor(c color.NRGBA) SampleOptions {
 	return func(cfg *config) {
 		cfg.LineColor = c
@@ -218,21 +225,22 @@ func WithDataStyle(b bool) SampleOptions {
 	}
 }
 
-// WithSaveName sets the file name of the plot for a variable.
+// WithSaveName sets the file name of the plot.
 func WithSaveName(n string) VariableOptions {
 	return func(cfg *config) {
 		cfg.SaveName = n
 	}
 }
 
-// WithTreeVar sets a TreeFunc object for an on-the-fly computed variable.
+// WithTreeVar sets a TreeFunc object for an on-the-fly
+// computed variable.
 func WithTreeVar(f TreeFunc) VariableOptions {
 	return func(cfg *config) {
 		cfg.TreeVar = f
 	}
 }
 
-// WithAxisLabels sets the x- and y-axis labels for a variable
+// WithAxisLabels sets the x- and y-axis label.
 func WithAxisLabels(xlab, ylab string) VariableOptions {
 	return func(cfg *config) {
 		cfg.XLabel = xlab
@@ -240,7 +248,7 @@ func WithAxisLabels(xlab, ylab string) VariableOptions {
 	}
 }
 
-// WithAxisLabels sets the x- and y-axis labels for a variable.
+// WithAxisLabels sets the x- and y-axis labels.
 func WithTickFormats(xticks, yticks string) VariableOptions {
 	return func(cfg *config) {
 		cfg.XTickFormat = xticks
@@ -248,7 +256,7 @@ func WithTickFormats(xticks, yticks string) VariableOptions {
 	}
 }
 
-// WithXRange sets the x-axis min and max for a variable.
+// WithXRange sets the x-axis min and max.
 func WithXRange(min, max float64) VariableOptions {
 	return func(cfg *config) {
 		cfg.RangeXmin = min
@@ -256,7 +264,7 @@ func WithXRange(min, max float64) VariableOptions {
 	}
 }
 
-// WithYRange sets the y-axis min and max for a variable.
+// WithYRange sets the y-axis min and max.
 func WithYRange(min, max float64) VariableOptions {
 	return func(cfg *config) {
 		cfg.RangeYmin = min
@@ -264,7 +272,7 @@ func WithYRange(min, max float64) VariableOptions {
 	}
 }
 
-// WithLegPosition sets the legend position on the plot for a variable.
+// WithLegPosition sets the legend position on the plot.
 func WithLegPosition(top, left bool) VariableOptions {
 	return func(cfg *config) {
 		cfg.LegPosTop = top
