@@ -12,7 +12,6 @@ import (
 
 // Example showing how a general TreeFunc object works.
 func ExampleTreeFunc() {
-
 	// Get a reader for the example
 	f, r := getReader(5)
 	defer f.Close()
@@ -50,7 +49,6 @@ func ExampleTreeFunc() {
 // Example showing how NewTreeFuncVarBool() works and compares
 // to the rtree.FormulaFunc.
 func ExampleNewTreeFuncVarBool() {
-
 	// Get a reader for the example
 	f, r := getReader(5)
 	defer f.Close()
@@ -87,7 +85,6 @@ func ExampleNewTreeFuncVarBool() {
 // Example showing how NewTreeFuncVarF64() works and compares
 // to the rtree.FormulaFunc.
 func ExampleNewTreeFuncVarF64() {
-
 	// Get a reader for the example
 	f, r := getReader(5)
 	defer f.Close()
@@ -126,7 +123,6 @@ func ExampleNewTreeFuncVarF64() {
 // to pass a simple constant to a sample, using the
 // same API  ana.With.Weight(f TreeFunc).
 func ExampleNewTreeFuncValF64() {
-
 	// Get a reader for the example
 	f, r := getReader(5)
 	defer f.Close()
@@ -155,7 +151,7 @@ func ExampleNewTreeFuncValF64() {
 
 // Helper function get a reader for the examples
 func getReader(nmax int64) (*groot.File, *rtree.Reader) {
-
+	
 	// Get the file
 	f, err := groot.Open("../testdata/ttbar_ME.root")
 	if err != nil {
