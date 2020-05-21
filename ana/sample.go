@@ -37,7 +37,7 @@ type Sample struct {
 	YErrBarsCapWidth  vg.Length   // Width of horizontal bars of the y-error bars.
 }
 
-// NewSample create a sample with the default settings.
+// NewSample creates a sample with the default settings.
 func NewSample(sname, stype, sleg, fname, tname string, opts ...SampleOptions) *Sample {
 
 	// Required fields
