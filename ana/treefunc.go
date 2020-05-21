@@ -10,8 +10,8 @@ import (
 // It provides a set of functions to ease the simple cases
 // of boolean and float64 returned type. Once the slice of variable
 // (branch) names and the function are given, one can either access
-// the rtree.FormulaFunc or the GO function to called in the event
-// loop directly.
+// the rtree.FormulaFunc or directly the GO function to be called
+// in the event loop for boolean and float64.
 type TreeFunc struct {
 	VarsName []string
 	Fct      interface{}
