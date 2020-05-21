@@ -16,7 +16,8 @@ import (
 // Default color
 var colorNil = color.NRGBA{R: 0, G: 0, B: 0, A: 0}
 
-// Sample contains all the information to define a process
+// Sample contains all the information defining a single histogram
+// of the final plot.
 type Sample struct {
 	Name              string      // Sample name.
 	Type              string      // Sample type: 'data', 'bkg' or 'sig'.
