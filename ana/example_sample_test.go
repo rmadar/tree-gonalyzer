@@ -1,5 +1,9 @@
 package ana_test
 
+import (
+	"github.com/rmadar/tree-gonalyzer/ana"
+)
+
 func ExampleSample_default() {
 	// Data sample
 	sData := ana.NewSample("DATA", "data", `pp data`, "myfile.root", "mytree")
@@ -9,6 +13,9 @@ func ExampleSample_default() {
 
 	// Signal sample, say pp->H->ttbar production
 	sSig := ana.NewSample("Htt", "sig", `Higgs prod.`, "myfile.root", "mytree")
+
+	// New analysis
+	ana.New([]*ana.Sample{sData, sBkg, sSig}, []*ana.Variable{})
 }
 
 
@@ -21,21 +28,38 @@ func ExampleSample_withWeight() {
 		},
 	}
 
-	// Computed weight
-	s2 := ana.NewSample("proc", "bkg", `leg`, "myfile.root", "mytree",
+	// Sample with computed weight
+	ana.NewSample("proc", "bkg", `leg`, "myfile.root", "mytree",
 		ana.WithWeight(w),
 	)
 	
-	// Single branch weight
-	s2 := ana.NewSample("proc", "bkg", `leg`, "myfile.root", "mytree",
-		ana.WithWeight(ana.NewTreeFruncF64("evt_weight")),
+	// Sample with single branch weight
+	ana.NewSample("proc", "bkg", `leg`, "myfile.root", "mytree",
+		ana.WithWeight(ana.NewTreeFuncVarF64("evt_weight")),
 	)
+
 }
 
 func ExampleSample_withCut() {
+	// Selection criteria computed from several branches 
+	sel := ana.TreeFunc{
+		VarsName: []string{"pt", "eta", "m"},
+		Fct: func (pt, eta, m float64) bool {
+			return (pt>150 && eta>0) || m<125
+		},
+	}
 	
+	// Sample with computed boolean
+	ana.NewSample("proc", "bkg", `leg`, "myfile.root", "mytree",
+		ana.WithCut(sel),
+	)
+	
+	// Sample with single branch boolean
+	ana.NewSample("proc", "bkg", `leg`, "myfile.root", "mytree",
+		ana.WithWeight(ana.NewTreeFuncVarBool("passCriteria")),
+	)	
 }
 
 func ExampleSample_withSubSamples() {
-	// To BE IMPLEMENTED FIRST
+	// FEATURE TO COME SOON
 }
