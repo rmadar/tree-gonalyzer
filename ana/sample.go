@@ -30,7 +30,7 @@ type Sample struct {
 	LineColor         color.NRGBA // Line color of the histogram (default: blue).
 	LineWidth         vg.Length   // Line width of the histogram (default: 1.5).
 	FillColor         color.NRGBA // Fill color of the histogram (default: none).
-	CircleMarkers     bool        // Enable the use of circle markers (default: false).
+	CircleMarkers     bool        // Enable circle markers (default: false).
 	CircleSize        vg.Length   // Circle size (default: 0).
 	CircleColor       color.NRGBA // Circle color (default: transparent).
 	YErrBars          bool        // Display y-error bars (default: false).
