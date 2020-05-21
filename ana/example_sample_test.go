@@ -35,9 +35,8 @@ func ExampleSample_withWeight() {
 	
 	// Sample with single branch weight
 	ana.NewSample("proc", "bkg", `leg`, "myfile.root", "mytree",
-		ana.WithWeight(ana.NewTreeFuncVarF64("evt_weight")),
+		ana.WithWeight(ana.NewTreeFuncVarF64("evtWght")),
 	)
-
 }
 
 func ExampleSample_withCut() {
