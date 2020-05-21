@@ -6,6 +6,9 @@ import (
 	"go-hep.org/x/hep/groot/rtree"
 )
 
+// TreeFunc is a wrapper to use rtree.FormulaFunc in an easy way.
+// Once the slice of variable (branch) names and the function are given,
+// the GO function to be called in the loop is obtained with one line.
 type TreeFunc struct {
 	VarsName []string
 	Fct      interface{}
