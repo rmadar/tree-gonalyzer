@@ -469,7 +469,7 @@ func (ana *Maker) PlotHistos() error {
 						)
 						hps2d_ratio.GlyphStyle.Radius = 0
 						hps2d_ratio.LineStyle.Color = ana.Samples[is].LineColor
-						ana.Samples[is].SetBandStyle(hps2d_ratio.Band)
+						ana.Samples[is].setBandStyle(hps2d_ratio.Band)
 						rp.Bottom.Add(hps2d_ratio)
 					}
 				}
