@@ -13,20 +13,22 @@ func ExampleSample_default() {
 
 
 func ExampleSample_withWeight() {
-	// Define a weight from a single branch
-	s1 := ana.NewSample("proc", "bkg", `leg`, "myfile.root", "mytree",
-		ana.WithWeight(ana.NewTreeFruncF64("evt_weight")),
-	)
-
-	// Define a weight computed from several branches 
+	// Weight computed from several branches 
 	w := ana.TreeFunc{
 		VarsName: []string{"w1", "w2", "w3"},
 		Fct: func (w1, w2, w3 float64) float64 {
 			return w1*w2*w3
 		},
 	}
+
+	// Computed weight
 	s2 := ana.NewSample("proc", "bkg", `leg`, "myfile.root", "mytree",
 		ana.WithWeight(w),
+	)
+	
+	// Single branch weight
+	s2 := ana.NewSample("proc", "bkg", `leg`, "myfile.root", "mytree",
+		ana.WithWeight(ana.NewTreeFruncF64("evt_weight")),
 	)
 }
 
