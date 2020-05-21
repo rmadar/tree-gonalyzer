@@ -10,12 +10,14 @@ import (
 	"github.com/rmadar/tree-gonalyzer/ana"
 )
 
-// Example showing how a genaral TreeFunc object works.
+// Example showing how a general TreeFunc object works.
 func ExampleTreeFunc() {
 
 	// Get a reader for the example
-	r := getReader(5)
-
+	f, r := getReader(5)
+	defer f.Close()
+	defer r.Close()
+	
 	// TreeFunc object computing t_pt*t_eta
 	treeFunc := ana.TreeFunc{
 		VarsName: []string{"t_pt", "t_eta"},
@@ -50,8 +52,10 @@ func ExampleTreeFunc() {
 func ExampleNewTreeFuncVarBool() {
 
 	// Get a reader for the example
-	r := getReader(5)
-
+	f, r := getReader(5)
+	defer f.Close()
+	defer r.Close()
+	
 	// branch name of a boolean variable in the TTree
 	varName := "init_qq"
 
@@ -80,12 +84,14 @@ func ExampleNewTreeFuncVarBool() {
 	// 4 false false
 }
 
-// Example showing how NewTreeFuncVarBool() works and compares
+// Example showing how NewTreeFuncVarF64() works and compares
 // to the rtree.FormulaFunc.
 func ExampleNewTreeFuncVarF64() {
 
 	// Get a reader for the example
-	r := getReader(5)
+	f, r := getReader(5)
+	defer f.Close()
+	defer r.Close()
 
 	// branch name of a boolean variable in the TTree
 	varName := "truth_dphi_ll"
@@ -116,11 +122,16 @@ func ExampleNewTreeFuncVarF64() {
 }
 
 // Example showing how NewTreeFuncValF64() works.
+// The reason why this approach exist is to be able
+// to pass a constant using the same sample API
+// ana.With.Weight(f TreeFunc).
 func ExampleNewTreeFuncValF64() {
 
 	// Get a reader for the example
-	r := getReader(5)
-
+	f, r := getReader(5)
+	defer f.Close()
+	defer r.Close()
+	
 	// TreeFunc object
 	treeFunc := ana.NewTreeFuncValF64(0.33)
 
@@ -143,14 +154,14 @@ func ExampleNewTreeFuncValF64() {
 }
 
 // Helper function get a reader for the examples
-func getReader(nmax int64) *rtree.Reader {
+func getReader(nmax int64) (*groot.File, *rtree.Reader) {
 
 	// Get the file
 	f, err := groot.Open("../testdata/ttbar_ME.root")
 	if err != nil {
 		log.Fatal("could not open ROOT file ../testdata/ttbar_ME.root: %w", err)
 	}
-
+	
 	// Get the tree
 	obj, err := f.Get("truth")
 	if err != nil {
@@ -164,5 +175,5 @@ func getReader(nmax int64) *rtree.Reader {
 		log.Fatal("could not create tree reader: %w", err)
 	}
 
-	return r
+	return f, r
 }
