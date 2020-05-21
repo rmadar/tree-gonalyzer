@@ -16,15 +16,15 @@ import (
 // Default color
 var colorNil = color.NRGBA{R: 0, G: 0, B: 0, A: 0}
 
-// Sample is the structure representing
+// Sample contains all the information to define a process
 type Sample struct {
 	Name              string      // Sample name.
 	Type              string      // Sample type: 'data', 'bkg' or 'sig'.
 	LegLabel          string      // Label used in the legend.
 	FileName          string      // Path the file of the sample.
 	TreeName          string      // Name of the tree.
-	WeightFunc        TreeFunc    // Weight to be applied to the sample (default: 1.0).
-	CutFunc           TreeFunc    // Cut to be applied to the sample (default: no cut).
+	WeightFunc        TreeFunc    // Weight to applied to the sample (default: 1.0).
+	CutFunc           TreeFunc    // Cut to be applied to the sample (default: none).
 	DataStyle         bool        // Enable data-like style (default: Type == 'data')
 	LineColor         color.NRGBA // Line color of the histogram (default: blue).
 	LineWidth         vg.Length   // Line width of the histogram (default: 1.5).
