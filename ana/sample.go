@@ -13,26 +13,28 @@ import (
 	"github.com/rmadar/hplot-style/style"
 )
 
+// Default color
 var colorNil = color.NRGBA{R: 0, G: 0, B: 0, A: 0}
 
+// Sample is the structure representing
 type Sample struct {
-	Name              string
-	Type              string
-	FileName          string
-	TreeName          string
-	LegLabel          string
-	WeightFunc        TreeFunc
-	CutFunc           TreeFunc
-	LineColor         color.NRGBA
-	LineWidth         vg.Length
-	FillColor         color.NRGBA
-	CircleMarkers     bool
-	CircleSize        vg.Length
-	CircleColor       color.NRGBA
-	YErrBars          bool
-	YErrBarsLineWidth vg.Length
-	YErrBarsCapWidth  vg.Length
-	DataStyle         bool
+	Name              string      // Sample name.
+	Type              string      // Sample type: 'data', 'bkg' or 'sig'.
+	FileName          string      // Path the file of the sample.
+	TreeName          string      // Name of the tree.
+	LegLabel          string      // Label used in the legend.
+	WeightFunc        TreeFunc    // Weight to be applied to the sample.
+	CutFunc           TreeFunc    // Cut to be applied to the sample.
+	LineColor         color.NRGBA // Line color of the histogram
+	LineWidth         vg.Length   // Line width of the histogram
+	FillColor         color.NRGBA // Fill color of the histogram
+	CircleMarkers     bool        // Enable the use of circle markers.
+	CircleSize        vg.Length   // Circle size.
+	CircleColor       color.NRGBA // Circle color.
+	YErrBars          bool        // Display y-error bars.
+	YErrBarsLineWidth vg.Length   // Width of y-error bars.
+	YErrBarsCapWidth  vg.Length   // Width of horizontal bars of the y-error bars.
+	DataStyle         bool        // Enable data-like histogram, circle marker with error bars.
 }
 
 func NewSample(sname, stype, sleg, fname, tname string, opts ...SampleOptions) *Sample {
