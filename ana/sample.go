@@ -20,23 +20,24 @@ var colorNil = color.NRGBA{R: 0, G: 0, B: 0, A: 0}
 type Sample struct {
 	Name              string      // Sample name.
 	Type              string      // Sample type: 'data', 'bkg' or 'sig'.
+	LegLabel          string      // Label used in the legend.
 	FileName          string      // Path the file of the sample.
 	TreeName          string      // Name of the tree.
-	LegLabel          string      // Label used in the legend.
-	WeightFunc        TreeFunc    // Weight to be applied to the sample.
-	CutFunc           TreeFunc    // Cut to be applied to the sample.
-	LineColor         color.NRGBA // Line color of the histogram
-	LineWidth         vg.Length   // Line width of the histogram
-	FillColor         color.NRGBA // Fill color of the histogram
-	CircleMarkers     bool        // Enable the use of circle markers.
-	CircleSize        vg.Length   // Circle size.
-	CircleColor       color.NRGBA // Circle color.
-	YErrBars          bool        // Display y-error bars.
+	WeightFunc        TreeFunc    // Weight to be applied to the sample (default: 1.0).
+	CutFunc           TreeFunc    // Cut to be applied to the sample (default: no cut).
+	DataStyle         bool        // Enable data histogram style (default: true if Type is 'data')
+	LineColor         color.NRGBA // Line color of the histogram (default: blue).
+	LineWidth         vg.Length   // Line width of the histogram (default: 1.5).
+	FillColor         color.NRGBA // Fill color of the histogram (default: none).
+	CircleMarkers     bool        // Enable the use of circle markers (default: false).
+	CircleSize        vg.Length   // Circle size (default: 0).
+	CircleColor       color.NRGBA // Circle color (default: transparent).
+	YErrBars          bool        // Display y-error bars (default: false).
 	YErrBarsLineWidth vg.Length   // Width of y-error bars.
 	YErrBarsCapWidth  vg.Length   // Width of horizontal bars of the y-error bars.
-	DataStyle         bool        // Enable data histogram style.
 }
 
+// 
 func NewSample(sname, stype, sleg, fname, tname string, opts ...SampleOptions) *Sample {
 
 	// Required fields
