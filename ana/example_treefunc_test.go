@@ -11,7 +11,7 @@ import (
 )
 
 // Example showing how a general TreeFunc object works.
-func ExampleTreeFunc() {
+func ExampleTreeFunc_general() {
 	// Get a reader for the example
 	f, r := getReader(5)
 	defer f.Close()
