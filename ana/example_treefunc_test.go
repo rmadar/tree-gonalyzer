@@ -93,7 +93,7 @@ func ExampleNewTreeFuncVarF64() {
 	defer f.Close()
 	defer r.Close()
 
-	// branch name of a boolean variable in the TTree
+	// branch name of a float64 variable in the TTree
 	varName := "truth_dphi_ll"
 
 	// TreeFunc object
@@ -122,9 +122,9 @@ func ExampleNewTreeFuncVarF64() {
 }
 
 // Example showing how NewTreeFuncValF64() works.
-// The reason why this approach exist is to be able
-// to pass a constant using the same sample API
-// ana.With.Weight(f TreeFunc).
+// The reason why this approach exists is to be able
+// to pass a simple constant to a sample, using the
+// same API  ana.With.Weight(f TreeFunc).
 func ExampleNewTreeFuncValF64() {
 
 	// Get a reader for the example
