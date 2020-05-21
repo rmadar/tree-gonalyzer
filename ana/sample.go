@@ -37,7 +37,7 @@ type Sample struct {
 	YErrBarsCapWidth  vg.Length   // Width of horizontal bars of the y-error bars.
 }
 
-// 
+// NewSample create a sample with the default settings.
 func NewSample(sname, stype, sleg, fname, tname string, opts ...SampleOptions) *Sample {
 
 	// Required fields
@@ -77,7 +77,7 @@ func NewSample(sname, stype, sleg, fname, tname string, opts ...SampleOptions) *
 	return s
 }
 
-// Return a hplot.H1D with the proper style
+// CreateHisto returns a hplot.H1D with the sample style.
 func (s Sample) CreateHisto(hdata *hbook.H1D, opts ...hplot.Options) *hplot.H1D {
 
 	// Append sample-defined options
