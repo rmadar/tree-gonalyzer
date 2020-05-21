@@ -131,13 +131,14 @@ func (s Sample) CreateHisto(hdata *hbook.H1D, opts ...hplot.Options) *hplot.H1D 
 
 	// Band setup
 	if h.Band != nil {
-		s.SetBandStyle(h.Band)
+		s.setBandStyle(h.Band)
 	}
 
 	return h
 }
 
-func (s Sample) SetBandStyle(b *hplot.Band) {
+// Helper function to set the error band style.
+func (s Sample) setBandStyle(b *hplot.Band) {
 
 	if s.FillColor != colorNil {
 		b.FillColor = style.ChangeOpacity(s.FillColor, 150)
@@ -147,16 +148,19 @@ func (s Sample) SetBandStyle(b *hplot.Band) {
 	}
 }
 
+// IsData returns true it the sample Type is 'data'.
 func (s *Sample) IsData() bool {
 	return strings.ToLower(s.Type) == "data"
 }
 
+// IsData returns true it the sample Type is 'background'.
 func (s *Sample) IsBkg() bool {
 	return strings.ToLower(s.Type) == "bkg" ||
 		strings.ToLower(s.Type) == "bg" ||
 		strings.ToLower(s.Type) == "background"
 }
 
+// IsData returns true it the sample Type is 'signal'.
 func (s *Sample) IsSig() bool {
 	return strings.ToLower(s.Type) == "sig" ||
 		strings.ToLower(s.Type) == "signal"
