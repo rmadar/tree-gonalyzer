@@ -28,7 +28,6 @@ type Maker struct {
 	Samples      []*Sample    // Sample on which to run
 	Variables    []*Variable  // List of variables to plot
 	KinemCuts    []*Selection // List of cuts
-	SamplesGroup string       // TODO: specify how to group samples together
 
 	// Figure related setup
 	SavePath     string // Path to which plot will be saved
@@ -36,22 +35,23 @@ type Maker struct {
 	CompileLatex bool   // Enable on-the-fly latex compilation of plots
 
 	// Plot related setup
-	AutoStyle    bool        // Enable automatic histo style: colors, fill, etc ...
+	AutoStyle    bool        // Enable automatic style: colors, fill, etc ...
 	PlotTitle    string      // General plot title
 	RatioPlot    bool        // Enable ratio plot
 	HistoStack   bool        // Enable histogram stacking
-	HistoNorm    bool        // Normalize distributions to unit area (when stacked, the total is normalized)
+	HistoNorm    bool        // Normalize distributions to unit area
 	ErrBandColor color.NRGBA // Color for the uncertainty band.
 
-	// Histograms
-	HbookHistos [][][]*hbook.H1D // Currently 3D histo container
-	HplotHistos [][][]*hplot.H1D // Currently 3D histo container
+	// Histograms for each {variables x samples x selection}
+	HbookHistos [][][]*hbook.H1D 
+	HplotHistos [][][]*hplot.H1D 
 
 	// Temporary fields for benchmarking
 	WithVarsTreeFormula bool
 	NoTreeFormula       bool
 	NoFuncCall          bool
 
+	// Internal fields
 	cutIdx      map[string]int // Linking cut name and cut index
 	samIdx      map[string]int // Linking sample name and sample index
 	varIdx      map[string]int // Linking variable name and variable index
