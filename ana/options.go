@@ -7,7 +7,7 @@ import (
 )
 
 // Options encodes the various settings to pass to
-// an analysis, ie a Maker, as arguements of ana.New().
+// an analysis, ie a Maker, as arguments of ana.New().
 type Options func(cfg *config)
 
 // VariableOptions encodes various settings to pass
@@ -15,7 +15,7 @@ type Options func(cfg *config)
 type VariableOptions func(cfg *config)
 
 // SampleOptions encodes the various settings to pass
-// to a Sample type, as arguements of ana.NewSample().
+// to a Sample type, as arguments of ana.NewSample().
 type SampleOptions func(cfg *config)
 
 // config contains all the possible options and their values.
