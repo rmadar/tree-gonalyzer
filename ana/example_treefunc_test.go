@@ -17,7 +17,7 @@ func ExampleTreeFunc() {
 	f, r := getReader(5)
 	defer f.Close()
 	defer r.Close()
-	
+
 	// TreeFunc object computing t_pt*t_eta
 	treeFunc := ana.TreeFunc{
 		VarsName: []string{"t_pt", "t_eta"},
@@ -55,7 +55,7 @@ func ExampleNewTreeFuncVarBool() {
 	f, r := getReader(5)
 	defer f.Close()
 	defer r.Close()
-	
+
 	// branch name of a boolean variable in the TTree
 	varName := "init_qq"
 
@@ -131,7 +131,7 @@ func ExampleNewTreeFuncValF64() {
 	f, r := getReader(5)
 	defer f.Close()
 	defer r.Close()
-	
+
 	// TreeFunc object
 	treeFunc := ana.NewTreeFuncValF64(0.33)
 
@@ -161,7 +161,7 @@ func getReader(nmax int64) (*groot.File, *rtree.Reader) {
 	if err != nil {
 		log.Fatal("could not open ROOT file ../testdata/ttbar_ME.root: %w", err)
 	}
-	
+
 	// Get the tree
 	obj, err := f.Get("truth")
 	if err != nil {

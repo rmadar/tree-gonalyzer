@@ -24,4 +24,3 @@ func ExampleMaker_autoStyle() {
 func ExampleMaker_kinematicCuts() {
 
 }
-

@@ -29,9 +29,9 @@ import (
 type Maker struct {
 
 	// Inputs
-	Samples      []*Sample    // List of samples on which to run.
-	Variables    []*Variable  // List of variables to plot.
-	KinemCuts    []*Selection // List of cuts to apply (default: no cut).
+	Samples   []*Sample    // List of samples on which to run.
+	Variables []*Variable  // List of variables to plot.
+	KinemCuts []*Selection // List of cuts to apply (default: no cut).
 
 	// Figures
 	SavePath     string // Path to which plot will be saved (default: 'plots').
@@ -47,8 +47,8 @@ type Maker struct {
 	ErrBandColor color.NRGBA // Color for the uncertainty band (default: gray).
 
 	// Histograms for {variables x samples x selection}
-	HbookHistos [][][]*hbook.H1D 
-	HplotHistos [][][]*hplot.H1D 
+	HbookHistos [][][]*hbook.H1D
+	HplotHistos [][][]*hplot.H1D
 
 	// Fields for benchmarking (TEMP)
 	WithVarsTreeFormula bool
