@@ -7,8 +7,11 @@ import (
 )
 
 // TreeFunc is a wrapper to use rtree.FormulaFunc in an easy way.
-// Once the slice of variable (branch) names and the function are given,
-// the GO function to be called in the loop is obtained with one line.
+// It provides a set of functions to ease the simple cases
+// of boolean and float64 returned type. Once the slice of variable
+// (branch) names and the function are given, one can either access
+// the rtree.FormulaFunc or the GO function to called in the event
+// loop directly.
 type TreeFunc struct {
 	VarsName []string
 	Fct      interface{}
