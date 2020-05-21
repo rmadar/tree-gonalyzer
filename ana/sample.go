@@ -34,7 +34,7 @@ type Sample struct {
 	YErrBars          bool        // Display y-error bars.
 	YErrBarsLineWidth vg.Length   // Width of y-error bars.
 	YErrBarsCapWidth  vg.Length   // Width of horizontal bars of the y-error bars.
-	DataStyle         bool        // Enable data-like histogram, circle marker with error bars.
+	DataStyle         bool        // Enable data histogram style.
 }
 
 func NewSample(sname, stype, sleg, fname, tname string, opts ...SampleOptions) *Sample {
