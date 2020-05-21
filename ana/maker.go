@@ -66,7 +66,8 @@ type Maker struct {
 
 }
 
-// Creating a new object
+// New creates a default analysis maker from a list of sample
+// and a list of variables.
 func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 
 	// Create the object
@@ -122,8 +123,9 @@ func getIdxMap(obj interface{}) map[string]int {
 	return make(map[string]int, 10)
 }
 
-// Run the event loop to fill all histo across samples / variables / cuts (and later: systematics)
-func (ana *Maker) MakeHistos() error {
+// FillHistos runs the one event loop per sample to fill
+// histograms for each variables and selections.
+func (ana *Maker) FillHistos() error {
 
 	// Start timing
 	start := time.Now()
@@ -241,7 +243,8 @@ func (ana *Maker) MakeHistos() error {
 	return nil
 }
 
-// Plotting all histograms
+// PlotHistos loops over all filled histograms and produce one plot
+// for each variable and selection, including all sample histograms.
 func (ana *Maker) PlotHistos() error {
 
 	// Start timing
@@ -254,7 +257,7 @@ func (ana *Maker) PlotHistos() error {
 
 	// Return an error if HbookHistos is empty
 	if !ana.histoFilled {
-		log.Fatalf("There is no histograms. Please make sure that 'MakeHistos()' is called before 'PlotHistos()'")
+		log.Fatalf("There is no histograms. Please make sure that 'FillHistos()' is called before 'PlotHistos()'")
 	}
 
 	// Preparing the final figure
@@ -505,7 +508,8 @@ func (ana *Maker) PlotHistos() error {
 	return nil
 }
 
-// Print processing report
+// PrintReport prints some general information about the number
+// of processed samples, events and produced histograms.
 func (ana Maker) PrintReport() {
 
 	// Event, histo info
@@ -533,11 +537,12 @@ func (ana Maker) PrintReport() {
 	)
 }
 
-// Run the analysis in one function
+// Run performs the three steps in one function: fill histos, plot histos
+// and print report.
 func (ana *Maker) Run() error {
 
 	// Create histograms via an event loop
-	err := ana.MakeHistos()
+	err := ana.FillHistos()
 	if err != nil {
 		return err
 	}
@@ -555,7 +560,7 @@ func (ana *Maker) Run() error {
 	return nil
 }
 
-// Initialize histogram containers
+// Helper function to initialize histogram containers
 func (ana *Maker) initHistoContainers() {
 
 	// Initialize hbook H1D
@@ -582,6 +587,7 @@ func (ana *Maker) initHistoContainers() {
 
 }
 
+// Helper function to setup the automatic style.
 func (ana *Maker) setAutoStyle() {
 
 	for i, s := range ana.Samples {
