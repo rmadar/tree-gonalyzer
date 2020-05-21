@@ -21,32 +21,34 @@ import (
 	"github.com/rmadar/hplot-style/style"
 )
 
-// Analysis maker type
+// Analysis maker type is the main object of the ana pacakge.
+// It contains all samples, variables and selection on which
+// to loop to produce and plot histograms. 
 type Maker struct {
 
-	// Inputs info
-	Samples      []*Sample    // Sample on which to run
-	Variables    []*Variable  // List of variables to plot
-	KinemCuts    []*Selection // List of cuts
+	// Inputs
+	Samples      []*Sample    // List of samples on which to run.
+	Variables    []*Variable  // List of variables to plot.
+	KinemCuts    []*Selection // List of cuts to apply.
 
-	// Figure related setup
-	SavePath     string // Path to which plot will be saved
-	SaveFormat   string // Extension of saved figure 'tex', 'pdf', 'png'
-	CompileLatex bool   // Enable on-the-fly latex compilation of plots
+	// Figures
+	SavePath     string // Path to which plot will be saved (default: 'plots').
+	SaveFormat   string // Plot file extension: 'tex' (default), 'pdf' or 'png'.
+	CompileLatex bool   // On-the-fly latex compilation (default: true).
 
-	// Plot related setup
-	AutoStyle    bool        // Enable automatic style: colors, fill, etc ...
-	PlotTitle    string      // General plot title
-	RatioPlot    bool        // Enable ratio plot
-	HistoStack   bool        // Enable histogram stacking
-	HistoNorm    bool        // Normalize distributions to unit area
-	ErrBandColor color.NRGBA // Color for the uncertainty band.
+	// Plots
+	AutoStyle    bool        // Enable automatic styling (default: false).
+	PlotTitle    string      // General plot title (default: 'TTree GOnalyzer').
+	RatioPlot    bool        // Enable ratio plot (default: true).
+	HistoStack   bool        // Enable histogram stacking (default: true).
+	HistoNorm    bool        // Normalize distributions to unit area (default: false).
+	ErrBandColor color.NRGBA // Color for the uncertainty band (default: gray).
 
-	// Histograms for each {variables x samples x selection}
+	// Histograms for {variables x samples x selection}
 	HbookHistos [][][]*hbook.H1D 
 	HplotHistos [][][]*hplot.H1D 
 
-	// Temporary fields for benchmarking
+	// Fields for benchmarking (TEMP)
 	WithVarsTreeFormula bool
 	NoTreeFormula       bool
 	NoFuncCall          bool
