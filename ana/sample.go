@@ -25,7 +25,7 @@ type Sample struct {
 	TreeName          string      // Name of the tree.
 	WeightFunc        TreeFunc    // Weight to be applied to the sample (default: 1.0).
 	CutFunc           TreeFunc    // Cut to be applied to the sample (default: no cut).
-	DataStyle         bool        // Enable data histogram style (default: true if Type is 'data')
+	DataStyle         bool        // Enable data histogram style (default: Type == 'data')
 	LineColor         color.NRGBA // Line color of the histogram (default: blue).
 	LineWidth         vg.Length   // Line width of the histogram (default: 1.5).
 	FillColor         color.NRGBA // Fill color of the histogram (default: none).
