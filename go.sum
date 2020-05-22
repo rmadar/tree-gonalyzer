@@ -104,6 +104,8 @@ github.com/rmadar/hplot-style v0.0.0-20200426203229-499ef3c294ba h1:cIISpnmOjoBf
 github.com/rmadar/hplot-style v0.0.0-20200426203229-499ef3c294ba/go.mod h1:N72hiC8V9YUSNd575So//ur+VS1NBXBRxOk4PFr+7l4=
 github.com/rmadar/hplot-style v0.0.0-20200503202946-6028c8e69f2d h1:BXqkDyRhZG0zFvO0ch57f92GKeIN4fWUooPC+ALhxAo=
 github.com/rmadar/hplot-style v0.0.0-20200503202946-6028c8e69f2d/go.mod h1:EQXTn/P8KD0WH0+YrEfuaOsaovM5MWkQcdQj/0Gj1dE=
+github.com/rmadar/hplot-style v0.0.0-20200520134309-407e13ffe0f5 h1:a95uDSwikboKOx+8Ev5CEWwjCOmQb0p7lSPVBMhzejg=
+github.com/rmadar/hplot-style v0.0.0-20200520134309-407e13ffe0f5/go.mod h1:EQXTn/P8KD0WH0+YrEfuaOsaovM5MWkQcdQj/0Gj1dE=
 github.com/ruudk/golang-pdf417 v0.0.0-20181029194003-1af4ab5afa58/go.mod h1:6lfFZQK844Gfx8o5WFuvpxWRwnSoipWe/p622j1v06w=
 github.com/sbinet/npyio v0.2.0/go.mod h1:Wk81yG1hlHgHAy4KXRQ59EfpZoAzT+2V4Pjyv7rUEM0=
 github.com/sbinet/npyio v0.3.0/go.mod h1:dJ6OpFwUDVVuDSqP5b8paU3yd7Rcs2TZiFimWwD30nc=
@@ -165,6 +167,8 @@ go-hep.org/x/hep v0.26.1-0.20200511085556-0f7b59f24c5e h1:YHSTRhwEFta5oPF5uEc7EY
 go-hep.org/x/hep v0.26.1-0.20200511085556-0f7b59f24c5e/go.mod h1:zS28ZIH/9eQX/yN93xqmAcxzRQQfkn/7vumDD47ZVhY=
 go-hep.org/x/hep v0.26.1-0.20200519131915-b5f389640bd9 h1:VAgrFiscVIkoeyNiSxCaU8u5KOBNz5KHU2r7oRQRrz4=
 go-hep.org/x/hep v0.26.1-0.20200519131915-b5f389640bd9/go.mod h1:zS28ZIH/9eQX/yN93xqmAcxzRQQfkn/7vumDD47ZVhY=
+go-hep.org/x/hep v0.27.1-0.20200522154754-56834a477c31 h1:aH/En2Av3T52LlBVEp+eUEFHODx7bgSX6R8i3wTbBSk=
+go-hep.org/x/hep v0.27.1-0.20200522154754-56834a477c31/go.mod h1:zS28ZIH/9eQX/yN93xqmAcxzRQQfkn/7vumDD47ZVhY=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
 golang.org/x/crypto v0.0.0-20190510104115-cbcb75029529/go.mod h1:yigFU9vqHzYiE8UmvKecakEJjdnWj3jj499lnFckfCI=
 golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550/go.mod h1:yigFU9vqHzYiE8UmvKecakEJjdnWj3jj499lnFckfCI=
@@ -190,6 +194,8 @@ golang.org/x/image v0.0.0-20190910094157-69e4b8554b2a/go.mod h1:FeLwcggjj3mMvU+o
 golang.org/x/image v0.0.0-20191009234506-e7c1f5e7dbb8/go.mod h1:FeLwcggjj3mMvU+oOTbSwawSJRM1uh48EjtB4UJZlP0=
 golang.org/x/image v0.0.0-20200119044424-58c23975cae1 h1:5h3ngYt7+vXCDZCup/HkCQgW5XwmSvR/nA2JmJ0RErg=
 golang.org/x/image v0.0.0-20200119044424-58c23975cae1/go.mod h1:FeLwcggjj3mMvU+oOTbSwawSJRM1uh48EjtB4UJZlP0=
+golang.org/x/image v0.0.0-20200430140353-33d19683fad8 h1:6WW6V3x1P/jokJBpRQYUJnMHRP6isStQwCozxnU7XQw=
+golang.org/x/image v0.0.0-20200430140353-33d19683fad8/go.mod h1:FeLwcggjj3mMvU+oOTbSwawSJRM1uh48EjtB4UJZlP0=
 golang.org/x/mobile v0.0.0-20190312151609-d3739f865fa6/go.mod h1:z+o9i4GpDbdi3rU15maQ/Ox0txvL9dWGYEHz965HBQE=
 golang.org/x/mobile v0.0.0-20190719004257-d2bd2a29d028/go.mod h1:E/iHnbuqvinMTCcRqshq8CkpyQDoeVncDDYHnLhea+o=
 golang.org/x/mobile v0.0.0-20191002175909-6d0d39b2ca82/go.mod h1:p895TfNkDgPEmEQrNiOtIl3j98d/tGU95djDj7NfyjQ=
@@ -237,6 +243,10 @@ golang.org/x/tools v0.0.0-20200502202811-ed308ab3e770 h1:M9Fif0OxNji8w+HvmhVQ8KJ
 golang.org/x/tools v0.0.0-20200502202811-ed308ab3e770/go.mod h1:EkVYQZoAsY45+roYkvgYkIh4xh/qjgUK9TdY2XT94GE=
 golang.org/x/tools v0.0.0-20200507050207-a1532b81a28f h1:8vKMSP2LYgBjfB4WCpdfkW5sK5C9eDWguFX9xhqSN2U=
 golang.org/x/tools v0.0.0-20200507050207-a1532b81a28f/go.mod h1:EkVYQZoAsY45+roYkvgYkIh4xh/qjgUK9TdY2XT94GE=
+golang.org/x/tools v0.0.0-20200513022744-65e69ff2d148 h1:X3wiF+nWEwv11fBoJVQN0dSMu7rlvPkRKYAHuuJoyvc=
+golang.org/x/tools v0.0.0-20200513022744-65e69ff2d148/go.mod h1:EkVYQZoAsY45+roYkvgYkIh4xh/qjgUK9TdY2XT94GE=
+golang.org/x/tools v0.0.0-20200521211927-2b542361a4fc h1:6m2YO+AmBApbUOmhsghW+IfRyZOY4My4UYvQQrEpHfY=
+golang.org/x/tools v0.0.0-20200521211927-2b542361a4fc/go.mod h1:EkVYQZoAsY45+roYkvgYkIh4xh/qjgUK9TdY2XT94GE=
 golang.org/x/xerrors v0.0.0-20190717185122-a985d3407aa7/go.mod h1:I/5z698sn9Ka8TeJc9MKroUUfqBBauWjQqLJ2OPfmY0=
 golang.org/x/xerrors v0.0.0-20191011141410-1b5146add898/go.mod h1:I/5z698sn9Ka8TeJc9MKroUUfqBBauWjQqLJ2OPfmY0=
 golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543 h1:E7g+9GITq07hpfrRu66IVDexMakfv52eLZ2CXBWiKr4=
@@ -249,6 +259,8 @@ gonum.org/v1/gonum v0.6.1/go.mod h1:9mxDZsDKxgMAuccQkewq682L+0eCu4dCN2yonUJTCLU=
 gonum.org/v1/gonum v0.7.0/go.mod h1:L02bwd0sqlsvRv41G7wGWFCsVNZFv/k1xzGIxeANHGM=
 gonum.org/v1/gonum v0.7.1-0.20200330111830-e98ce15ff236 h1:SOhSD/rlx1DzJVHAHInC3RAW45sQob3VBHw8QB5kMlk=
 gonum.org/v1/gonum v0.7.1-0.20200330111830-e98ce15ff236/go.mod h1:L02bwd0sqlsvRv41G7wGWFCsVNZFv/k1xzGIxeANHGM=
+gonum.org/v1/gonum v0.7.1-0.20200522112325-9c4b7ca31365 h1:QMaGTLiND/xpnscPPvx+K/uxeKGMMBKOjToI+nlMKXA=
+gonum.org/v1/gonum v0.7.1-0.20200522112325-9c4b7ca31365/go.mod h1:L02bwd0sqlsvRv41G7wGWFCsVNZFv/k1xzGIxeANHGM=
 gonum.org/v1/netlib v0.0.0-20180816165226-ebcc3d2662d3/go.mod h1:wa6Ws7BG/ESfp6dHfk7C6KdzKA7wR7u/rKwOGE66zvw=
 gonum.org/v1/netlib v0.0.0-20190313105609-8cb42192e0e0/go.mod h1:wa6Ws7BG/ESfp6dHfk7C6KdzKA7wR7u/rKwOGE66zvw=
 gonum.org/v1/netlib v0.0.0-20190331212654-76723241ea4e/go.mod h1:kS+toOQn6AQKjmKJ7gzohV1XkqsFehRA2FbsbkopSuQ=
@@ -265,6 +277,8 @@ gonum.org/v1/plot v0.7.1-0.20200409110503-eddda93a2277 h1:Dd9muKz0CB4Y1RtjvDswHo
 gonum.org/v1/plot v0.7.1-0.20200409110503-eddda93a2277/go.mod h1:2wtU6YrrdQAhAF9+MTd5tOQjrov/zF70b1i99Npjvgo=
 gonum.org/v1/plot v0.7.1-0.20200414075901-f4e1939a9e7a h1:tBDQRiC/lYKhx2AC87XbGseCEkfbW7VgID8Kxr0PkkI=
 gonum.org/v1/plot v0.7.1-0.20200414075901-f4e1939a9e7a/go.mod h1:2wtU6YrrdQAhAF9+MTd5tOQjrov/zF70b1i99Npjvgo=
+gonum.org/v1/plot v0.7.1-0.20200522144533-3b246acc696f h1:WAacwJD13RlCZWZdqUO3SZncMo1DU4g2sBVIK6Y6pi0=
+gonum.org/v1/plot v0.7.1-0.20200522144533-3b246acc696f/go.mod h1:BCHZ+YSvjoscp+v8yU26t8mxytnp3UOu+3bn70hP+dE=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/jcmturner/aescts.v1 v1.0.1/go.mod h1:nsR8qBOg+OucoIW+WMhB3GspUQXq9XorLnQb9XtvcOo=
 gopkg.in/jcmturner/dnsutils.v1 v1.0.1/go.mod h1:m3v+5svpVOhtFAP/wSz+yzh4Mc0Fg7eRhxkJMWSIz9Q=
