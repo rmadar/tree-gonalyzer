@@ -131,16 +131,16 @@ func (ana *Maker) FillHistos() error {
 	start := time.Now()
 
 	// Loop over the samples
-	for iSamp, Samp := range ana.Samples {
+	for iSamp, samp := range ana.Samples {
 
 		// Loop over sub-samples
-		for is, s := range Samp.SubSamples {
+		for iComp, c := range samp.SampleComp {
 
 			// Anonymous function to avoid memory-leaks due to 'defer'
 			func(j int) error {
 
 				// Get the file and tree
-				f, t := getTreeFromFile(s.FileName, s.TreeName)
+				f, t := getTreeFromFile(c.FileName, c.TreeName)
 				defer f.Close()
 
 				// Prepare variables to explicitely load
@@ -167,14 +167,14 @@ func (ana *Maker) FillHistos() error {
 
 				// Prepare the weight
 				getWeight := func() float64 { return float64(1.0) }
-				if s.WeightFunc.Fct != nil && !ana.NoTreeFormula {
-					getWeight = s.WeightFunc.GetFuncF64(r)
+				if c.WeightFunc.Fct != nil && !ana.NoTreeFormula {
+					getWeight = c.WeightFunc.GetFuncF64(r)
 				}
 
 				// Prepare the sample cut
 				passSampleCut := func() bool { return true }
-				if s.CutFunc.Fct != nil && !ana.NoTreeFormula {
-					passSampleCut = s.CutFunc.GetFuncBool(r)
+				if c.CutFunc.Fct != nil && !ana.NoTreeFormula {
+					passSampleCut = c.CutFunc.GetFuncBool(r)
 				}
 
 				// Prepare the cut string for kinematics
@@ -235,7 +235,7 @@ func (ana *Maker) FillHistos() error {
 				ana.nEvents += t.Entries()
 
 				return nil
-			}(is)
+			}(iComp)
 		}
 	}
 

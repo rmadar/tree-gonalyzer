@@ -21,10 +21,10 @@ var colorNil = color.NRGBA{R: 0, G: 0, B: 0, A: 0}
 type Sample struct {
 
 	// General settings
-	Name       string       // Sample name.
-	Type       string       // Sample type: 'data', 'bkg' or 'sig'.
-	LegLabel   string       // Label used in the legend.
-	SubSamples []*SubSample // List of sub-samples to be included in the histogram.
+	Name       string             // Sample name.
+	Type       string             // Sample type: 'data', 'bkg' or 'sig'.
+	LegLabel   string             // Label used in the legend.
+	SampleComp []*SampleComponent // List of components to be included in the histogram.
 
 	// Cosmetic settings
 	DataStyle         bool        // Enable data-like style (default: Type == 'data').
@@ -39,9 +39,11 @@ type Sample struct {
 	YErrBarsCapWidth  vg.Length   // Width of horizontal bars of the y-error bars.
 }
 
-// SubSample contains the needed information to fill the
-// final histogram.
-type SubSample struct {
+// SampleComponent contains the needed information
+// to fill the final histogram for a given component
+// (or sub-sample). This includes a file, a tree and
+// possibly a specific weight and cut.
+type SampleComponent struct {
 	FileName   string
 	TreeName   string
 	WeightFunc TreeFunc
@@ -57,8 +59,8 @@ func NewSample(sname, stype, sleg, fname, tname string, opts ...SampleOptions) *
 		Name:     sname,
 		Type:     stype,
 		LegLabel: sleg,
-		SubSamples: []*SubSample{
-			&SubSample{
+		SampleComp: []*SampleComponent{
+			&SampleComponent{
 				FileName: fname,
 				TreeName: tname,
 			},
@@ -77,8 +79,8 @@ func NewSample(sname, stype, sleg, fname, tname string, opts ...SampleOptions) *
 	}
 
 	// Set sub-sample settings with the updated configuration
-	s.SubSamples[0].WeightFunc = cfg.Weight
-	s.SubSamples[0].CutFunc = cfg.Cut
+	s.SampleComp[0].WeightFunc = cfg.Weight
+	s.SampleComp[0].CutFunc = cfg.Cut
 
 	// Set cosmetic setting with the updated configuration
 	s.LineColor = cfg.LineColor
