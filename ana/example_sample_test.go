@@ -58,6 +58,13 @@ func ExampleSample_withCut() {
 	)
 }
 
-func ExampleSample_withSubSamples() {
-	// FEATURE TO COME SOON
+func ExampleSample_severalComponents() {
+	// ttbar background starting with one component, say ttbar->dilepton
+	ttbar := ana.NewSample("ttbar", "bkg", `Dilepton`, "dilep.root", "mytree")
+
+	// Adding l+jets decay
+	ttbar.AddComponent("ljets.root", "mytree")
+
+	// Adding full hadronic decay
+	ttbar.AddComponent("fullhad.root", "mytree")
 }
