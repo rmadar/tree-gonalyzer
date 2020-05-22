@@ -151,7 +151,7 @@ func ExampleNewTreeFuncValF64() {
 
 // Helper function get a reader for the examples
 func getReader(nmax int64) (*groot.File, *rtree.Reader) {
-	
+
 	// Get the file
 	f, err := groot.Open("../testdata/ttbar_ME.root")
 	if err != nil {

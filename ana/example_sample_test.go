@@ -18,13 +18,12 @@ func ExampleSample_default() {
 	ana.New([]*ana.Sample{sData, sBkg, sSig}, []*ana.Variable{})
 }
 
-
 func ExampleSample_withWeight() {
-	// Weight computed from several branches 
+	// Weight computed from several branches
 	w := ana.TreeFunc{
 		VarsName: []string{"w1", "w2", "w3"},
-		Fct: func (w1, w2, w3 float64) float64 {
-			return w1*w2*w3
+		Fct: func(w1, w2, w3 float64) float64 {
+			return w1 * w2 * w3
 		},
 	}
 
@@ -32,7 +31,7 @@ func ExampleSample_withWeight() {
 	ana.NewSample("proc", "bkg", `leg`, "myfile.root", "mytree",
 		ana.WithWeight(w),
 	)
-	
+
 	// Sample with single branch weight
 	ana.NewSample("proc", "bkg", `leg`, "myfile.root", "mytree",
 		ana.WithWeight(ana.NewTreeFuncVarF64("evtWght")),
@@ -40,23 +39,23 @@ func ExampleSample_withWeight() {
 }
 
 func ExampleSample_withCut() {
-	// Selection criteria computed from several branches 
+	// Selection criteria computed from several branches
 	sel := ana.TreeFunc{
 		VarsName: []string{"pt", "eta", "m"},
-		Fct: func (pt, eta, m float64) bool {
-			return (pt>150 && eta>0) || m<125
+		Fct: func(pt, eta, m float64) bool {
+			return (pt > 150 && eta > 0) || m < 125
 		},
 	}
-	
+
 	// Sample with computed boolean
 	ana.NewSample("proc", "bkg", `leg`, "myfile.root", "mytree",
 		ana.WithCut(sel),
 	)
-	
+
 	// Sample with single branch boolean
 	ana.NewSample("proc", "bkg", `leg`, "myfile.root", "mytree",
 		ana.WithWeight(ana.NewTreeFuncVarBool("passCriteria")),
-	)	
+	)
 }
 
 func ExampleSample_withSubSamples() {
