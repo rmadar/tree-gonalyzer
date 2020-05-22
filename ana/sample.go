@@ -51,22 +51,43 @@ type SampleComponent struct {
 }
 
 // NewSample creates a sample with one sub-sample based
-// the default settings.
+// on the default settings.
 func NewSample(sname, stype, sleg, fname, tname string, opts ...SampleOptions) *Sample {
 
-	// Fill the sample with a 1-element sub-sample slice.
+	// New empty sample
+	s := NewEmptySample(sname, stype, sleg, opts...)
+
+	// Configuration
+	cfg := newConfig()
+	for _, opt := range opts {
+		opt(cfg)
+	}
+	
+	// Create a component
+	c := &SampleComponent{
+		FileName:   fname,
+		TreeName:   tname,
+		WeightFunc: cfg.Weight,
+		CutFunc:    cfg.Cut,
+	}
+
+	// Append it to the pointer-receiver sample
+	s.Components = append(s.Components, c)
+	
+	return s
+}
+
+// NewEmptySample creates a new sample without any components
+func NewEmptySample(sname, stype, sleg string, opts ...SampleOptions) *Sample {
+
+	// Empty basic sample
 	s := &Sample{
 		Name:     sname,
 		Type:     stype,
 		LegLabel: sleg,
-		Components: []*SampleComponent{
-			&SampleComponent{
-				FileName: fname,
-				TreeName: tname,
-			},
-		},
+		Components: []*SampleComponent{},
 	}
-
+	
 	// Configuration with defaults values for all optional fields
 	cfg := newConfig(
 		WithFillColor(color.NRGBA{R: 20, G: 20, B: 180, A: 200}),
@@ -77,10 +98,6 @@ func NewSample(sname, stype, sleg, fname, tname string, opts ...SampleOptions) *
 	for _, opt := range opts {
 		opt(cfg)
 	}
-
-	// Set sub-sample settings with the updated configuration
-	s.Components[0].WeightFunc = cfg.Weight
-	s.Components[0].CutFunc = cfg.Cut
 
 	// Set cosmetic setting with the updated configuration
 	s.LineColor = cfg.LineColor
@@ -95,16 +112,23 @@ func NewSample(sname, stype, sleg, fname, tname string, opts ...SampleOptions) *
 	s.DataStyle = cfg.DataStyle
 
 	return s
+	
 }
 
 // AddComponent adds a new sample component to the sample.
+// By default, weights and cuts are the same as defined for
+// sample in s := NewSample(). If new weights/cut are specifed
+// using WithCut() and WithWeight() options, 
 func (s *Sample) AddComponent(fname, tname string, opts ...SampleOptions) {
 
 	// Manage default settings and passed options
 	// FIXME(rmadar): most of SampleOption doesn't change a component.
 	//                consider adding a protection against the ones whic
 	//                doesn't change the behaviour of the component?
-	cfg := newConfig()
+	cfg := newConfig(
+		WithWeight(s.Components[0].WeightFunc),
+		WithCut(s.Components[0].CutFunc),
+	)
 	for _, opt := range opts {
 		opt(cfg)
 	}
