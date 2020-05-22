@@ -51,7 +51,8 @@ type SampleComponent struct {
 }
 
 // NewSample creates a sample with one sub-sample based
-// on the default settings.
+// on the default settings. This function is to be used
+// for single-component samples.
 func NewSample(sname, stype, sleg, fname, tname string, opts ...SampleOptions) *Sample {
 
 	// New empty sample
@@ -77,7 +78,9 @@ func NewSample(sname, stype, sleg, fname, tname string, opts ...SampleOptions) *
 	return s
 }
 
-// NewEmptySample creates a new sample without any components
+// NewEmptySample creates a new sample without any components.
+// This function is to be favoured in case of several sub-samples,
+// than can be added using s.AddComponent().
 func NewEmptySample(sname, stype, sleg string, opts ...SampleOptions) *Sample {
 
 	// Empty basic sample
@@ -116,9 +119,14 @@ func NewEmptySample(sname, stype, sleg string, opts ...SampleOptions) *Sample {
 }
 
 // AddComponent adds a new sample component to the sample.
-// By default, weights and cuts are the same as defined for
-// sample in s := NewSample(). If new weights/cut are specifed
-// using WithCut() and WithWeight() options, 
+// In case the sample is created using NewSample(), weights
+// and cuts are the same as defined as the one passed to NewSample()
+// function. In order to avoid confusion, it's discouraged to use
+// this function with a sample created via s := NewSample(). Instead,
+// the use of the function NewEmptySample() is encouraged, where weight
+// and cut of each component is explicitely given via s.AddComponent().
+// 
+// Finding a better way might be possible (suggestions open).
 func (s *Sample) AddComponent(fname, tname string, opts ...SampleOptions) {
 
 	// Manage default settings and passed options
