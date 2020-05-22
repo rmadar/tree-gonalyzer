@@ -41,13 +41,16 @@ func ExampleMaker_complexCase() {
 	data.AddComponent("data2020.root", "mytree")
 
 	// Define a single sample for the total background
-	bkg := ana.NewSample("bkgTot", "bkg", `Total Bkg`, "proc1.root", "mytree", ana.WithWeight(w))
+	bkg := ana.NewSample("bkgTot", "bkg", `Total Bkg`, "proc1.root", "mytree",
+		ana.WithWeight(w))
 	bkg.AddComponent("proc2.root", "mytree")
 	bkg.AddComponent("proc3.root", "mytree")
-	bkg.AddComponent("proc4.root", "mytree", ana.WithCut(isProc4))
+	bkg.AddComponent("proc4.root", "mytree",
+		ana.WithCut(isProc4))
 
 	// Define a single sample for the total signal
-	sig := ana.NewSample("sigTot", "sig", `Total signal`, "sig1.root", "mytree", ana.WithWeight(w))
+	sig := ana.NewSample("sigTot", "sig", `Total signal`, "sig1.root", "mytree",
+		ana.WithWeight(w))
 	sig.AddComponent("sig2.root", "mytree")
 	sig.AddComponent("sig3.root", "mytree")
 
