@@ -30,7 +30,7 @@ func ExampleMaker_simpleCase() {
 }
 
 // Creation of the default analysis maker type
-func ExampleMaker_ComplexCase() {
+func ExampleMaker_complexCase() {
 	// Define useful TreeFunc for weights and cuts
 	w := ana.NewTreeFuncVarF64("evtWeight")
 	isProc4 := ana.NewTreeFuncVarBool("IsProc4")
