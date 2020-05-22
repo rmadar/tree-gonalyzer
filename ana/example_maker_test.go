@@ -5,7 +5,7 @@ import (
 )
 
 // Creation of the default analysis maker type
-func ExampleMaker_simpleCase() {
+func ExampleMaker_withSingleComponentSamples() {
 	// Define samples
 	samples := []*ana.Sample{
 		ana.NewSample("data", "data", `Data`, "data.root", "mytree"),
@@ -30,29 +30,29 @@ func ExampleMaker_simpleCase() {
 }
 
 // Creation of the default analysis maker type
-func ExampleMaker_complexCase() {
+func ExampleMaker_withMultiComponentSamples() {
 	// Define useful TreeFunc for weights and cuts
 	w := ana.NewTreeFuncVarF64("evtWeight")
 	isProc4 := ana.NewTreeFuncVarBool("IsProc4")
 
 	// Define data sample
-	data := ana.NewSample("data", "data", `Data 18-20`, "data2018.root", "mytree")
+	data := ana.NewEmptySample("data", "data", `Data 18-20`)
+	data.AddComponent("data2018.root", "mytree")
 	data.AddComponent("data2019.root", "mytree")
 	data.AddComponent("data2020.root", "mytree")
 
 	// Define a single sample for the total background
-	bkg := ana.NewSample("bkgTot", "bkg", `Total Bkg`, "proc1.root", "mytree",
-		ana.WithWeight(w))
-	bkg.AddComponent("proc2.root", "mytree")
-	bkg.AddComponent("proc3.root", "mytree")
-	bkg.AddComponent("proc4.root", "mytree",
-		ana.WithCut(isProc4))
+	bkg := ana.NewEmptySample("bkgTot", "bkg", `Total Bkg`)
+	bkg.AddComponent("proc1.root", "mytree", ana.WithWeight(w))
+	bkg.AddComponent("proc2.root", "mytree", ana.WithWeight(w))
+	bkg.AddComponent("proc3.root", "mytree", ana.WithWeight(w))
+	bkg.AddComponent("proc4.root", "mytree", ana.WithWeight(w), ana.WithCut(isProc4))
 
 	// Define a single sample for the total signal
-	sig := ana.NewSample("sigTot", "sig", `Total signal`, "sig1.root", "mytree",
-		ana.WithWeight(w))
-	sig.AddComponent("sig2.root", "mytree")
-	sig.AddComponent("sig3.root", "mytree")
+	sig := ana.NewEmptySample("sigTot", "sig", `Total signal`)
+	sig.AddComponent("sig1.root", "mytree", ana.WithWeight(w))
+	sig.AddComponent("sig2.root", "mytree", ana.WithWeight(w))
+	sig.AddComponent("sig3.root", "mytree", ana.WithWeight(w))
 
 	// Put samples together
 	samples := []*ana.Sample{data, bkg, sig}
