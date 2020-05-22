@@ -63,8 +63,12 @@ func ExampleSample_severalComponents() {
 	ttbarIncl := ana.NewSample("ttbar", "bkg", `Inclusive`, "dilep.root", "mytree")
 
 	// Adding l+jets decay, weighted by BR(ttbar->l+jets)
-	ttbarIncl.AddComponent("ljets.root", "mytree", ana.WithWeight("0.3"))
-
+	ttbarIncl.AddComponent("ljets.root", "mytree",
+		ana.WithWeight(ana.NewTreeFuncValF64(0.3)),
+	)
+	
 	// Adding full hadronic decay, applying a cut to make sure of the decay
-	ttbarIncl.AddComponent("fullhad.root", "mytree", ana.WithCut("isHadronic")))
+	ttbarIncl.AddComponent("fullhad.root", "mytree",
+		ana.WithCut(ana.NewTreeFuncVarBool("isHadronic")),
+	)
 }
