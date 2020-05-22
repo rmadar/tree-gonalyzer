@@ -134,7 +134,7 @@ func (ana *Maker) FillHistos() error {
 	for iSamp, samp := range ana.Samples {
 
 		// Loop over sub-samples
-		for iComp, c := range samp.SampleComp {
+		for iComp, c := range samp.Components {
 
 			// Anonymous function to avoid memory-leaks due to 'defer'
 			func(j int) error {

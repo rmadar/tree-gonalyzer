@@ -24,7 +24,7 @@ type Sample struct {
 	Name       string             // Sample name.
 	Type       string             // Sample type: 'data', 'bkg' or 'sig'.
 	LegLabel   string             // Label used in the legend.
-	SampleComp []*SampleComponent // List of components included in the histogram.
+	Components []*SampleComponent // List of components included in the histogram.
 
 	// Cosmetic settings
 	DataStyle         bool        // Enable data-like style (default: Type == 'data').
@@ -59,7 +59,7 @@ func NewSample(sname, stype, sleg, fname, tname string, opts ...SampleOptions) *
 		Name:     sname,
 		Type:     stype,
 		LegLabel: sleg,
-		SampleComp: []*SampleComponent{
+		Components: []*SampleComponent{
 			&SampleComponent{
 				FileName: fname,
 				TreeName: tname,
@@ -79,8 +79,8 @@ func NewSample(sname, stype, sleg, fname, tname string, opts ...SampleOptions) *
 	}
 
 	// Set sub-sample settings with the updated configuration
-	s.SampleComp[0].WeightFunc = cfg.Weight
-	s.SampleComp[0].CutFunc = cfg.Cut
+	s.Components[0].WeightFunc = cfg.Weight
+	s.Components[0].CutFunc = cfg.Cut
 
 	// Set cosmetic setting with the updated configuration
 	s.LineColor = cfg.LineColor
@@ -95,6 +95,30 @@ func NewSample(sname, stype, sleg, fname, tname string, opts ...SampleOptions) *
 	s.DataStyle = cfg.DataStyle
 
 	return s
+}
+
+// AddComponent adds a new sample component to the sample.
+func (s *Sample) AddComponent(fname, tname string, opts ...SampleOptions) {
+
+	// Manage default settings and passed options
+	// FIXME(rmadar): most of SampleOption doesn't change a component.
+	//                consider adding a protection against the ones whic
+	//                doesn't change the behaviour of the component?
+	cfg := newConfig()
+	for _, opt := range opts {
+		opt(cfg)
+	}
+
+	// Create a component
+	c := &SampleComponent{
+		FileName:   fname,
+		TreeName:   tname,
+		WeightFunc: cfg.Weight,
+		CutFunc:    cfg.Cut,
+	}
+
+	// Append it to the pointer-receiver sample
+	s.Components = append(s.Components, c)
 }
 
 // CreateHisto returns a hplot.H1D with the sample style.
