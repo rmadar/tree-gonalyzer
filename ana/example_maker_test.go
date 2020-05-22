@@ -4,16 +4,16 @@ package ana_test
 func ExampleMaker_default() {
 	// Define Samples
 	samples := []*ana.Sample{
-		ana.NewSample("data", "data", `Data 2020`, "../testdata/ttbar_MadSpinOff.root", "truth"),
-		ana.NewSample("bkg1", "bkg", `Proc 1`, "../testdata/ttbar_MadSpinOn_1.root", "truth"),
-		ana.NewSample("bkg2", "bkg", `Proc 2`, "../testdata/ttbar_MadSpinOn_2.root", "truth"),
-		ana.NewSample("bkg3", "bkg", `Proc 3`, "../testdata/ttbar_MadSpinOn_1.root", "truth"),
+		ana.NewSample("data", "data", `Data`, "data.root", "mytree")
+		ana.NewSample("bkg1", "bkg", `Proc 1`, "proc1.root", "mytree")
+		ana.NewSample("bkg2", "bkg", `Proc 2`, "proc2.root", "mytree")
+		ana.NewSample("bkg3", "bkg", `Proc 3`, "proc3.root", "mytree")
 	}
 	
 	// Variables
 	variables := []*ana.Variable{
-		ana.NewVariable("truth_dphi_ll", "truth_dphi_ll", new(float64), 15, 0, math.Pi),
-		ana.NewVariable("m_tt", "ttbar_m", new(float32), 25, 300, 1000),
+		ana.NewVariable("plot1", "branch1", new(float64), 15, 0, 10),
+		ana.NewVariable("plot2", "branch2", new(float32), 25, 0, 10),
 	}
 
 	// Create analyzer object
