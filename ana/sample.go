@@ -24,7 +24,7 @@ type Sample struct {
 	Name       string             // Sample name.
 	Type       string             // Sample type: 'data', 'bkg' or 'sig'.
 	LegLabel   string             // Label used in the legend.
-	SampleComp []*SampleComponent // List of components to be included in the histogram.
+	SampleComp []*SampleComponent // List of components included in the histogram.
 
 	// Cosmetic settings
 	DataStyle         bool        // Enable data-like style (default: Type == 'data').
