@@ -54,7 +54,7 @@ func ExampleSample_withCut() {
 
 	// Sample with single branch boolean
 	ana.NewSample("proc", "bkg", `leg`, "myfile.root", "mytree",
-		ana.WithWeight(ana.NewTreeFuncVarBool("passCriteria")),
+		ana.WithCut(ana.NewTreeFuncVarBool("passCriteria")),
 	)
 }
 
