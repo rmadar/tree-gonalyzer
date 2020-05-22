@@ -119,14 +119,16 @@ func NewEmptySample(sname, stype, sleg string, opts ...SampleOptions) *Sample {
 }
 
 // AddComponent adds a new sample component to the sample.
-// In case the sample is created using NewSample(), weights
+// In case the sample is created using NewSample() function, default weights
 // and cuts are the same as defined as the one passed to NewSample()
-// function. In order to avoid confusion, it's discouraged to use
+// function. They will be overwritten if new weights/cuts are passed to AddComponent().
+//
+// In order to avoid confusion, it is discouraged to use
 // this function with a sample created via s := NewSample(). Instead,
 // the use of the function NewEmptySample() is encouraged, where weight
 // and cut of each component is explicitely given via s.AddComponent().
 // 
-// Finding a better way might be possible (suggestions open).
+// It should be possible to finding a better.
 func (s *Sample) AddComponent(fname, tname string, opts ...SampleOptions) {
 
 	// Manage default settings and passed options
