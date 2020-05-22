@@ -131,108 +131,112 @@ func (ana *Maker) FillHistos() error {
 	start := time.Now()
 
 	// Loop over the samples
-	for is, s := range ana.Samples {
+	for iSamp, Samp := range ana.Samples {
 
-		// Anonymous function to avoid memory-leaks due to 'defer'
-		func(j int) error {
+		// Loop over sub-samples
+		for is, s := range Samp.SubSamples {
 
-			// Get the file and tree
-			f, t := getTreeFromFile(s.FileName, s.TreeName)
-			defer f.Close()
+			// Anonymous function to avoid memory-leaks due to 'defer'
+			func(j int) error {
 
-			// Prepare variables to explicitely load
-			var rvars []rtree.ReadVar
-			if !ana.WithVarsTreeFormula {
-				for _, v := range ana.Variables {
-					rvars = append(rvars, rtree.ReadVar{Name: v.TreeName, Value: v.Value})
-				}
-			}
+				// Get the file and tree
+				f, t := getTreeFromFile(s.FileName, s.TreeName)
+				defer f.Close()
 
-			// Get the tree reader
-			r, err := rtree.NewReader(t, rvars)
-			if err != nil {
-				log.Fatal("could not create tree reader: %w", err)
-			}
-			defer r.Close()
-
-			varFormula := make([]func() float64, len(ana.Variables))
-			if ana.WithVarsTreeFormula {
-				for i, v := range ana.Variables {
-					varFormula[i] = v.TreeVar.GetFuncF64(r)
-				}
-			}
-
-			// Prepare the weight
-			getWeight := func() float64 { return float64(1.0) }
-			if s.WeightFunc.Fct != nil && !ana.NoTreeFormula {
-				getWeight = s.WeightFunc.GetFuncF64(r)
-			}
-
-			// Prepare the sample cut
-			passSampleCut := func() bool { return true }
-			if s.CutFunc.Fct != nil && !ana.NoTreeFormula {
-				passSampleCut = s.CutFunc.GetFuncBool(r)
-			}
-
-			// Prepare the cut string for kinematics
-			passKinemCut := make([]func() bool, len(ana.KinemCuts))
-			for ic, cut := range ana.KinemCuts {
-				idx := ic
-				if !ana.NoTreeFormula {
-					passKinemCut[idx] = cut.TreeFunc.GetFuncBool(r)
-				} else {
-					_, passKinemCut[idx] = cut, func() bool { return true }
-				}
-			}
-
-			// Read the tree (event loop)
-			err = r.Read(func(ctx rtree.RCtx) error {
-
-				// No call to function at all
-				if ana.NoFuncCall {
-					for ic := range ana.KinemCuts {
-						for iv, v := range ana.Variables {
-							ana.HbookHistos[iv][ic][is].Fill(v.GetValue(), 1.0)
-						}
+				// Prepare variables to explicitely load
+				var rvars []rtree.ReadVar
+				if !ana.WithVarsTreeFormula {
+					for _, v := range ana.Variables {
+						rvars = append(rvars, rtree.ReadVar{Name: v.TreeName, Value: v.Value})
 					}
+				}
 
-				} else {
+				// Get the tree reader
+				r, err := rtree.NewReader(t, rvars)
+				if err != nil {
+					log.Fatal("could not create tree reader: %w", err)
+				}
+				defer r.Close()
 
-					// Sample-level cut
-					if !passSampleCut() {
-						return nil
+				varFormula := make([]func() float64, len(ana.Variables))
+				if ana.WithVarsTreeFormula {
+					for i, v := range ana.Variables {
+						varFormula[i] = v.TreeVar.GetFuncF64(r)
 					}
+				}
 
-					// Get the event weight
-					w := getWeight()
+				// Prepare the weight
+				getWeight := func() float64 { return float64(1.0) }
+				if s.WeightFunc.Fct != nil && !ana.NoTreeFormula {
+					getWeight = s.WeightFunc.GetFuncF64(r)
+				}
 
-					// Loop over selection and variables
-					for ic := range ana.KinemCuts {
+				// Prepare the sample cut
+				passSampleCut := func() bool { return true }
+				if s.CutFunc.Fct != nil && !ana.NoTreeFormula {
+					passSampleCut = s.CutFunc.GetFuncBool(r)
+				}
 
-						if !passKinemCut[ic]() {
-							continue
-						}
+				// Prepare the cut string for kinematics
+				passKinemCut := make([]func() bool, len(ana.KinemCuts))
+				for ic, cut := range ana.KinemCuts {
+					idx := ic
+					if !ana.NoTreeFormula {
+						passKinemCut[idx] = cut.TreeFunc.GetFuncBool(r)
+					} else {
+						_, passKinemCut[idx] = cut, func() bool { return true }
+					}
+				}
 
-						for iv, v := range ana.Variables {
-							val := 0.0
-							if ana.WithVarsTreeFormula {
-								val = varFormula[iv]()
-							} else {
-								val = v.GetValue()
+				// Read the tree (event loop)
+				err = r.Read(func(ctx rtree.RCtx) error {
+
+					// No call to function at all
+					if ana.NoFuncCall {
+						for ic := range ana.KinemCuts {
+							for iv, v := range ana.Variables {
+								ana.HbookHistos[iv][ic][iSamp].Fill(v.GetValue(), 1.0)
 							}
-							ana.HbookHistos[iv][ic][is].Fill(val, w)
+						}
+
+					} else {
+
+						// Sample-level cut
+						if !passSampleCut() {
+							return nil
+						}
+
+						// Get the event weight
+						w := getWeight()
+
+						// Loop over selection and variables
+						for ic := range ana.KinemCuts {
+
+							if !passKinemCut[ic]() {
+								continue
+							}
+
+							for iv, v := range ana.Variables {
+								val := 0.0
+								if ana.WithVarsTreeFormula {
+									val = varFormula[iv]()
+								} else {
+									val = v.GetValue()
+								}
+								ana.HbookHistos[iv][ic][iSamp].Fill(val, w)
+							}
 						}
 					}
-				}
+
+					return nil
+				})
+
+				// Keep track of the number of processed events
+				ana.nEvents += t.Entries()
 
 				return nil
-			})
-
-			// Keep track of the number of processed events
-			ana.nEvents += t.Entries()
-
-			return nil
-		}(is)
+			}(is)
+		}
 	}
 
 	ana.histoFilled = true

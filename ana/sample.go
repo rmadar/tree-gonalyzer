@@ -19,14 +19,15 @@ var colorNil = color.NRGBA{R: 0, G: 0, B: 0, A: 0}
 // Sample contains all the information defining a single histogram
 // of the final plot.
 type Sample struct {
-	Name              string      // Sample name.
-	Type              string      // Sample type: 'data', 'bkg' or 'sig'.
-	LegLabel          string      // Label used in the legend.
-	FileName          string      // Path the file of the sample.
-	TreeName          string      // Name of the tree.
-	WeightFunc        TreeFunc    // Weight to applied to the sample (default: 1.0).
-	CutFunc           TreeFunc    // Cut to be applied to the sample (default: none).
-	DataStyle         bool        // Enable data-like style (default: Type == 'data')
+
+	// General settings
+	Name       string       // Sample name.
+	Type       string       // Sample type: 'data', 'bkg' or 'sig'.
+	LegLabel   string       // Label used in the legend.
+	SubSamples []*SubSample // List of sub-samples to be included in the histogram.
+
+	// Cosmetic settings
+	DataStyle         bool        // Enable data-like style (default: Type == 'data').
 	LineColor         color.NRGBA // Line color of the histogram (default: blue).
 	LineWidth         vg.Length   // Line width of the histogram (default: 1.5).
 	FillColor         color.NRGBA // Fill color of the histogram (default: none).
@@ -38,16 +39,30 @@ type Sample struct {
 	YErrBarsCapWidth  vg.Length   // Width of horizontal bars of the y-error bars.
 }
 
-// NewSample creates a sample with the default settings.
+// SubSample contains the needed information to fill the
+// final histogram.
+type SubSample struct {
+	FileName   string
+	TreeName   string
+	WeightFunc TreeFunc
+	CutFunc    TreeFunc
+}
+
+// NewSample creates a sample with one sub-sample based
+// the default settings.
 func NewSample(sname, stype, sleg, fname, tname string, opts ...SampleOptions) *Sample {
 
-	// Required fields
+	// Fill the sample with a 1-element sub-sample slice.
 	s := &Sample{
 		Name:     sname,
 		Type:     stype,
 		LegLabel: sleg,
-		FileName: fname,
-		TreeName: tname,
+		SubSamples: []*SubSample{
+			&SubSample{
+				FileName: fname,
+				TreeName: tname,
+			},
+		},
 	}
 
 	// Configuration with defaults values for all optional fields
@@ -61,9 +76,11 @@ func NewSample(sname, stype, sleg, fname, tname string, opts ...SampleOptions) *
 		opt(cfg)
 	}
 
-	// Set all fields with the updated configuration
-	s.WeightFunc = cfg.Weight
-	s.CutFunc = cfg.Cut
+	// Set sub-sample settings with the updated configuration
+	s.SubSamples[0].WeightFunc = cfg.Weight
+	s.SubSamples[0].CutFunc = cfg.Cut
+
+	// Set cosmetic setting with the updated configuration
 	s.LineColor = cfg.LineColor
 	s.LineWidth = cfg.LineWidth
 	s.FillColor = cfg.FillColor
