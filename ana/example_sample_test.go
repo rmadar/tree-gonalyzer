@@ -66,7 +66,7 @@ func ExampleSample_severalComponents() {
 	ttbarIncl.AddComponent("ljets.root", "mytree",
 		ana.WithWeight(ana.NewTreeFuncValF64(0.3)),
 	)
-	
+
 	// Adding full hadronic decay, applying a cut to make sure of the decay
 	ttbarIncl.AddComponent("fullhad.root", "mytree",
 		ana.WithCut(ana.NewTreeFuncVarBool("isHadronic")),

@@ -1,6 +1,7 @@
 package ana
 
 import (
+	"fmt"
 	"strings"
 
 	"image/color"
@@ -37,6 +38,9 @@ type Sample struct {
 	YErrBars          bool        // Display y-error bars (default: false).
 	YErrBarsLineWidth vg.Length   // Width of y-error bars.
 	YErrBarsCapWidth  vg.Length   // Width of horizontal bars of the y-error bars.
+
+	// Internal use
+	canAddComponents bool // Forbid the addition of component when created by s := NewSample()
 }
 
 // SampleComponent contains the needed information
@@ -50,34 +54,6 @@ type SampleComponent struct {
 	CutFunc    TreeFunc
 }
 
-// NewSample creates a sample with one sub-sample based
-// on the default settings. This function is to be used
-// for single-component samples.
-func NewSample(sname, stype, sleg, fname, tname string, opts ...SampleOptions) *Sample {
-
-	// New empty sample
-	s := NewEmptySample(sname, stype, sleg, opts...)
-
-	// Configuration
-	cfg := newConfig()
-	for _, opt := range opts {
-		opt(cfg)
-	}
-	
-	// Create a component
-	c := &SampleComponent{
-		FileName:   fname,
-		TreeName:   tname,
-		WeightFunc: cfg.Weight,
-		CutFunc:    cfg.Cut,
-	}
-
-	// Append it to the pointer-receiver sample
-	s.Components = append(s.Components, c)
-	
-	return s
-}
-
 // NewEmptySample creates a new sample without any components.
 // This function is to be favoured in case of several sub-samples,
 // than can be added using s.AddComponent().
@@ -85,12 +61,12 @@ func NewEmptySample(sname, stype, sleg string, opts ...SampleOptions) *Sample {
 
 	// Empty basic sample
 	s := &Sample{
-		Name:     sname,
-		Type:     stype,
-		LegLabel: sleg,
+		Name:       sname,
+		Type:       stype,
+		LegLabel:   sleg,
 		Components: []*SampleComponent{},
 	}
-	
+
 	// Configuration with defaults values for all optional fields
 	cfg := newConfig(
 		WithFillColor(color.NRGBA{R: 20, G: 20, B: 180, A: 200}),
@@ -114,31 +90,53 @@ func NewEmptySample(sname, stype, sleg string, opts ...SampleOptions) *Sample {
 	s.YErrBarsCapWidth = cfg.YErrBarsCapWidth
 	s.DataStyle = cfg.DataStyle
 
+	// Allow Addition of new components
+	s.canAddComponents = true
+
 	return s
-	
+}
+
+// NewSample creates a sample with one sub-sample based
+// on the default settings. This function is to be used
+// for single-component samples. For multi-component samples,
+// one has to use NewEmptySample(...) followed by s.AddComponent(...).
+func NewSample(sname, stype, sleg, fname, tname string, opts ...SampleOptions) *Sample {
+
+	// New empty sample
+	s := NewEmptySample(sname, stype, sleg, opts...)
+
+	// Configuration
+	cfg := newConfig()
+	for _, opt := range opts {
+		opt(cfg)
+	}
+
+	// Add it to component the new sample
+	s.AddComponent(fname, tname, opts...)
+
+	// Forbid further addition of component.
+	s.canAddComponents = false
+
+	return s
 }
 
 // AddComponent adds a new sample component to the sample.
-// In case the sample is created using NewSample() function, default weights
-// and cuts are the same as defined as the one passed to NewSample()
-// function. They will be overwritten if new weights/cuts are passed to AddComponent().
-//
-// In order to avoid confusion, it is discouraged to use
-// this function with a sample created via s := NewSample(). Instead,
-// the use of the function NewEmptySample() is encouraged, where weight
-// and cut of each component is explicitely given via s.AddComponent().
-// 
-// It should be possible to finding a better.
+// In case the sample is created using NewSample() function,
+// the call of this function will panic. Explicit addition of component
+// should be done on a sample created empty, with NewEmptySample().
 func (s *Sample) AddComponent(fname, tname string, opts ...SampleOptions) {
+
+	if !s.canAddComponents {
+		message := fmt.Sprintf("Cannot add a component to sample %v\n", s.Name)
+		message += fmt.Sprintf("Make sure it was created via ana.NewEmptySample().")
+		panic(message)
+	}
 
 	// Manage default settings and passed options
 	// FIXME(rmadar): most of SampleOption doesn't change a component.
 	//                consider adding a protection against the ones whic
 	//                doesn't change the behaviour of the component?
-	cfg := newConfig(
-		WithWeight(s.Components[0].WeightFunc),
-		WithCut(s.Components[0].CutFunc),
-	)
+	cfg := newConfig()
 	for _, opt := range opts {
 		opt(cfg)
 	}
