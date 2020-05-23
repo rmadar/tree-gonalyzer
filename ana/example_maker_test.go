@@ -13,7 +13,7 @@ func ExampleMaker_withSingleComponentSamples() {
 		ana.NewSample("bkg2", "bkg", `Proc 2`, "proc2.root", "mytree"),
 		ana.NewSample("bkg3", "bkg", `Proc 3`, "proc3.root", "mytree"),
 	}
-	
+
 	// Define variables
 	variables := []*ana.Variable{
 		ana.NewVariable("plot1", "branch1", new(float64), 15, 0, 10),
@@ -22,7 +22,7 @@ func ExampleMaker_withSingleComponentSamples() {
 
 	// Create analyzer object
 	analyzer := ana.New(samples, variables)
-	
+
 	// Run the analyzer to produce all the plots
 	if err := analyzer.Run(); err != nil {
 		panic(err)
@@ -56,7 +56,7 @@ func ExampleMaker_withMultiComponentSamples() {
 
 	// Put samples together
 	samples := []*ana.Sample{data, bkg, sig}
-	
+
 	// Define variables
 	variables := []*ana.Variable{
 		ana.NewVariable("plot1", "branch1", new(float64), 15, 0, 10),
@@ -65,7 +65,7 @@ func ExampleMaker_withMultiComponentSamples() {
 
 	// Create analyzer object
 	analyzer := ana.New(samples, variables)
-	
+
 	// Run the analyzer to produce all the plots
 	if err := analyzer.Run(); err != nil {
 		panic(err)
