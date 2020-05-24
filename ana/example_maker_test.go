@@ -75,17 +75,17 @@ func ExampleMaker_defaultMultiComponents() {
 }
 
 // Creation of the Stack analysis maker type
-func ExampleMaker_stack() {
+func ExampleMaker_withStacked() {
 
 }
 
 // Creation of the normalized analysis maker type
-func ExampleMaker_norm() {
+func ExampleMaker_withNormalized() {
 
 }
 
 // Creation of the auto-styled analysis maker type
-func ExampleMaker_autoStyle() {
+func ExampleMaker_withAutoStyle() {
 
 }
 
