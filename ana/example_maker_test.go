@@ -31,7 +31,9 @@ func ExampleMaker_defaultSingleComponent() {
 	}
 }
 
-// Creation of the default analysis maker type
+// Creation of the default analysis maker type with
+// multi-component samples. The files, trees and
+// variables are dummy, they are here just for the example.
 func ExampleMaker_defaultMultiComponents() {
 	// Weights and cuts
 	w := ana.NewTreeFuncVarF64("evtWeight")
