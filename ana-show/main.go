@@ -12,20 +12,36 @@ import (
 func main() {
 
 	// Options passed by command lines.
-	var pFormat = flag.String("f", "tex", "Select output plot format")
-	var doLatex = flag.Bool("l", false, "On-the-fly LaTeX compilation to produce figures")
-	var doRatio = flag.Bool("r", false, "Enable ratio plot")
-	var doStack = flag.Bool("s", false, "Enable histogram stacking")
-	var doNorm = flag.Bool("n", false, "Enable histogram normalization")
+	var (
+		nMax    = flag.Int64("nevts", -1, "Maximum number of processed event per sample component.")
+		pFormat = flag.String("f", "tex", "Select output plot format")
+		doLatex = flag.Bool("l", false, "On-the-fly LaTeX compilation to produce figures")
+		doRatio = flag.Bool("r", false, "Enable ratio plot")
+		doStack = flag.Bool("s", false, "Enable histogram stacking")
+		doNorm = flag.Bool("n", false, "Enable histogram normalization")
+	)
 	flag.Parse()
 
-	// Samples
-	samples := []*ana.Sample{
-		ana.CreateSample("data", "data", `Data`, file1, tname),
-		ana.CreateSample("bkg1", "bkg", `Proc 1`, file2, tname, ana.WithWeight(w1)),
-		ana.CreateSample("bkg2", "bkg", `Proc 2`, file3, tname, ana.WithWeight(w1)),
-		ana.CreateSample("bkg4", "bkg", `Proc 3`, file1, tname, ana.WithWeight(w2)),
-	}
+	// Data
+	sData := ana.CreateSample("data", "data", `Data`, file1, tname)
+
+	// Background 1 
+	sBkg1 := ana.NewSample("bkg1", "bkg", `Proc1+Proc2`, ana.WithWeight(wptPos))
+	sBkg1.AddComponent(file2, tname)
+	sBkg1.AddComponent(file3, tname)
+	
+	// Background 2 
+	sBkg2 := ana.NewSample("bkg2", "bkg", `Proc3+Proc4`, ana.WithWeight(wptNeg))
+	sBkg2.AddComponent(file2, tname, ana.WithWeight(w1))
+	sBkg2.AddComponent(file3, tname, ana.WithWeight(w1))
+	
+	// Background 3 
+	sBkg3 := ana.NewSample("bkg3", "bkg", `Proc5+Proc6`, ana.WithWeight(w2))
+	sBkg3.AddComponent(file2, tname)
+	sBkg3.AddComponent(file3, tname)
+
+	// Putting samples together
+	samples := []*ana.Sample{sData, sBkg1, sBkg2, sBkg3}
 
 	// Variables
 	variables := []*ana.Variable{
@@ -40,6 +56,7 @@ func main() {
 	analyzer := ana.New(samples, variables, ana.WithKinemCuts(selections), ana.WithAutoStyle(true))
 
 	// Command line options
+	analyzer.Nevts = *nMax
 	analyzer.SaveFormat = *pFormat
 	analyzer.CompileLatex = *doLatex
 	analyzer.RatioPlot = *doRatio
@@ -60,24 +77,34 @@ var (
 	file3 = "../testdata/file3.root"
 	tname = "truth"
 		
-	// Weights 
+	// TreeFunc: weights and cuts 
 	w1 = ana.NewTreeFuncValF64(0.5)
-	w2 = ana.NewTreeFuncValF64(0.5)
+	w2 = ana.NewTreeFuncValF64(0.25)
+	wptPos = ana.TreeFunc{
+		VarsName: []string{"t_pt"},
+		Fct: func(pt float32) float64 {return 1.0 + float64(pt)/200.},
+	}
+	wptNeg = ana.TreeFunc{
+		VarsName: []string{"t_pt"},
+		Fct: func(pt float32) float64 {return 1.0 - float64(pt)/200.},
+	}
+	mtGT800 = ana.TreeFunc{
+		VarsName: []string{"ttbar_m"},
+		Fct:      func(m float32) bool { return m > 800 },
+	}
+	dphiLT1 = ana.TreeFunc{
+		VarsName: []string{"truth_dphi_ll"},
+		Fct:      func(dphi float64) bool { return dphi < 1.0 },
+	}
 
 	// Selections
 	sel0 = ana.NewSelection()
 	sel1 = &ana.Selection{
 		Name: "m_gt_800",
-		TreeFunc: ana.TreeFunc{
-			VarsName: []string{"ttbar_m"},
-			Fct:      func(m float32) bool { return m > 800 },
-		},
+		TreeFunc: mtGT800, 
 	}
 	sel2 = &ana.Selection{
 		Name: "dphi_lg_1",
-		TreeFunc: ana.TreeFunc{
-			VarsName: []string{"truth_dphi_ll"},
-			Fct:      func(dphi float64) bool { return dphi < 1.0 },
-		},
+		TreeFunc: dphiLT1,
 	}
 )
