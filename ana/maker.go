@@ -133,7 +133,7 @@ func (ana *Maker) FillHistos() error {
 	// Loop over the samples
 	for iSamp, samp := range ana.Samples {
 
-		// Loop over sub-samples
+		// Loop over the sample components
 		for iComp, comp := range samp.Components {
 
 			// Anonymous function to avoid memory-leaks due to 'defer'
@@ -157,33 +157,37 @@ func (ana *Maker) FillHistos() error {
 					log.Fatal("could not create tree reader: %w", err)
 				}
 				defer r.Close()
-
+				
+				// Loading variable when using formulaFunc
+				// FIXME(rmadar): to be reshaped.
 				varFormula := make([]func() float64, len(ana.Variables))
 				if ana.WithVarsTreeFormula {
 					for i, v := range ana.Variables {
-						varFormula[i] = v.TreeVar.GetFuncF64(r)
+						if v.TreeVar.Fct != nil {
+							varFormula[i] = v.TreeVar.GetFuncF64(r)
+						}
 					}
 				}
 
-				// Prepare the sample weight
+				// Prepare the sample global weight
 				getWeightSamp := func() float64 { return float64(1.0) }
 				if samp.WeightFunc.Fct != nil && !ana.NoTreeFormula {
 					getWeightSamp = samp.WeightFunc.GetFuncF64(r)
 				}
 
-				// Prepare the component weight
+				// Prepare the additional weight of the component
 				getWeightComp := func() float64 { return float64(1.0) }
 				if comp.WeightFunc.Fct != nil && !ana.NoTreeFormula {
 					getWeightSamp = comp.WeightFunc.GetFuncF64(r)
 				}
 
-				// Prepare the sample cut
+				// Prepare the sample global cut
 				passCutSamp := func() bool { return true }
 				if samp.CutFunc.Fct != nil && !ana.NoTreeFormula {
 					passCutSamp = samp.CutFunc.GetFuncBool(r)
 				}
 
-				// Prepare the component cut
+				// Prepare the component additional cut
 				passCutComp := func() bool { return true }
 				if comp.CutFunc.Fct != nil && !ana.NoTreeFormula {
 					passCutComp = comp.CutFunc.GetFuncBool(r)
@@ -214,7 +218,7 @@ func (ana *Maker) FillHistos() error {
 					} else {
 
 						// Sample-level and component-level cut
-						if !passCutSamp() || !passCutComp() {
+						if !(passCutSamp() && passCutComp()) {
 							return nil
 						}
 

@@ -18,10 +18,10 @@ var colorNil = color.NRGBA{R: 0, G: 0, B: 0, A: 0}
 
 // Sample contains all the information defining a single histogram
 // of the final plot. A sample is made of (potentially) several
-// components. Each component can have different file/tree names,
-// as well as additional cuts and weights, on top of the global ones
-// which are apply to all components. Cuts are combined with AND
-// while weights are multiplied.
+// components, or sub-sample. Each component can have different
+// file/tree names, as well as additional cuts and weights,
+// on top of the global ones. Concretly, the global cut is combined
+// with the component cut with a AND, while weights are multiplied.
 type Sample struct {
 
 	// General settings
@@ -30,7 +30,8 @@ type Sample struct {
 	LegLabel   string             // Label used in the legend.
 	Components []*SampleComponent // List of components included in the histogram.
 
-	// Gobal weight and cut
+	// Gobal weight and cut to be applied to
+	// all components.
 	CutFunc    TreeFunc
 	WeightFunc TreeFunc
 
@@ -45,9 +46,6 @@ type Sample struct {
 	YErrBars          bool        // Display y-error bars (default: false).
 	YErrBarsLineWidth vg.Length   // Width of y-error bars.
 	YErrBarsCapWidth  vg.Length   // Width of horizontal bars of the y-error bars.
-
-	// Internal use
-	canAddComponents bool // Forbid the addition of component when created by s := NewSample()
 }
 
 // SampleComponent contains the needed information
@@ -99,16 +97,14 @@ func NewSample(sname, stype, sleg string, opts ...SampleOptions) *Sample {
 	s.YErrBarsCapWidth = cfg.YErrBarsCapWidth
 	s.DataStyle = cfg.DataStyle
 
-	// Allow Addition of new components
-	s.canAddComponents = true
-
 	return s
 }
 
-// GetSimpleSample creates a non-empty sample, with only one component,
-// having the default settings. This function is a friendly API to
+// CreateSample creates a non-empty sample having the default settings,
+// with only one component. This function is a friendly API to
 // ease single-component samples declaration. For multi-component samples,
-// one has to use NewSample(...) followed by s.AddComponent(...).
+// one can either add components on top with s.AddComponent(...), or start
+// from an empty sample using NewSample(...) followed by few s.AddComponent(...).
 func CreateSample(sname, stype, sleg, fname, tname string, opts ...SampleOptions) *Sample {
 
 	// New empty sample

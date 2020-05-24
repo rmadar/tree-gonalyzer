@@ -21,17 +21,10 @@ func main() {
 
 	// Samples
 	samples := []*ana.Sample{
-		ana.CreateSample("data", "data", `Data 2020`,
-			"../testdata/ttbar_MadSpinOff.root", "truth"),
-		ana.CreateSample("bkg1", "bkg", `Proc 1`,
-			"../testdata/ttbar_MadSpinOn_1.root", "truth",
-			ana.WithWeight(ana.NewTreeFuncValF64(0.33))),
-		ana.CreateSample("bkg2", "bkg", `Proc 2`,
-			"../testdata/ttbar_MadSpinOn_2.root", "truth",
-			ana.WithWeight(ana.NewTreeFuncValF64(0.33))),
-		ana.CreateSample("bkg3", "bkg", `Proc 3`,
-			"../testdata/ttbar_MadSpinOn_1.root", "truth",
-			ana.WithWeight(ana.NewTreeFuncValF64(0.33))),
+		ana.CreateSample("data", "data", `Data`, file1, tname),
+		ana.CreateSample("bkg1", "bkg", `Proc 1`, file2, tname, ana.WithWeight(w1)),
+		ana.CreateSample("bkg2", "bkg", `Proc 2`, file3, tname, ana.WithWeight(w1)),
+		ana.CreateSample("bkg4", "bkg", `Proc 3`, file1, tname, ana.WithWeight(w2)),
 	}
 
 	// Variables
@@ -59,8 +52,19 @@ func main() {
 	}
 }
 
-// Selection definition
+// Few definition
 var (
+	// Files and tree names
+	file1 = "../testdata/file1.root"
+	file2 = "../testdata/file2.root"
+	file3 = "../testdata/file3.root"
+	tname = "truth"
+		
+	// Weights 
+	w1 = ana.NewTreeFuncValF64(0.5)
+	w2 = ana.NewTreeFuncValF64(0.5)
+
+	// Selections
 	sel0 = ana.NewSelection()
 	sel1 = &ana.Selection{
 		Name: "m_gt_800",
