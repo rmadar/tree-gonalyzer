@@ -42,11 +42,11 @@ func ExampleMaker_withMultiComponentSamples() {
 	data.AddComponent("data2020.root", "mytree")
 
 	// Define a single sample for the total background
-	bkg := ana.NewSample("bkgTot", "bkg", `Total Bkg`)
-	bkg.AddComponent("proc1.root", "mytree", ana.WithWeight(w))
-	bkg.AddComponent("proc2.root", "mytree", ana.WithWeight(w))
-	bkg.AddComponent("proc3.root", "mytree", ana.WithWeight(w))
-	bkg.AddComponent("proc4.root", "mytree", ana.WithWeight(w), ana.WithCut(isProc4))
+	bkg := ana.NewSample("bkgTot", "bkg", `Total Bkg`, ana.WithWeight(w))
+	bkg.AddComponent("proc1.root", "mytree")
+	bkg.AddComponent("proc2.root", "mytree")
+	bkg.AddComponent("proc3.root", "mytree")
+	bkg.AddComponent("proc4.root", "mytree", ana.WithCut(isProc4))
 
 	// Define a single sample for the total signal
 	sig := ana.NewSample("sigTot", "sig", `Total signal`)

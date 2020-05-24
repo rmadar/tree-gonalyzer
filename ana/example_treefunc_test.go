@@ -39,11 +39,11 @@ func ExampleTreeFunc_general() {
 	})
 
 	// Output:
-	// pt=128.41, eta=-1.17, pt*eta=-149.63
-	// pt=149.89, eta=0.70, pt*eta=104.62
-	// pt=212.82, eta=1.16, pt*eta=245.99
-	// pt=108.26, eta=-1.63, pt*eta=-176.88
-	// pt=133.40, eta=-2.63, pt*eta=-350.77
+	// pt=145.13, eta=-2.08, pt*eta=-302.15
+	// pt=13.85, eta=-1.69, pt*eta=-23.35
+	// pt=44.03, eta=-3.93, pt*eta=-173.06
+	// pt=136.98, eta=0.64, pt*eta=87.88
+	// pt=77.47, eta=2.93, pt*eta=226.79
 }
 
 // Example showing how NewTreeFuncVarBool() works and compares
@@ -77,7 +77,7 @@ func ExampleNewTreeFuncVarBool() {
 	// Output:
 	// 0 false false
 	// 1 false false
-	// 2 false false
+	// 2 true true
 	// 3 false false
 	// 4 false false
 }
@@ -111,11 +111,11 @@ func ExampleNewTreeFuncVarF64() {
 	})
 
 	// Output:
-	// 0 0.14 0.14
-	// 1 2.17 2.17
-	// 2 2.23 2.23
-	// 3 1.78 1.78
-	// 4 1.65 1.65
+	// 0 2.99 2.99
+	// 1 1.07 1.07
+	// 2 3.03 3.03
+	// 3 0.07 0.07
+	// 4 2.35 2.35
 }
 
 // Example showing how NewTreeFuncValF64() works.
@@ -153,9 +153,9 @@ func ExampleNewTreeFuncValF64() {
 func getReader(nmax int64) (*groot.File, *rtree.Reader) {
 
 	// Get the file
-	f, err := groot.Open("../testdata/ttbar_ME.root")
+	f, err := groot.Open("../testdata/file1.root")
 	if err != nil {
-		log.Fatal("could not open ROOT file ../testdata/ttbar_ME.root: %w", err)
+		log.Fatal("example_treefunc_test.go: could not open ../testdata/file1.root: %w", err)
 	}
 
 	// Get the tree

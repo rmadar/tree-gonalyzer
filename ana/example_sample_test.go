@@ -59,21 +59,20 @@ func ExampleSample_withCut() {
 }
 
 func ExampleSample_multiComponents() {
+	// Declare weights and cuts
+	wGlobal := ana.NewTreeFuncVarF64("evtWeight")   // evtWeight is float64 branch
+	wBljets := ana.NewTreeFuncValF64(0.30)
+	cIsHadr := ana.NewTreeFuncVarBool("isHadronic") // isHadronic is boolean branch
+	
 	// ttbar background starting with an empty sample with a global weight
-	ttbarIncl := ana.NewSample("ttbar", "bkg", `Inclusive`,
-		ana.WithWeight(ana.NewTreeFuncVarF64("evtWeight")),
-	)
+	ttbarIncl := ana.NewSample("ttbar", "bkg", `Inclusive`, ana.WithWeight(wGlobal))
 
 	// Adding dilepont decay
 	ttbarIncl.AddComponent("dilep.root", "mytree")
 
 	// Adding l+jets decay, weighted by BR(ttbar->l+jets)
-	ttbarIncl.AddComponent("ljets.root", "mytree",
-		ana.WithWeight(ana.NewTreeFuncValF64(0.3)),
-	)
+	ttbarIncl.AddComponent("ljets.root", "mytree", ana.WithWeight(wBljets))
 
 	// Adding full hadronic decay, applying a cut to make sure of the decay
-	ttbarIncl.AddComponent("fullhad.root", "mytree",
-		ana.WithCut(ana.NewTreeFuncVarBool("isHadronic")),
-	)
+	ttbarIncl.AddComponent("fullhad.root", "mytree", ana.WithCut(cIsHadr))
 }
