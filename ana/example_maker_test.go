@@ -4,8 +4,10 @@ import (
 	"github.com/rmadar/tree-gonalyzer/ana"
 )
 
-// Creation of the default analysis maker type
-func ExampleMaker_withSingleComponentSamples() {
+// Creation of the default analysis maker type with
+// single-component samples. The files, trees and
+// variables are dummy, they are here just for the example.
+func ExampleMaker_defaultSingleComponent() {
 	// Define samples
 	samples := []*ana.Sample{
 		ana.CreateSample("data", "data", `Data`, "data.root", "mytree"),
@@ -30,37 +32,37 @@ func ExampleMaker_withSingleComponentSamples() {
 }
 
 // Creation of the default analysis maker type
-func ExampleMaker_withMultiComponentSamples() {
-	// Define useful TreeFunc for weights and cuts
+func ExampleMaker_defaultMultiComponents() {
+	// Weights and cuts
 	w := ana.NewTreeFuncVarF64("evtWeight")
 	isProc4 := ana.NewTreeFuncVarBool("IsProc4")
 
-	// Define data sample
+	// Data sample.
 	data := ana.NewSample("data", "data", `Data 18-20`)
 	data.AddComponent("data2018.root", "mytree")
 	data.AddComponent("data2019.root", "mytree")
 	data.AddComponent("data2020.root", "mytree")
 
-	// Define a single sample for the total background
+	// Background sample including four components.
 	bkg := ana.NewSample("bkgTot", "bkg", `Total Bkg`, ana.WithWeight(w))
 	bkg.AddComponent("proc1.root", "mytree")
 	bkg.AddComponent("proc2.root", "mytree")
 	bkg.AddComponent("proc3.root", "mytree")
 	bkg.AddComponent("proc4.root", "mytree", ana.WithCut(isProc4))
 
-	// Define a single sample for the total signal
+	// Signal sample including three components.
 	sig := ana.NewSample("sigTot", "sig", `Total signal`, ana.WithWeight(w))
 	sig.AddComponent("sig1.root", "mytree")
 	sig.AddComponent("sig2.root", "mytree")
 	sig.AddComponent("sig3.root", "mytree")
 	
-	// Put samples together
+	// Put samples together.
 	samples := []*ana.Sample{data, bkg, sig}
 
 	// Define variables
 	variables := []*ana.Variable{
-		ana.NewVariable("plot1", "branch1", new(float64), 15, 0, 10),
-		ana.NewVariable("plot2", "branch2", new(float32), 25, 0, 10),
+		ana.NewVariable("plotName1", "branchName1", new(float64), 15, 0, 10),
+		ana.NewVariable("plotName2", "branchName2", new(float32), 25, 0, 10),
 	}
 
 	// Create analyzer object
