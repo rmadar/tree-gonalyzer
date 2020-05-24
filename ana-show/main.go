@@ -21,15 +21,15 @@ func main() {
 
 	// Samples
 	samples := []*ana.Sample{
-		ana.NewSample("data", "data", `Data 2020`,
+		ana.CreateSample("data", "data", `Data 2020`,
 			"../testdata/ttbar_MadSpinOff.root", "truth"),
-		ana.NewSample("bkg1", "bkg", `Proc 1`,
+		ana.CreateSample("bkg1", "bkg", `Proc 1`,
 			"../testdata/ttbar_MadSpinOn_1.root", "truth",
 			ana.WithWeight(ana.NewTreeFuncValF64(0.33))),
-		ana.NewSample("bkg2", "bkg", `Proc 2`,
+		ana.CreateSample("bkg2", "bkg", `Proc 2`,
 			"../testdata/ttbar_MadSpinOn_2.root", "truth",
 			ana.WithWeight(ana.NewTreeFuncValF64(0.33))),
-		ana.NewSample("bkg3", "bkg", `Proc 3`,
+		ana.CreateSample("bkg3", "bkg", `Proc 3`,
 			"../testdata/ttbar_MadSpinOn_1.root", "truth",
 			ana.WithWeight(ana.NewTreeFuncValF64(0.33))),
 	}

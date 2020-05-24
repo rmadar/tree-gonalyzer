@@ -168,13 +168,13 @@ func (ana *Maker) FillHistos() error {
 				// Prepare the sample weight
 				getWeightSamp := func() float64 { return float64(1.0) }
 				if samp.WeightFunc.Fct != nil && !ana.NoTreeFormula {
-					getWeightSamp = comp.WeightFunc.GetFuncF64(r)
+					getWeightSamp = samp.WeightFunc.GetFuncF64(r)
 				}
 
 				// Prepare the component weight
 				getWeightComp := func() float64 { return float64(1.0) }
 				if comp.WeightFunc.Fct != nil && !ana.NoTreeFormula {
-					getWeightSamp = samp.WeightFunc.GetFuncF64(r)
+					getWeightSamp = comp.WeightFunc.GetFuncF64(r)
 				}
 
 				// Prepare the sample cut
