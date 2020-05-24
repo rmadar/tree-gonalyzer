@@ -22,15 +22,16 @@ type SampleOptions func(cfg *config)
 type config struct {
 
 	// ana.Maker options
-	KinemCuts    []*Selection // List of cuts
-	SavePath     string       // Path to which plot will be saved
-	SaveFormat   string       // Extension of saved figure 'tex', 'pdf', 'png'
-	CompileLatex bool         // Enable on-the-fly latex compilation of plots
-	AutoStyle    bool         // Enable auto style of the histogram
-	PlotTitle    string       // General plot title
-	RatioPlot    bool         // Enable ratio plot
-	HistoStack   bool         // Disable histogram stacking (e.g. compare various processes)
-	HistoNorm    bool         // Normalize distributions to unit area (when stacked, the total is normalized)
+	KinemCuts    []*Selection // List of cuts.
+	Nevts        int64        // Maximum of processed events.
+	SavePath     string       // Path to which plot will be saved.
+	SaveFormat   string       // Extension of saved figure 'tex', 'pdf', 'png'.
+	CompileLatex bool         // Enable on-the-fly latex compilation of plots.
+	AutoStyle    bool         // Enable auto style of the histogram.
+	PlotTitle    string       // General plot title.
+	RatioPlot    bool         // Enable ratio plot.
+	HistoStack   bool         // Disable histogram stacking (e.g. compare various processes).
+	HistoNorm    bool         // Normalize distributions to unit area (when stacked, the total is normalized).
 	ErrBandColor color.NRGBA  // Color for the uncertainty band.
 
 	// Sample options
@@ -70,6 +71,13 @@ func newConfig(opts ...func(cfg *config)) *config {
 func WithKinemCuts(c []*Selection) Options {
 	return func(cfg *config) {
 		cfg.KinemCuts = c
+	}
+}
+
+// WithKinemCuts sets the list of kinematic cuts to run on.
+func WithNevts(n int64) Options {
+	return func(cfg *config) {
+		cfg.Nevts = n
 	}
 }
 

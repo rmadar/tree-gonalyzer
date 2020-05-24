@@ -32,6 +32,7 @@ type Maker struct {
 	Samples   []*Sample    // List of samples on which to run.
 	Variables []*Variable  // List of variables to plot.
 	KinemCuts []*Selection // List of cuts to apply (default: no cut).
+	Nevts     int64        // Maximum number of event to process.
 
 	// Figures
 	SavePath     string // Path to which plot will be saved (default: 'plots').
@@ -78,6 +79,7 @@ func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 
 	// Configuration with default values for all optional fields
 	cfg := newConfig(
+		WithNevts(-1),
 		WithSavePath("plots"),
 		WithSaveFormat("tex"),
 		WithPlotTitle(`TTree GOnalyzer`),
@@ -96,6 +98,7 @@ func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 
 	// Set fields with updaded configuration
 	a.KinemCuts = cfg.KinemCuts
+	a.Nevts = cfg.Nevts
 	a.SavePath = cfg.SavePath
 	a.SaveFormat = cfg.SaveFormat
 	a.AutoStyle = cfg.AutoStyle
@@ -152,7 +155,7 @@ func (ana *Maker) FillHistos() error {
 				}
 
 				// Get the tree reader
-				r, err := rtree.NewReader(t, rvars)
+				r, err := rtree.NewReader(t, rvars, rtree.WithRange(0, ana.Nevts))
 				if err != nil {
 					log.Fatal("could not create tree reader: %w", err)
 				}
@@ -178,7 +181,7 @@ func (ana *Maker) FillHistos() error {
 				// Prepare the additional weight of the component
 				getWeightComp := func() float64 { return float64(1.0) }
 				if comp.WeightFunc.Fct != nil && !ana.NoTreeFormula {
-					getWeightSamp = comp.WeightFunc.GetFuncF64(r)
+					getWeightComp = comp.WeightFunc.GetFuncF64(r)
 				}
 
 				// Prepare the sample global cut
@@ -227,7 +230,7 @@ func (ana *Maker) FillHistos() error {
 
 						// Loop over selection and variables
 						for ic := range ana.KinemCuts {
-
+							
 							if !passKinemCut[ic]() {
 								continue
 							}
@@ -495,8 +498,9 @@ func (ana *Maker) PlotHistos() error {
 				}
 
 				// Adjust ratio plot scale
-				rp.Bottom.Y.Min = 0.7
-				rp.Bottom.Y.Max = 1.3
+				// FIXME(rmadar): to be set as ana.Maker options
+				// rp.Bottom.Y.Min = 0.7
+				// rp.Bottom.Y.Max = 1.3
 			}
 
 			// Save the figure
@@ -610,25 +614,28 @@ func (ana *Maker) initHistoContainers() {
 // Helper function to setup the automatic style.
 func (ana *Maker) setAutoStyle() {
 
-	for i, s := range ana.Samples {
+	ic := 0
+	for _, s := range ana.Samples {
 
 		// Color
-		r, g, b, a := plotutil.Color(i).RGBA()
+		r, g, b, a := plotutil.Color(ic).RGBA()
 		c := color.NRGBA{R: uint8(r), G: uint8(g), B: uint8(b), A: uint8(a)}
 
 		// Apply data style automatically
 		if s.IsData() {
 			s.DataStyle = true
-		}
-
-		// Fill for stacked histo, lines otherwise
-		if ana.HistoStack {
-			s.FillColor = c
-			s.LineWidth = 0.
 		} else {
-			s.FillColor = color.NRGBA{}
-			s.LineColor = c
-			s.LineWidth = 2.
+			
+			// Fill for stacked histo, lines otherwise
+			if ana.HistoStack {
+				s.FillColor = c
+				s.LineWidth = 0.
+			} else {
+				s.FillColor = color.NRGBA{}
+				s.LineColor = c
+				s.LineWidth = 2.
+			}
+			ic += 1
 		}
 	}
 }
