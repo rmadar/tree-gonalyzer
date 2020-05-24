@@ -4,15 +4,15 @@ import (
 	"github.com/rmadar/tree-gonalyzer/ana"
 )
 
-func ExampleSample_default() {
+func ExampleSample_singleComponent() {
 	// Data sample
-	sData := ana.NewSample("DATA", "data", `pp data`, "myfile.root", "mytree")
+	sData := ana.CreateSample("DATA", "data", `pp data`, "myfile.root", "mytree")
 
 	// Background sample, say QCD pp->ttbar production
-	sBkg := ana.NewSample("ttbar", "bkg", `QCD prod.`, "myfile.root", "mytree")
+	sBkg := ana.CreateSample("ttbar", "bkg", `QCD prod.`, "myfile.root", "mytree")
 
 	// Signal sample, say pp->H->ttbar production
-	sSig := ana.NewSample("Htt", "sig", `Higgs prod.`, "myfile.root", "mytree")
+	sSig := ana.CreateSample("Htt", "sig", `Higgs prod.`, "myfile.root", "mytree")
 
 	// New analysis
 	ana.New([]*ana.Sample{sData, sBkg, sSig}, []*ana.Variable{})
@@ -28,12 +28,12 @@ func ExampleSample_withWeight() {
 	}
 
 	// Sample with computed weight
-	ana.NewSample("proc", "bkg", `leg`, "myfile.root", "mytree",
+	ana.CreateSample("proc", "bkg", `leg`, "myfile.root", "mytree",
 		ana.WithWeight(w),
 	)
 
 	// Sample with single branch weight
-	ana.NewSample("proc", "bkg", `leg`, "myfile.root", "mytree",
+	ana.CreateSample("proc", "bkg", `leg`, "myfile.root", "mytree",
 		ana.WithWeight(ana.NewTreeFuncVarF64("evtWght")),
 	)
 }
@@ -48,19 +48,24 @@ func ExampleSample_withCut() {
 	}
 
 	// Sample with computed boolean
-	ana.NewSample("proc", "bkg", `leg`, "myfile.root", "mytree",
+	ana.CreateSample("proc", "bkg", `leg`, "myfile.root", "mytree",
 		ana.WithCut(sel),
 	)
 
 	// Sample with single branch boolean
-	ana.NewSample("proc", "bkg", `leg`, "myfile.root", "mytree",
+	ana.CreateSample("proc", "bkg", `leg`, "myfile.root", "mytree",
 		ana.WithCut(ana.NewTreeFuncVarBool("passCriteria")),
 	)
 }
 
-func ExampleSample_severalComponents() {
-	// ttbar background starting with one component, say ttbar->dilepton
-	ttbarIncl := ana.NewSample("ttbar", "bkg", `Inclusive`, "dilep.root", "mytree")
+func ExampleSample_multiComponents() {
+	// ttbar background starting with an empty sample with a global weight
+	ttbarIncl := ana.NewSample("ttbar", "bkg", `Inclusive`,
+		ana.WithWeight(ana.NewTreeFuncVarF64("evtWeight")),
+	)
+
+	// Adding dilepont decay
+	ttbarIncl.AddComponent("dilep.root", "mytree")
 
 	// Adding l+jets decay, weighted by BR(ttbar->l+jets)
 	ttbarIncl.AddComponent("ljets.root", "mytree",

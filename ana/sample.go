@@ -1,7 +1,6 @@
 package ana
 
 import (
-	"fmt"
 	"strings"
 
 	"image/color"
@@ -18,7 +17,11 @@ import (
 var colorNil = color.NRGBA{R: 0, G: 0, B: 0, A: 0}
 
 // Sample contains all the information defining a single histogram
-// of the final plot.
+// of the final plot. A sample is made of (potentially) several
+// components. Each component can have different file/tree names,
+// as well as additional cuts and weights, on top of the global ones
+// which are apply to all components. Cuts are combined with AND
+// while weights are multiplied.
 type Sample struct {
 
 	// General settings
@@ -26,6 +29,10 @@ type Sample struct {
 	Type       string             // Sample type: 'data', 'bkg' or 'sig'.
 	LegLabel   string             // Label used in the legend.
 	Components []*SampleComponent // List of components included in the histogram.
+
+	// Gobal weight and cut
+	CutFunc    TreeFunc
+	WeightFunc TreeFunc
 
 	// Cosmetic settings
 	DataStyle         bool        // Enable data-like style (default: Type == 'data').
@@ -54,10 +61,10 @@ type SampleComponent struct {
 	CutFunc    TreeFunc
 }
 
-// NewEmptySample creates a new sample without any components.
-// This function is to be favoured in case of several sub-samples,
-// than can be added using s.AddComponent().
-func NewEmptySample(sname, stype, sleg string, opts ...SampleOptions) *Sample {
+// NewSample creates a new empty sample, ie without any components,
+// with the default options. Components can be then added using
+// s.AddComponent(...) function.
+func NewSample(sname, stype, sleg string, opts ...SampleOptions) *Sample {
 
 	// Empty basic sample
 	s := &Sample{
@@ -78,7 +85,9 @@ func NewEmptySample(sname, stype, sleg string, opts ...SampleOptions) *Sample {
 		opt(cfg)
 	}
 
-	// Set cosmetic setting with the updated configuration
+	// Set setting with the updated configuration
+	s.WeightFunc = cfg.Weight
+	s.CutFunc = cfg.Cut
 	s.LineColor = cfg.LineColor
 	s.LineWidth = cfg.LineWidth
 	s.FillColor = cfg.FillColor
@@ -96,14 +105,14 @@ func NewEmptySample(sname, stype, sleg string, opts ...SampleOptions) *Sample {
 	return s
 }
 
-// NewSample creates a sample with one sub-sample based
-// on the default settings. This function is to be used
-// for single-component samples. For multi-component samples,
-// one has to use NewEmptySample(...) followed by s.AddComponent(...).
-func NewSample(sname, stype, sleg, fname, tname string, opts ...SampleOptions) *Sample {
+// GetSimpleSample creates a non-empty sample, with only one component,
+// having the default settings. This function is a friendly API to
+// ease single-component samples declaration. For multi-component samples,
+// one has to use NewSample(...) followed by s.AddComponent(...).
+func CreateSample(sname, stype, sleg, fname, tname string, opts ...SampleOptions) *Sample {
 
 	// New empty sample
-	s := NewEmptySample(sname, stype, sleg, opts...)
+	s := NewSample(sname, stype, sleg, opts...)
 
 	// Configuration
 	cfg := newConfig()
@@ -111,30 +120,18 @@ func NewSample(sname, stype, sleg, fname, tname string, opts ...SampleOptions) *
 		opt(cfg)
 	}
 
-	// Add it to component the new sample
-	s.AddComponent(fname, tname, opts...)
-
-	// Forbid further addition of component.
-	s.canAddComponents = false
+	// Add it to component the sample
+	s.AddComponent(fname, tname)
 
 	return s
 }
 
 // AddComponent adds a new sample component to the sample.
-// In case the sample is created using NewSample() function,
-// the call of this function will panic. Explicit addition of component
-// should be done on a sample created empty, with NewEmptySample().
 func (s *Sample) AddComponent(fname, tname string, opts ...SampleOptions) {
-
-	if !s.canAddComponents {
-		message := fmt.Sprintf("Cannot add a component to sample %v\n", s.Name)
-		message += fmt.Sprintf("Make sure it was created via ana.NewEmptySample().")
-		panic(message)
-	}
 
 	// Manage default settings and passed options
 	// FIXME(rmadar): most of SampleOption doesn't change a component.
-	//                consider adding a protection against the ones whic
+	//                consider adding a protection against the ones which
 	//                doesn't change the behaviour of the component?
 	cfg := newConfig()
 	for _, opt := range opts {

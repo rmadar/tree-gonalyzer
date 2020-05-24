@@ -7,13 +7,16 @@ import (
 )
 
 type Variable struct {
-	Name        string
-	SaveName    string
-	TreeName    string
-	Value       interface{}
-	TreeVar     TreeFunc
-	Nbins       int
-	Xmin, Xmax  float64
+	Name       string
+	TreeName   string
+	Value      interface{}
+	Nbins      int
+	Xmin, Xmax float64
+
+	SaveName string
+	TreeVar  TreeFunc
+
+	// Axis cosmetics
 	XLabel      string
 	YLabel      string
 	XTickFormat string
@@ -22,8 +25,10 @@ type Variable struct {
 	RangeXmax   float64
 	RangeYmin   float64
 	RangeYmax   float64
-	LegPosTop   bool
-	LegPosLeft  bool
+
+	// Legend cosmetics
+	LegPosTop  bool
+	LegPosLeft bool
 }
 
 // Create a new type variable

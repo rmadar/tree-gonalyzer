@@ -134,13 +134,13 @@ func (ana *Maker) FillHistos() error {
 	for iSamp, samp := range ana.Samples {
 
 		// Loop over sub-samples
-		for iComp, c := range samp.Components {
+		for iComp, comp := range samp.Components {
 
 			// Anonymous function to avoid memory-leaks due to 'defer'
 			func(j int) error {
 
 				// Get the file and tree
-				f, t := getTreeFromFile(c.FileName, c.TreeName)
+				f, t := getTreeFromFile(comp.FileName, comp.TreeName)
 				defer f.Close()
 
 				// Prepare variables to explicitely load
@@ -165,16 +165,28 @@ func (ana *Maker) FillHistos() error {
 					}
 				}
 
-				// Prepare the weight
-				getWeight := func() float64 { return float64(1.0) }
-				if c.WeightFunc.Fct != nil && !ana.NoTreeFormula {
-					getWeight = c.WeightFunc.GetFuncF64(r)
+				// Prepare the sample weight
+				getWeightSamp := func() float64 { return float64(1.0) }
+				if samp.WeightFunc.Fct != nil && !ana.NoTreeFormula {
+					getWeightSamp = comp.WeightFunc.GetFuncF64(r)
+				}
+
+				// Prepare the component weight
+				getWeightComp := func() float64 { return float64(1.0) }
+				if comp.WeightFunc.Fct != nil && !ana.NoTreeFormula {
+					getWeightSamp = samp.WeightFunc.GetFuncF64(r)
 				}
 
 				// Prepare the sample cut
-				passSampleCut := func() bool { return true }
-				if c.CutFunc.Fct != nil && !ana.NoTreeFormula {
-					passSampleCut = c.CutFunc.GetFuncBool(r)
+				passCutSamp := func() bool { return true }
+				if samp.CutFunc.Fct != nil && !ana.NoTreeFormula {
+					passCutSamp = samp.CutFunc.GetFuncBool(r)
+				}
+
+				// Prepare the component cut
+				passCutComp := func() bool { return true }
+				if comp.CutFunc.Fct != nil && !ana.NoTreeFormula {
+					passCutComp = comp.CutFunc.GetFuncBool(r)
 				}
 
 				// Prepare the cut string for kinematics
@@ -201,13 +213,13 @@ func (ana *Maker) FillHistos() error {
 
 					} else {
 
-						// Sample-level cut
-						if !passSampleCut() {
+						// Sample-level and component-level cut
+						if !passCutSamp() || !passCutComp() {
 							return nil
 						}
 
 						// Get the event weight
-						w := getWeight()
+						w := getWeightSamp() * getWeightComp()
 
 						// Loop over selection and variables
 						for ic := range ana.KinemCuts {
