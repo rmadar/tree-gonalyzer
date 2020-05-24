@@ -160,7 +160,7 @@ func (ana *Maker) FillHistos() error {
 					log.Fatal("could not create tree reader: %w", err)
 				}
 				defer r.Close()
-				
+
 				// Loading variable when using formulaFunc
 				// FIXME(rmadar): to be reshaped.
 				varFormula := make([]func() float64, len(ana.Variables))
@@ -230,7 +230,7 @@ func (ana *Maker) FillHistos() error {
 
 						// Loop over selection and variables
 						for ic := range ana.KinemCuts {
-							
+
 							if !passKinemCut[ic]() {
 								continue
 							}
@@ -625,7 +625,7 @@ func (ana *Maker) setAutoStyle() {
 		if s.IsData() {
 			s.DataStyle = true
 		} else {
-			
+
 			// Fill for stacked histo, lines otherwise
 			if ana.HistoStack {
 				s.FillColor = c

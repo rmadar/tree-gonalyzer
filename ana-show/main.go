@@ -18,24 +18,24 @@ func main() {
 		doLatex = flag.Bool("l", false, "On-the-fly LaTeX compilation to produce figures")
 		doRatio = flag.Bool("r", false, "Enable ratio plot")
 		doStack = flag.Bool("s", false, "Enable histogram stacking")
-		doNorm = flag.Bool("n", false, "Enable histogram normalization")
+		doNorm  = flag.Bool("n", false, "Enable histogram normalization")
 	)
 	flag.Parse()
 
 	// Data
 	sData := ana.CreateSample("data", "data", `Data`, file1, tname)
 
-	// Background 1 
+	// Background 1
 	sBkg1 := ana.NewSample("bkg1", "bkg", `Proc1+Proc2`, ana.WithWeight(wptPos))
 	sBkg1.AddComponent(file2, tname)
 	sBkg1.AddComponent(file3, tname)
-	
-	// Background 2 
+
+	// Background 2
 	sBkg2 := ana.NewSample("bkg2", "bkg", `Proc3+Proc4`, ana.WithWeight(wptNeg))
 	sBkg2.AddComponent(file2, tname, ana.WithWeight(w1))
 	sBkg2.AddComponent(file3, tname, ana.WithWeight(w1))
-	
-	// Background 3 
+
+	// Background 3
 	sBkg3 := ana.NewSample("bkg3", "bkg", `Proc5+Proc6`, ana.WithWeight(w2))
 	sBkg3.AddComponent(file2, tname)
 	sBkg3.AddComponent(file3, tname)
@@ -76,17 +76,17 @@ var (
 	file2 = "../testdata/file2.root"
 	file3 = "../testdata/file3.root"
 	tname = "truth"
-		
-	// TreeFunc: weights and cuts 
-	w1 = ana.NewTreeFuncValF64(0.5)
-	w2 = ana.NewTreeFuncValF64(0.25)
+
+	// TreeFunc: weights and cuts
+	w1     = ana.NewTreeFuncValF64(0.5)
+	w2     = ana.NewTreeFuncValF64(0.25)
 	wptPos = ana.TreeFunc{
 		VarsName: []string{"t_pt"},
-		Fct: func(pt float32) float64 {return 1.0 + float64(pt)/200.},
+		Fct:      func(pt float32) float64 { return 1.0 + float64(pt)/200. },
 	}
 	wptNeg = ana.TreeFunc{
 		VarsName: []string{"t_pt"},
-		Fct: func(pt float32) float64 {return 1.0 - float64(pt)/200.},
+		Fct:      func(pt float32) float64 { return 1.0 - float64(pt)/200. },
 	}
 	mtGT800 = ana.TreeFunc{
 		VarsName: []string{"ttbar_m"},
@@ -100,11 +100,11 @@ var (
 	// Selections
 	sel0 = ana.NewSelection()
 	sel1 = &ana.Selection{
-		Name: "m_gt_800",
-		TreeFunc: mtGT800, 
+		Name:     "m_gt_800",
+		TreeFunc: mtGT800,
 	}
 	sel2 = &ana.Selection{
-		Name: "dphi_lg_1",
+		Name:     "dphi_lg_1",
 		TreeFunc: dphiLT1,
 	}
 )

@@ -57,7 +57,7 @@ func ExampleMaker_defaultMultiComponents() {
 	sig.AddComponent("sig1.root", "mytree")
 	sig.AddComponent("sig2.root", "mytree")
 	sig.AddComponent("sig3.root", "mytree")
-	
+
 	// Put samples together.
 	samples := []*ana.Sample{data, bkg, sig}
 
