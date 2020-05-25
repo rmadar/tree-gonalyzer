@@ -36,7 +36,7 @@ analyzer.Run()
 
 | | | |
 |:-------------------------:|:-------------------------:|:-------------------------:|
-| <img width="1604" src="ana-show/eg-plot.png"> [code](ana-show/main.go) | <img width="1604" src="ana-show/eg-plot.png"> [code](ana-show/main.go) | | <img width="1604" src="ana-show/eg-plot.png"> [code](ana-show/main.go) |
+| <img width="1604" src="ana-show/eg-plot.png"> [code](ana-show/main.go) | <img width="1604" src="ana-show/eg-plot.png"> [code](ana-show/main.go) | <img width="1604" src="ana-show/eg-plot.png"> [code](ana-show/main.go) |
 
 ### Comparing sample shapes
 
