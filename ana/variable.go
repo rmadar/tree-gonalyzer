@@ -24,7 +24,7 @@ type Variable struct {
 	RangeYmin, RangeYmax     float64 // Y-axis range (default: hplot default).
 
 	// Legend cosmetics
-	LegPosTop, LegPosLeft  bool // Legend position (default: true, false)
+	LegPosTop, LegPosLeft bool // Legend position (default: true, false)
 }
 
 // NewVariable creates a new variable value with

@@ -2,7 +2,7 @@ package ana_test
 
 import (
 	"testing"
-	
+
 	"gonum.org/v1/plot/cmpimg"
 )
 

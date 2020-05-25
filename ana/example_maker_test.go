@@ -80,7 +80,7 @@ func ExampleMaker_multiComponentSamples() {
 	analyzer := ana.New(samples, variables,
 		ana.WithAutoStyle(true),
 		ana.WithSaveFormat("png"),
-		ana.WithSavePath("testdata/Plots_multiComponents"),		
+		ana.WithSavePath("testdata/Plots_multiComponents"),
 	)
 
 	// Run the analyzer to produce all the plots
