@@ -32,11 +32,11 @@ analyzer.Run()
 
 ```
 
-## Example gallery
+## Gallery
 
 | | | |
 |:-------------------------:|:-------------------------:|:-------------------------:|
-| <img width="1604" src="ana-show/eg-plot.png"> Data/Bkg comparison ([code](ana-show/main.go)) | <img width="1604" src="ana-show/eg-plot.png"> (Sample shape comparison ([code](ana-show/main.go)) | <img width="1604" src="ana-show/eg-plot.png"> ([code](ana-show/main.go)) |
+| <img width="1604" src="ana-show/eg-plot.png"> Data/Bkg comparison ([code](ana-show/main.go)) | <img width="1604" src="ana-show/eg-plot.png"> Sample shape comparison ([code](ana-show/main.go)) | <img width="1604" src="ana-show/eg-plot.png"> Shape distortion ([code](ana-show/main.go)) |
 
 ### Comparing sample shapes
 
