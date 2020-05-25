@@ -214,7 +214,7 @@ func (ana *Maker) FillHistos() error {
 					if ana.NoFuncCall {
 						for ic := range ana.KinemCuts {
 							for iv, v := range ana.Variables {
-								ana.HbookHistos[iv][ic][iSamp].Fill(v.GetValue(), 1.0)
+								ana.HbookHistos[iv][ic][iSamp].Fill(v.getValue(), 1.0)
 							}
 						}
 
@@ -240,7 +240,7 @@ func (ana *Maker) FillHistos() error {
 								if ana.WithVarsTreeFormula {
 									val = varFormula[iv]()
 								} else {
-									val = v.GetValue()
+									val = v.getValue()
 								}
 								ana.HbookHistos[iv][ic][iSamp].Fill(val, w)
 							}
@@ -412,11 +412,11 @@ func (ana *Maker) PlotHistos() error {
 			}
 
 			// Apply common and user-defined style for this variable
-			// FIX-ME (rmadar): the v.SetPlotStyle(v) command doesn't update
+			// FIX-ME (rmadar): the v.setPlotStyle(v) command doesn't update
 			//                  y-axis scale if it is put before the samples
 			//                  loop and I am not sure why.
 			style.ApplyToPlot(p)
-			v.SetPlotStyle(p)
+			v.setPlotStyle(p)
 			plt = p
 
 			// Addition of the ratio plot
