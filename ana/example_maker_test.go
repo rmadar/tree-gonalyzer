@@ -104,6 +104,6 @@ func ExampleMaker_withAutoStyle() {
 }
 
 // Creation of an analysis maker type including cuts
-func ExampleMaker_kinematicCuts() {
+func ExampleMaker_withKinemCuts() {
 
 }
