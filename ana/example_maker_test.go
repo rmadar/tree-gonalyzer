@@ -34,7 +34,7 @@ func ExampleMaker_aSimpleUseCase() {
 	analyzer := ana.New(samples, variables,
 		ana.WithAutoStyle(true),
 		ana.WithSaveFormat("png"),
-		ana.WithSavePath("Plots_simpleUseCase"),
+		ana.WithSavePath("testdata/Plots_simpleUseCase"),
 	)
 
 	// Run the analyzer to produce all the plots

@@ -1,9 +1,13 @@
 package ana_test
 
+import (
+	"github.com/rmadar/tree-gonalyzer/ana"
+)
+
 func ExampleNewVariable() {
 	// Variable 'name' corresponding to the branch 'branchF64'
 	// to be histogrammed with 100 bins between 0 and 100.
-	NewVariable("name", "branchF64", new(float64), 100, 0, 100)
+	ana.NewVariable("name", "branchF64", new(float64), 100, 0, 100)
 }
 
 func ExampleNewVariableFromTreeFunc() {
@@ -15,5 +19,5 @@ func ExampleNewVariableFromTreeFunc() {
 
 	// Variable 'name' corresponding to the branch 'br1+br2/br3'
 	// to be histogrammed with 100 bins between 0 and 100.
-	NewVariableFromTreeFunc("name", fct, 100, 0, 100)
+	ana.NewVariableFromTreeFunc("name", fct, 100, 0, 100)
 }
