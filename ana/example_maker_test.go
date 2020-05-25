@@ -1,29 +1,41 @@
 package ana_test
 
 import (
+	"math"
+
 	"github.com/rmadar/tree-gonalyzer/ana"
 )
 
+var (
+	fData = "../testdata/file1.root"
+	fBkg1 = "../testdata/file2.root"
+	fBkg2 = "../testdata/file3.root"
+	tName = "truth"
+)
+
 // Creation of the default analysis maker type with
-// single-component samples. The files, trees and
-// variables are dummy, they are here just for the example.
+// single-component samples.
 func ExampleMaker_defaultSingleComponent() {
 	// Define samples
 	samples := []*ana.Sample{
-		ana.CreateSample("data", "data", `Data`, "data.root", "mytree"),
-		ana.CreateSample("bkg1", "bkg", `Proc 1`, "proc1.root", "mytree"),
-		ana.CreateSample("bkg2", "bkg", `Proc 2`, "proc2.root", "mytree"),
-		ana.CreateSample("bkg3", "bkg", `Proc 3`, "proc3.root", "mytree"),
+		ana.CreateSample("data", "data", `Data`, fData, tName),
+		ana.CreateSample("bkg1", "bkg", `Proc 1`, fBkg1, tName),
+		ana.CreateSample("bkg2", "bkg", `Proc 2`, fBkg2, tName),
+		ana.CreateSample("bkg3", "bkg", `Proc 3`, fBkg1, tName),
 	}
 
 	// Define variables
 	variables := []*ana.Variable{
-		ana.NewVariable("plot1", "branch1", new(float64), 15, 0, 10),
-		ana.NewVariable("plot2", "branch2", new(float32), 25, 0, 10),
+		ana.NewVariable("Mttbar", "ttbar_m", new(float32), 50, 0, 1000),
+		ana.NewVariable("DphiLL", "truth_dphi_ll", new(float64), 25, 0, math.Pi),
 	}
 
 	// Create analyzer object
-	analyzer := ana.New(samples, variables)
+	analyzer := ana.New(samples, variables,
+		ana.WithAutoStyle(true),
+		ana.WithSaveFormat("png"),
+		ana.WithSavePath("Plots_defaultSingleComponent"),
+	)
 
 	// Run the analyzer to produce all the plots
 	if err := analyzer.Run(); err != nil {
