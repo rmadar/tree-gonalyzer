@@ -33,7 +33,7 @@ if err := analyzer.Run(); err != nil {
 }
 ```
 
-![example](ana-show/eg-plot.png)
+![example](ana-show/eg-plot.png | width=70)
 
 
 ## Example gallery
