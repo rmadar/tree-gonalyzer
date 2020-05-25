@@ -33,9 +33,7 @@ if err := analyzer.Run(); err != nil {
 }
 ```
 
-<a href="url"><img src="ana-show/eg-plot.png" align="left" width="48" ></a> 
-
-![example](ana-show/eg-plot.png){:height="36px"}.
+![example](ana-show/eg-plot.png)
 
 
 ## Example gallery
