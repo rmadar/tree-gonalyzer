@@ -1,6 +1,6 @@
 # TTree GOnalyzer
 
-[![Documentation](https://godoc.org/github.com/rmadar/tree-gonalyzer/ana?status.svg)](https://godoc.org/github.com/rmadar/tree-gonalyzer/ana)
+[![Documentation](https://godoc.org/github.com/rmadar/tree-gonalyzer?status.svg)](https://godoc.org/github.com/rmadar/tree-gonalyzer)
 
 This is a tool written in go to produce publication-quality plots from ROOT TTrees in an flexible and easy way.
 This tool is built on top of [go-hep.org](https://go-hep.org).
