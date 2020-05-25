@@ -34,3 +34,8 @@ if err := analyzer.Run(); err != nil {
 ```
 
 ![example](ana-show/eg-plot.png)
+
+
+## Example gallery
+
+To come soon.
