@@ -37,4 +37,8 @@ analyzer.Run()
 
 ## Example gallery
 
-To come soon.
+### Comparing samples
+
+### Systematic variations
+
+### Shape distortion due to selections
