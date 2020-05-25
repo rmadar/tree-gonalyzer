@@ -15,7 +15,7 @@ var (
 
 // Creation of the default analysis maker type with
 // single-component samples.
-func ExampleMaker_simpleUseCase() {
+func ExampleMaker_aSimpleUseCase() {
 	// Define samples
 	samples := []*ana.Sample{
 		ana.CreateSample("data", "data", `Data`, fData, tName),
@@ -89,22 +89,18 @@ func ExampleMaker_multiComponentSamples() {
 	}
 }
 
-// Creation of the Stack analysis maker type
 func ExampleMaker_shapeComparison() {
 
 }
 
-// Creation of the normalized analysis maker type
 func ExampleMaker_systematicVariations() {
 
 }
 
-// Creation of the auto-styled analysis maker type
 func ExampleMaker_shapeDistortion() {
 
 }
 
-// Creation of an analysis maker type including cuts
 func ExampleMaker_withKinemCuts() {
 
 }
