@@ -74,7 +74,8 @@ func WithKinemCuts(c []*Selection) Options {
 	}
 }
 
-// WithKinemCuts sets the list of kinematic cuts to run on.
+// WithNevts sets the maximum processed event for
+// each sample component.
 func WithNevts(n int64) Options {
 	return func(cfg *config) {
 		cfg.Nevts = n
