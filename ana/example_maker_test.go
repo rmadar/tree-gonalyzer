@@ -15,7 +15,7 @@ var (
 
 // Creation of the default analysis maker type with
 // single-component samples.
-func ExampleMaker_defaultSingleComponent() {
+func ExampleMaker_simpleUseCase() {
 	// Define samples
 	samples := []*ana.Sample{
 		ana.CreateSample("data", "data", `Data`, fData, tName),
