@@ -37,7 +37,7 @@ analyzer.Run()
 
 ## Example gallery
 
-### Comparing samples
+### Comparing sample shapes
 
 ### Systematic variations
 
