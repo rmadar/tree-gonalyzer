@@ -9,7 +9,7 @@ import (
 type Variable struct {
 	Name       string      // Variable name.
 	TreeName   string      // Name of the branch corresponding to the variable.
-	Value      interface{} // Empty pointer of the branch type (e.g. new(float64)).
+	Value      interface{} // Pointer of the branch type (e.g. new(float64)).
 	Nbins      int         // Number of bins of final histograms.
 	Xmin, Xmax float64     // Mininum and maximum values of the histogram.
 
