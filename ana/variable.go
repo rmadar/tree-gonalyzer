@@ -9,12 +9,12 @@ import (
 type Variable struct {
 	Name       string      // Variable name.
 	TreeName   string      // Name of the branch corresponding to the variable.
-	Value      interface{} // Empty pointer having the branch type (e.g. new(float64)).
+	Value      interface{} // Empty pointer of the branch type (e.g. new(float64)).
 	Nbins      int         // Number of bins of final histograms.
 	Xmin, Xmax float64     // Mininum and maximum values of the histogram.
 
 	// Non-cosmetics options
-	TreeVar  TreeFunc // Complexe variables, e.g. branches combination (default: nil).
+	TreeVar  TreeFunc // Complexe variable, eg. branches combination (default: nil).
 	SaveName string   // Name of the plot to be saved default (default 'Name').
 
 	// Axis cosmetics
