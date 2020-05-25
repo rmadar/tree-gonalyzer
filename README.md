@@ -38,6 +38,15 @@ analyzer.Run()
 |:-------------------------:|:-------------------------:|:-------------------------:|
 | <img width="1604" src="ana-show/eg-plot.png"> Data/Bkg comparison ([code](ana-show/main.go)) | <img width="1604" src="ana-show/eg-plot.png"> Sample shape comparison ([code](ana-show/main.go)) | <img width="1604" src="ana-show/eg-plot.png"> Shape distortion ([code](ana-show/main.go)) |
 
+
+<table>
+  <tr>
+    <td valign="top"><img src="ana-show/eg-plot.png"> Data/Bkg comparison ([code](ana-show/main.go)) </td>
+    <td valign="top"><img src="ana-show/eg-plot.png"> Data/Bkg comparison ([code](ana-show/main.go)) </td>
+    <td valign="top"><img src="ana-show/eg-plot.png"> Shape distortion ([code](ana-show/main.go)) </td>
+  </tr>
+ </table>
+
 ### Comparing sample shapes
 
 ### Systematic variations
