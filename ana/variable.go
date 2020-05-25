@@ -7,31 +7,28 @@ import (
 )
 
 type Variable struct {
-	Name       string
-	TreeName   string
-	Value      interface{}
-	Nbins      int
-	Xmin, Xmax float64
+	Name       string      // Variable name.
+	TreeName   string      // Name of the branch corresponding to the variable.
+	Value      interface{} // Empty pointer having the branch type (e.g. new(float64)).
+	Nbins      int         // Number of bins of final histograms.
+	Xmin, Xmax float64     // Mininum and maximum values of the histogram.
 
-	SaveName string
-	TreeVar  TreeFunc
+	// Non-cosmetics options
+	TreeVar  TreeFunc // Complexe variables, e.g. branches combination (default: nil).
+	SaveName string   // Name of the plot to be saved default (default 'Name').
 
 	// Axis cosmetics
-	XLabel      string
-	YLabel      string
-	XTickFormat string
-	YTickFormat string
-	RangeXmin   float64
-	RangeXmax   float64
-	RangeYmin   float64
-	RangeYmax   float64
+	XLabel, YLabel           string  // Axis labels (default: 'Variable', 'Events').
+	XTickFormat, YTickFormat string  // Axis tick formatting (default: hplot default).
+	RangeXmin, RangeXmax     float64 // X-axis range (default: hplot default).
+	RangeYmin, RangeYmax     float64 // Y-axis range (default: hplot default).
 
 	// Legend cosmetics
-	LegPosTop  bool
-	LegPosLeft bool
+	LegPosTop, LegPosLeft  bool // Legend position (default: true, false)
 }
 
-// Create a new type variable
+// NewVariable creates a new variable value with
+// default settings.
 func NewVariable(name, tname string, value interface{},
 	nbins int, xmin, xmax float64, opts ...VariableOptions) *Variable {
 
@@ -74,7 +71,8 @@ func NewVariable(name, tname string, value interface{},
 	return v
 }
 
-// Create a new variable from a TreeFunc object
+// NewVariableFromTreeFunc creates a new variable from
+// a TreeFunc object.
 func NewVariableFromTreeFunc(name string, f TreeFunc, nbins int,
 	xmin, xmax float64, opts ...VariableOptions) *Variable {
 	v := NewVariable(name, "", nil, nbins, xmin, xmax, opts...)
@@ -82,8 +80,9 @@ func NewVariableFromTreeFunc(name string, f TreeFunc, nbins int,
 	return v
 }
 
-// Get a value according to it's type
-func (v Variable) GetValue() float64 {
+// getValue returns the value of the variable with the
+// proper type.
+func (v Variable) getValue() float64 {
 	switch v := v.Value.(type) {
 	case *float64:
 		return *v
@@ -96,8 +95,9 @@ func (v Variable) GetValue() float64 {
 	}
 }
 
-// Set user-specified style on the plot
-func (v Variable) SetPlotStyle(p *hplot.Plot) {
+// SetPlotStyle sets the user-specified style on
+// the hplot.Plot value.
+func (v Variable) setPlotStyle(p *hplot.Plot) {
 
 	// Plot labels
 	if v.XLabel != "" {
