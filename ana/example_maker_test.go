@@ -34,7 +34,7 @@ func ExampleMaker_simpleUseCase() {
 	analyzer := ana.New(samples, variables,
 		ana.WithAutoStyle(true),
 		ana.WithSaveFormat("png"),
-		ana.WithSavePath("Plots_defaultSingleComponent"),
+		ana.WithSavePath("Plots_simpleUseCase"),
 	)
 
 	// Run the analyzer to produce all the plots
@@ -46,41 +46,42 @@ func ExampleMaker_simpleUseCase() {
 // Creation of the default analysis maker type with
 // multi-component samples. The files, trees and
 // variables are dummy, they are here just for the example.
-func ExampleMaker_defaultMultiComponents() {
+func ExampleMaker_multiComponentSamples() {
 	// Weights and cuts
-	w := ana.NewTreeFuncVarF64("evtWeight")
-	isProc4 := ana.NewTreeFuncVarBool("IsProc4")
+	w := ana.NewTreeFuncVarF64("weight")
+	isQQ := ana.NewTreeFuncVarBool("init_qq")
 
 	// Data sample.
 	data := ana.NewSample("data", "data", `Data 18-20`)
-	data.AddComponent("data2018.root", "mytree")
-	data.AddComponent("data2019.root", "mytree")
-	data.AddComponent("data2020.root", "mytree")
+	data.AddComponent(fData, tName)
+	data.AddComponent(fBkg1, tName)
 
 	// Background sample including four components.
 	bkg := ana.NewSample("bkgTot", "bkg", `Total Bkg`, ana.WithWeight(w))
-	bkg.AddComponent("proc1.root", "mytree")
-	bkg.AddComponent("proc2.root", "mytree")
-	bkg.AddComponent("proc3.root", "mytree")
-	bkg.AddComponent("proc4.root", "mytree", ana.WithCut(isProc4))
+	bkg.AddComponent(fBkg1, tName)
+	bkg.AddComponent(fBkg2, tName)
+	bkg.AddComponent(fBkg1, tName, ana.WithCut(isQQ))
 
 	// Signal sample including three components.
 	sig := ana.NewSample("sigTot", "sig", `Total signal`, ana.WithWeight(w))
-	sig.AddComponent("sig1.root", "mytree")
-	sig.AddComponent("sig2.root", "mytree")
-	sig.AddComponent("sig3.root", "mytree")
+	sig.AddComponent(fBkg1, tName)
+	sig.AddComponent(fBkg2, tName)
 
 	// Put samples together.
 	samples := []*ana.Sample{data, bkg, sig}
 
 	// Define variables
 	variables := []*ana.Variable{
-		ana.NewVariable("plotName1", "branchName1", new(float64), 15, 0, 10),
-		ana.NewVariable("plotName2", "branchName2", new(float32), 25, 0, 10),
+		ana.NewVariable("plotName1", "l_pt", new(float32), 25, 0, 250),
+		ana.NewVariable("plotName2", "v_pt", new(float32), 25, 0, 250),
 	}
 
 	// Create analyzer object
-	analyzer := ana.New(samples, variables)
+	analyzer := ana.New(samples, variables,
+		ana.WithAutoStyle(true),
+		ana.WithSaveFormat("png"),
+		ana.WithSavePath("Plots_multiComponents"),		
+	)
 
 	// Run the analyzer to produce all the plots
 	if err := analyzer.Run(); err != nil {
@@ -89,17 +90,17 @@ func ExampleMaker_defaultMultiComponents() {
 }
 
 // Creation of the Stack analysis maker type
-func ExampleMaker_withStacked() {
+func ExampleMaker_shapeComparison() {
 
 }
 
 // Creation of the normalized analysis maker type
-func ExampleMaker_withNormalized() {
+func ExampleMaker_systematicVariations() {
 
 }
 
 // Creation of the auto-styled analysis maker type
-func ExampleMaker_withAutoStyle() {
+func ExampleMaker_shapeDistortion() {
 
 }
 
