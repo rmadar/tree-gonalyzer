@@ -32,7 +32,7 @@ analyzer.Run()
 
 ```
 
-<img src="ana-show/eg-plot.png" width="324">
+<img src="ana-show/eg-plot.png" width="600">
 
 
 ## Example gallery
