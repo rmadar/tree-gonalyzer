@@ -7,7 +7,7 @@ type Selection struct {
 
 func NewSelection() *Selection {
 	return &Selection{
-		Name: "No-cut",
+		Name: "",
 		TreeFunc: TreeFunc{
 			VarsName: []string{},
 			Fct:      func() bool { return true },

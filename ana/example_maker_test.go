@@ -48,7 +48,7 @@ func ExampleMaker_aSimpleUseCase() {
 // variables are dummy, they are here just for the example.
 func ExampleMaker_multiComponentSamples() {
 	// Weights and cuts
-	w := ana.NewTreeFuncVarF64("weight")
+	w := ana.NewTreeFuncVarF32("weight")
 	isQQ := ana.NewTreeFuncVarBool("init_qq")
 
 	// Data sample.
@@ -72,15 +72,15 @@ func ExampleMaker_multiComponentSamples() {
 
 	// Define variables
 	variables := []*ana.Variable{
-		ana.NewVariable("plotName1", "l_pt", new(float32), 25, 0, 250),
-		ana.NewVariable("plotName2", "v_pt", new(float32), 25, 0, 250),
+		ana.NewVariable("Mttbar", "ttbar_m", new(float32), 50, 0, 1000),
+		ana.NewVariable("DphiLL", "truth_dphi_ll", new(float64), 25, 0, math.Pi),
 	}
 
 	// Create analyzer object
 	analyzer := ana.New(samples, variables,
 		ana.WithAutoStyle(true),
 		ana.WithSaveFormat("png"),
-		ana.WithSavePath("Plots_multiComponents"),		
+		ana.WithSavePath("testdata/Plots_multiComponents"),		
 	)
 
 	// Run the analyzer to produce all the plots
