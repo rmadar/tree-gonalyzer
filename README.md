@@ -21,16 +21,15 @@ variables := []*ana.Variable{
 	ana.NewVariable("plot2", "branch2", new(float32), 25, 0, 1000),
 }
 
-// Create analyzer object
+// Create analyzer object with some options
 analyzer := ana.New(samples, variables,
 	      ana.WithAutoStyle(true),
 	      ana.WithHistoNorm(true),
 )
 
-// Run the analyzer to produce all the plots
-if err := analyzer.Run(); err != nil {
-	panic(err)
-}
+// Produce plots
+analyzer.Run()
+
 ```
 
 ![example](ana-show/eg-plot.png)
