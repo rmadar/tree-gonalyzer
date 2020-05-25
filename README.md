@@ -1,8 +1,9 @@
 # TTree GOnalyzer
 
+[![Documentation](https://godoc.org/github.com/rmadar/tree-gonalyzer/ana?status.svg)](https://godoc.org/github.com/rmadar/tree-gonalyzer/ana)
 
 This is a tool written in go to produce publication-quality plots from ROOT TTrees in an flexible and easy way.
-This tool is built on top of [go-hep.org](https://go-hep.org). The documentation is on [godoc.org](https://godoc.org/github.com/rmadar/tree-gonalyzer/ana).
+This tool is built on top of [go-hep.org](https://go-hep.org).
 
 ## In a nutshell
 
@@ -21,7 +22,10 @@ variables := []*ana.Variable{
 }
 
 // Create analyzer object
-analyzer := ana.New(samples, variables, ana.WithAutoStyle(true))
+analyzer := ana.New(samples, variables,
+	      ana.WithAutoStyle(true),
+	      ana.WithHistoNorm(true),
+)
 
 // Run the analyzer to produce all the plots
 if err := analyzer.Run(); err != nil {
