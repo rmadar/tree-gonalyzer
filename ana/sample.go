@@ -85,8 +85,8 @@ func NewSample(sname, stype, sleg string, opts ...SampleOptions) *Sample {
 	}
 
 	// Set setting with the updated configuration
-	s.WeightFunc = cfg.Weight
-	s.CutFunc = cfg.Cut
+	s.WeightFunc = cfg.WeightFunc
+	s.CutFunc = cfg.CutFunc
 	s.LineColor = cfg.LineColor
 	s.LineWidth = cfg.LineWidth
 	s.FillColor = cfg.FillColor
@@ -140,8 +140,8 @@ func (s *Sample) AddComponent(fname, tname string, opts ...SampleOptions) {
 	c := &SampleComponent{
 		FileName:   fname,
 		TreeName:   tname,
-		WeightFunc: cfg.Weight,
-		CutFunc:    cfg.Cut,
+		WeightFunc: cfg.WeightFunc,
+		CutFunc:    cfg.CutFunc,
 	}
 
 	// Append it to the pointer-receiver sample

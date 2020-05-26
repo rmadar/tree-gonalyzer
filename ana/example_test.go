@@ -31,6 +31,13 @@ func TestShapeComparison(t *testing.T) {
 	)
 }
 
+func TestShapeDistortion(t *testing.T) {
+	cmpimg.CheckPlot(Example_shapeDistortion, t,
+		"Plots_shapeDistortion/Mttbar.png",
+		"Plots_shapeDistortion/DphiLL.png",
+	)
+}
+
 // Creation of the default analysis maker type with
 // single-component samples.
 func Example_aSimpleUseCase() {
@@ -154,10 +161,6 @@ func Example_systematicVariations() {
 func Example_shapeDistortion() {
 
 	// Selections as TreeFunc's
-	ptTopGT10 := ana.TreeFunc{
-		VarsName: []string{"t_pt"},
-		Fct:      func(pt float32) bool { return pt > 10. },
-	}
 	ptTopGT50 := ana.TreeFunc{
 		VarsName: []string{"t_pt"},
 		Fct:      func(pt float32) bool { return pt > 50. },
@@ -166,24 +169,28 @@ func Example_shapeDistortion() {
 		VarsName: []string{"t_pt"},
 		Fct:      func(pt float32) bool { return pt > 100. },
 	}
+	ptTopGT200 := ana.TreeFunc{
+		VarsName: []string{"t_pt"},
+		Fct:      func(pt float32) bool { return pt > 200. },
+	}
 
 	// Samples
 	samples := []*ana.Sample{
 		ana.CreateSample("noCut", "bkg", `No cut`, fBkg1, tName,
 			ana.WithFillColor(shadowBlue),
 		),
-		ana.CreateSample("cut1", "bkg", `pT[top]>10`, fBkg1, tName,
-			ana.WithCut(ptTopGT10),
+		ana.CreateSample("cut1", "bkg", `pT>50`, fBkg1, tName,
+			ana.WithCut(ptTopGT50),
 			ana.WithLineColor(darkRed),
 			ana.WithLineWidth(2),
 		),
-		ana.CreateSample("cut2", "bkg", `pT[top]>50`, fBkg1, tName,
-			ana.WithCut(ptTopGT50),
+		ana.CreateSample("cut2", "bkg", `pT>100`, fBkg1, tName,
+			ana.WithCut(ptTopGT100),
 			ana.WithLineColor(darkBlue),
 			ana.WithLineWidth(2),
 		),
-		ana.CreateSample("cut3", "bkg", `pT[top]>100`, fBkg1, tName,
-			ana.WithCut(ptTopGT100),
+		ana.CreateSample("cut3", "bkg", `pT>200`, fBkg1, tName,
+			ana.WithCut(ptTopGT200),
 			ana.WithLineColor(darkGreen),
 			ana.WithLineWidth(2),
 		),
@@ -191,13 +198,20 @@ func Example_shapeDistortion() {
 
 	// Define variables
 	variables := []*ana.Variable{
-		ana.NewVariable("Mttbar", "ttbar_m", new(float32), 25, 350, 1000),
-		ana.NewVariable("DphiLL", "truth_dphi_ll", new(float64), 10, 0, math.Pi, ana.WithLegLeft(true)),
+		ana.NewVariable("Mttbar", "ttbar_m", new(float32), 25, 350, 1500,
+			ana.WithAxisLabels("M(t,t) [GeV]", "PDF"),
+		),
+		ana.NewVariable("DphiLL", "truth_dphi_ll", new(float64), 10, 0, math.Pi,
+			ana.WithLegLeft(true),
+			ana.WithAxisLabels("dPhi(l,l)", "PDF"),
+			ana.WithYRange(0, 0.3),
+		),
 	}
 	
 	// Create analyzer object
 	analyzer := ana.New(samples, variables,
 		ana.WithHistoStack(false),
+		ana.WithRatioPlot(false),
 		ana.WithHistoNorm(true),
 		ana.WithSaveFormat("png"),
 		ana.WithSavePath("testdata/Plots_shapeDistortion"),

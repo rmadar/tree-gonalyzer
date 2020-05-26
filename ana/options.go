@@ -36,8 +36,8 @@ type config struct {
 	ErrBandColor color.NRGBA  // Color for the uncertainty band.
 
 	// Sample options
-	Weight            TreeFunc    // Weight applied to the sample
-	Cut               TreeFunc    // Cut applied to the sample
+	WeightFunc            TreeFunc    // Weight applied to the sample
+	CutFunc           TreeFunc  // Cut applied to the sample
 	LineColor         color.NRGBA // Line color of the sample histogram
 	LineWidth         vg.Length   // Line width of the sample histogram
 	FillColor         color.NRGBA // Fill color of the sample histogram
@@ -161,7 +161,7 @@ func WithErrBandColor(c color.NRGBA) Options {
 // as defined by the TreeFunc f.
 func WithWeight(f TreeFunc) SampleOptions {
 	return func(cfg *config) {
-		cfg.Weight = f
+		cfg.WeightFunc = f
 	}
 }
 
@@ -169,7 +169,7 @@ func WithWeight(f TreeFunc) SampleOptions {
 // defined by the TreeFunc f.
 func WithCut(f TreeFunc) SampleOptions {
 	return func(cfg *config) {
-		cfg.Cut = f
+		cfg.CutFunc = f
 	}
 }
 
