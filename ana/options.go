@@ -21,7 +21,7 @@ type SampleOptions func(cfg *config)
 // config contains all the possible options and their values.
 type config struct {
 
-	// ana.Maker options
+	// Maker options
 	KinemCuts    []*Selection // List of cuts.
 	Nevts        int64        // Maximum of processed events.
 	SavePath     string       // Path to which plot will be saved.
@@ -51,13 +51,14 @@ type config struct {
 	YErrBarsCapWidth  vg.Length   // Width of the y error bar caps
 	DataStyle         bool        // Use default data style histogram
 
-	// Variables options
+	// Variable options
 	SaveName                 string   // Filename for a variable plot
 	TreeVar                  TreeFunc // TreeFunc for a computed variable (ie not a single branch)
 	XLabel, YLabel           string   // Axis labels
 	XTickFormat, YTickFormat string   // Ticks formating
 	RangeXmin, RangeXmax     float64  // X-axis ranges
 	RangeYmin, RangeYmax     float64  // Y-axis ranges
+	RatioYmin, RatioYmax     float64  // Ratio Y-axis range
 	LegPosTop, LegPosLeft    bool     // Legend position
 }
 
@@ -304,6 +305,14 @@ func WithYRange(min, max float64) VariableOptions {
 	return func(cfg *config) {
 		cfg.RangeYmin = min
 		cfg.RangeYmax = max
+	}
+}
+
+// WithRatioYRange sets the y-axis min and max for the ratio plot.
+func WithRatioYRange(min, max float64) VariableOptions {
+	return func(cfg *config) {
+		cfg.RatioYmin = min
+		cfg.RatioYmax = max
 	}
 }
 

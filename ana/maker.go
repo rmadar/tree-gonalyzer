@@ -113,9 +113,9 @@ func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 	a.ErrBandColor = cfg.ErrBandColor
 
 	// Get mappings between slice indices and object names
-	a.samIdx = getIdxMap(a.Samples)
-	a.varIdx = getIdxMap(a.Variables)
-	a.cutIdx = getIdxMap(a.KinemCuts)
+	a.samIdx = getIdxMap(a.Samples, &Sample{})
+	a.varIdx = getIdxMap(a.Variables, &Variable{})
+	a.cutIdx = getIdxMap(a.KinemCuts, &Selection{})
 
 	// Build hbook and hplot H1D containers
 	a.initHistoContainers()
@@ -124,9 +124,25 @@ func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 }
 
 // Helper function creating the mapping between name and objects
-func getIdxMap(obj interface{}) map[string]int {
-	// obj = []*Variables, []*Sample, []*Selections
-	return make(map[string]int, 10)
+func getIdxMap(objs interface{}, objType interface{}) map[string]int {
+	res := make(map[string]int)
+	switch objType.(type) {
+	case *Variable:
+		for i, obj := range(objs.([]*Variable)) {
+			res[obj.Name] = i
+		}
+	case *Sample:
+		for i, obj := range(objs.([]*Sample)) {
+			res[obj.Name] = i
+		}
+	case *Selection:
+		for i, obj := range(objs.([]*Selection)) {
+			res[obj.Name] = i
+		}
+	default:
+		panic(fmt.Errorf("invalid variable value-type %T", objType))
+	}
+	return res
 }
 
 // FillHistos runs the one event loop per sample to fill
@@ -359,9 +375,8 @@ func (ana *Maker) PlotHistos() error {
 				}
 
 				// Get plottable histogram and add it to the legend
-				hplt := ana.Samples[is].CreateHisto(h)
-				p.Legend.Add(ana.Samples[is].LegLabel, hplt)
-				ana.HplotHistos[iv][isel][is] = hplt
+				ana.HplotHistos[iv][isel][is] = ana.Samples[is].CreateHisto(h)
+				p.Legend.Add(ana.Samples[is].LegLabel, ana.HplotHistos[iv][isel][is])
 
 				// Keep data appart from backgrounds
 				if ana.Samples[is].IsData() {
@@ -369,27 +384,28 @@ func (ana *Maker) PlotHistos() error {
 					if ana.Samples[is].DataStyle {
 						style.ApplyToDataHist(phData)
 					}
-
 				}
 
 				// Sum-up normalized bkg and store all bkgs in a slice for the stack
 				if ana.Samples[is].IsBkg() {
+					phBkgs = append(phBkgs, ana.HplotHistos[iv][isel][is])
 					bhBkgs_postnorm = append(bhBkgs_postnorm, h)
 					bhBkgTot = hbook.AddH1D(h, bhBkgTot)
-					phBkgs = append(phBkgs, ana.HplotHistos[iv][isel][is])
 				}
 			}
 
 			// Manage background stack plotting
 			if len(phBkgs) > 0 {
-
+		
 				// Reverse the order so that legend and plot order matches
-				for i, j := 0, len(phBkgs)-1; i < j; i, j = i+1, j-1 {
-					phBkgs[i], phBkgs[j] = phBkgs[j], phBkgs[i]
+				phBkgsLeg := make([]*hplot.H1D, len(phBkgs))
+				copy(phBkgsLeg, phBkgs)
+				for i, j := 0, len(phBkgsLeg)-1; i < j; i, j = i+1, j-1 {
+					phBkgsLeg[i], phBkgsLeg[j] = phBkgsLeg[j], phBkgsLeg[i]
 				}
 
 				// Stacking the background histo
-				stack := hplot.NewHStack(phBkgs, hplot.WithBand(ana.TotalBand))
+				stack := hplot.NewHStack(phBkgsLeg, hplot.WithBand(ana.TotalBand))
 				stack.Band.FillColor = ana.ErrBandColor
 				if ana.HistoStack && ana.TotalBand {
 					hBand := hplot.NewH1D(hbook.NewH1D(1, 0, 1), hplot.WithBand(true))
@@ -467,9 +483,9 @@ func (ana *Maker) PlotHistos() error {
 					rp.Bottom.Add(hps2d_ratio)
 
 				default:
-					// [FIX-ME 0 (rmadar)] Ratio wrt data (or 1 bkg if data is empty) -> to be specied as an option?
-					// [FIX-ME 1 (rmadar)] loop is over bhBkgs_postnorm while 'ana.Samples[is]' runs also over data.
-					for is, h := range bhBkgs_postnorm {
+					// FIX-ME (rmadar): Ratio wrt data (or first bkg if data is empty)
+					//                    -> to be specied as an option?
+					for ib, h := range bhBkgs_postnorm {
 						
 						href := bhData
 						if bhData.Entries() == 0 {
@@ -480,20 +496,22 @@ func (ana *Maker) PlotHistos() error {
 						if err != nil {
 							log.Fatal("cannot divide histo for the ratio plot")
 						}
-						hps2d_ratio := hplot.NewS2D(hbs2d_ratio, hplot.WithBand(true),
+						
+						hps2d_ratio := hplot.NewS2D(hbs2d_ratio,
+							hplot.WithBand(phBkgs[ib].Band != nil),
 							hplot.WithStepsKind(hplot.HiSteps),
 						)
-						// FIX-ME (rmadar): issue with band style passed through
-						//                  style.CopyStyleH1DtoS2D()
-						style.CopyStyleH1DtoS2D(hps2d_ratio, phBkgs[is])
+						style.CopyStyleH1DtoS2D(hps2d_ratio, phBkgs[ib])
+						fmt.Println(hps2d_ratio.Band)
 						rp.Bottom.Add(hps2d_ratio)
 					}
 				}
-
+				
 				// Adjust ratio plot scale
-				// FIXME(rmadar): to be set as ana.Maker options
-				// rp.Bottom.Y.Min = 0.7
-				// rp.Bottom.Y.Max = 1.3
+				if v.RatioYmin != v.RatioYmax {
+					rp.Bottom.Y.Min = v.RatioYmin
+					rp.Bottom.Y.Max = v.RatioYmax
+				}
 			}
 			
 			// Save the figure

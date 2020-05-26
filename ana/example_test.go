@@ -34,8 +34,8 @@ func TestShapeComparison(t *testing.T) {
 
 func TestSystVariations(t *testing.T) {
 	cmpimg.CheckPlot(Example_systematicVariations, t,
-		"Plots_systematicVariations/Mttbar.png",
-		"Plots_systematicVariations/DphiLL.png",
+		"Plots_systVariations/Mttbar.png",
+		"Plots_systVariations/DphiLL.png",
 	)
 }
 
@@ -194,13 +194,18 @@ func Example_systematicVariations() {
 	
 	// Define variables
 	variables := []*ana.Variable{
-		ana.NewVariable("Mttbar", "ttbar_m", new(float32), 25, 350, 1500),
-		ana.NewVariable("DphiLL", "truth_dphi_ll", new(float64), 10, 0, math.Pi),
+		ana.NewVariable("Mttbar", "ttbar_m", new(float32), 25, 350, 1500,
+			ana.WithRatioYRange(0.7, 1.3)),
+		ana.NewVariable("DphiLL", "truth_dphi_ll", new(float64), 10, 0, math.Pi,
+			ana.WithRatioYRange(0.7, 1.3),
+			ana.WithYRange(0, 0.2),
+			ana.WithLegLeft(true),
+		),
 	}
 	
 	// Create analyzer object
 	analyzer := ana.New(samples, variables,
-		ana.WithRatioPlot(false),
+		ana.WithRatioPlot(true),
 		ana.WithHistoStack(false),
 		ana.WithHistoNorm(true),
 		ana.WithSaveFormat("png"),

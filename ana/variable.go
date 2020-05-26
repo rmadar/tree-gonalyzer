@@ -22,6 +22,7 @@ type Variable struct {
 	XTickFormat, YTickFormat string  // Axis tick formatting (default: hplot default).
 	RangeXmin, RangeXmax     float64 // X-axis range (default: hplot default).
 	RangeYmin, RangeYmax     float64 // Y-axis range (default: hplot default).
+	RatioYmin, RatioYmax     float64 // Ratio Y-axis range (default: hplot default).
 
 	// Legend cosmetics
 	LegPosTop, LegPosLeft bool // Legend position (default: true, false)
@@ -66,6 +67,8 @@ func NewVariable(name, tname string, value interface{},
 	v.RangeXmax = cfg.RangeXmax
 	v.RangeYmin = cfg.RangeYmin
 	v.RangeYmax = cfg.RangeYmax
+	v.RatioYmin = cfg.RatioYmin
+	v.RatioYmax = cfg.RatioYmax
 	v.LegPosTop = cfg.LegPosTop
 	v.LegPosLeft = cfg.LegPosLeft
 
