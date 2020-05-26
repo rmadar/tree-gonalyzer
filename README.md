@@ -48,10 +48,10 @@ analyzer.Run()
 
   <tr>
     <td><p align="center"><img src="ana/testdata/Plots_XXX/Mttbar_golden.png">
-	Data/Background <a href="https://github.com/rmadar/tree-gonalyzer/blob/master/ana/XXX">[code]</a></p>
+	Shape distortion <a href="https://github.com/rmadar/tree-gonalyzer/blob/master/ana/XXX">[code]</a></p>
     </td>
     <td><p align="center"><img src="ana/testdata/Plots_shapeComparison/DphiLL_golden.png">
-	Shape comparison <a href="https://github.com/rmadar/tree-gonalyzer/blob/master/ana/XXX">[code]</a></p>
+	Systematic variation <a href="https://github.com/rmadar/tree-gonalyzer/blob/master/ana/XXX">[code]</a></p>
     </td>
   </tr>
 
