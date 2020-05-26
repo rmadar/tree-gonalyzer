@@ -128,15 +128,15 @@ func getIdxMap(objs interface{}, objType interface{}) map[string]int {
 	res := make(map[string]int)
 	switch objType.(type) {
 	case *Variable:
-		for i, obj := range(objs.([]*Variable)) {
+		for i, obj := range objs.([]*Variable) {
 			res[obj.Name] = i
 		}
 	case *Sample:
-		for i, obj := range(objs.([]*Sample)) {
+		for i, obj := range objs.([]*Sample) {
 			res[obj.Name] = i
 		}
 	case *Selection:
-		for i, obj := range(objs.([]*Selection)) {
+		for i, obj := range objs.([]*Selection) {
 			res[obj.Name] = i
 		}
 	default:
@@ -396,7 +396,7 @@ func (ana *Maker) PlotHistos() error {
 
 			// Manage background stack plotting
 			if len(phBkgs) > 0 {
-		
+
 				// Reverse the order so that legend and plot order matches
 				phBkgsLeg := make([]*hplot.H1D, len(phBkgs))
 				copy(phBkgsLeg, phBkgs)
@@ -486,7 +486,7 @@ func (ana *Maker) PlotHistos() error {
 					// FIX-ME (rmadar): Ratio wrt data (or first bkg if data is empty)
 					//                    -> to be specied as an option?
 					for ib, h := range bhBkgs_postnorm {
-						
+
 						href := bhData
 						if bhData.Entries() == 0 {
 							href = bhBkgs_postnorm[0]
@@ -496,7 +496,7 @@ func (ana *Maker) PlotHistos() error {
 						if err != nil {
 							log.Fatal("cannot divide histo for the ratio plot")
 						}
-						
+
 						hps2d_ratio := hplot.NewS2D(hbs2d_ratio,
 							hplot.WithBand(phBkgs[ib].Band != nil),
 							hplot.WithStepsKind(hplot.HiSteps),
@@ -506,14 +506,14 @@ func (ana *Maker) PlotHistos() error {
 						rp.Bottom.Add(hps2d_ratio)
 					}
 				}
-				
+
 				// Adjust ratio plot scale
 				if v.RatioYmin != v.RatioYmax {
 					rp.Bottom.Y.Min = v.RatioYmin
 					rp.Bottom.Y.Max = v.RatioYmax
 				}
 			}
-			
+
 			// Save the figure
 			f := hplot.Figure(plt)
 			style.ApplyToFigure(f)

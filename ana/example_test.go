@@ -1,13 +1,13 @@
 package ana_test
 
 import (
-	"math"
 	"image/color"
+	"math"
 	"testing"
 
 	"gonum.org/v1/plot/cmpimg"
 	"gonum.org/v1/plot/vg"
-	
+
 	"github.com/rmadar/tree-gonalyzer/ana"
 )
 
@@ -170,7 +170,6 @@ func Example_shapeComparison() {
 }
 
 func Example_systematicVariations() {
-	
 	// Samples
 	samples := []*ana.Sample{
 		ana.CreateSample("nom", "bkg", `Nominal`, fBkg1, tName,
@@ -190,8 +189,8 @@ func Example_systematicVariations() {
 			ana.WithLineWidth(1.5),
 			ana.WithLineDashes([]vg.Length{3, 2}),
 		),
-	}	
-	
+	}
+
 	// Define variables
 	variables := []*ana.Variable{
 		ana.NewVariable("Mttbar", "ttbar_m", new(float32), 25, 350, 1500,
@@ -202,7 +201,7 @@ func Example_systematicVariations() {
 			ana.WithLegLeft(true),
 		),
 	}
-	
+
 	// Create analyzer object
 	analyzer := ana.New(samples, variables,
 		ana.WithRatioPlot(true),
@@ -211,11 +210,11 @@ func Example_systematicVariations() {
 		ana.WithSaveFormat("png"),
 		ana.WithSavePath("testdata/Plots_systVariations"),
 	)
-	
+
 	// Run the analyzer to produce all the plots
 	if err := analyzer.Run(); err != nil {
 		panic(err)
-	}	
+	}
 }
 
 func Example_shapeDistortion() {
@@ -253,7 +252,7 @@ func Example_shapeDistortion() {
 			ana.WithLineColor(darkGreen),
 			ana.WithLineWidth(2),
 		),
-	}	
+	}
 
 	// Define variables
 	variables := []*ana.Variable{
@@ -266,7 +265,7 @@ func Example_shapeDistortion() {
 			ana.WithYRange(0, 0.3),
 		),
 	}
-	
+
 	// Create analyzer object
 	analyzer := ana.New(samples, variables,
 		ana.WithHistoStack(false),
@@ -275,7 +274,7 @@ func Example_shapeDistortion() {
 		ana.WithSaveFormat("png"),
 		ana.WithSavePath("testdata/Plots_shapeDistortion"),
 	)
-	
+
 	// Run the analyzer to produce all the plots
 	if err := analyzer.Run(); err != nil {
 		panic(err)
@@ -285,7 +284,6 @@ func Example_shapeDistortion() {
 func Example_withKinemCuts() {
 
 }
-
 
 var (
 	// Some files and trees names
@@ -305,12 +303,12 @@ var (
 		VarsName: []string{"t_pt"},
 		Fct:      func(pt float32) float64 { return 1.0 - float64(pt)/250. },
 	}
-	
+
 	// Some colors
-	noColor = color.NRGBA{}
-	softBlack = color.NRGBA{R: 50, G: 30, B: 50, A: 200}
+	noColor    = color.NRGBA{}
+	softBlack  = color.NRGBA{R: 50, G: 30, B: 50, A: 200}
 	shadowBlue = color.NRGBA{R: 50, G: 20, B: 150, A: 20}
-	darkRed = color.NRGBA{R: 180, G: 30, B: 50, A: 200}
-	darkGreen = color.NRGBA{G: 180, R: 30, B: 50, A: 200}
-	darkBlue = color.NRGBA{B: 180, G: 30, R: 50, A: 200}
+	darkRed    = color.NRGBA{R: 180, G: 30, B: 50, A: 200}
+	darkGreen  = color.NRGBA{G: 180, R: 30, B: 50, A: 200}
+	darkBlue   = color.NRGBA{B: 180, G: 30, R: 50, A: 200}
 )

@@ -36,8 +36,8 @@ type config struct {
 	ErrBandColor color.NRGBA  // Color for the uncertainty band.
 
 	// Sample options
-	WeightFunc            TreeFunc    // Weight applied to the sample
-	CutFunc           TreeFunc  // Cut applied to the sample
+	WeightFunc        TreeFunc    // Weight applied to the sample
+	CutFunc           TreeFunc    // Cut applied to the sample
 	LineColor         color.NRGBA // Line color of the sample histogram
 	LineWidth         vg.Length   // Line width of the sample histogram
 	LineDashes        []vg.Length // Line dashes format

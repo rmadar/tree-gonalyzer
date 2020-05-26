@@ -34,7 +34,7 @@ type Sample struct {
 	// all components.
 	CutFunc    TreeFunc
 	WeightFunc TreeFunc
-	
+
 	// Cosmetic settings
 	DataStyle         bool        // Enable data-like style (default: Type == 'data').
 	LineColor         color.NRGBA // Line color of the histogram (default: blue).
@@ -172,7 +172,7 @@ func (s Sample) CreateHisto(hdata *hbook.H1D, opts ...hplot.Options) *hplot.H1D 
 	if len(s.LineDashes) > 0 {
 		h.LineStyle.Dashes = s.LineDashes
 	}
-	
+
 	// Fill color
 	if s.FillColor != colorNil {
 		h.FillColor = s.FillColor
