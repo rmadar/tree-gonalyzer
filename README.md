@@ -37,7 +37,7 @@ analyzer.Run()
 <table>
   <tr>
     <td valign="top">
-    	![example1]("ana-show/eg-plot.png) 
+    	![example1](ana-show/eg-plot.png) 
         Data/Bkg comparison [[code]](ana-show/main.go)
     </td>
     <td valign="top">
