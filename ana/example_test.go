@@ -159,7 +159,6 @@ func Example_systematicVariations() {
 }
 
 func Example_shapeDistortion() {
-
 	// Selections as TreeFunc's
 	ptTopGT50 := ana.TreeFunc{
 		VarsName: []string{"t_pt"},
