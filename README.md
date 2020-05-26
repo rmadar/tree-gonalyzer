@@ -18,7 +18,8 @@ samples := []*ana.Sample{
 
 // Define variables
 variables := []*ana.Variable{
-	ana.NewVariable("plot2", "branch2", new(float32), 25, 0, 1000),
+	ana.NewVariable("plot1", "branch1", new(float32), 25, 0, 1000),
+	ana.NewVariable("plot2", "branch2", new(float64), 50, 0, 1000),
 }
 
 // Create analyzer object with some options
@@ -36,7 +37,7 @@ analyzer.Run()
 
 <table>
   <tr>
-    <td><p align="center"><img src="ana-show/eg-plot.png">
+    <td><p align="center"><img src="ana/testdata/Plots_simpleUseCase/Mttbar_golden.png">
 	Data/Background <a href="ana-show/main.go" _target="blank">[code]</a></p>
     </td>
     <td><p align="center"><img src="ana-show/eg-plot.png">
