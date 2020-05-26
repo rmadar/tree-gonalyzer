@@ -38,10 +38,10 @@ analyzer.Run()
 <table>
   <tr>
     <td><p align="center"><img src="ana/testdata/Plots_simpleUseCase/Mttbar_golden.png">
-	Data/Background <a href="ana-show/main.go" _target="blank">[code]</a></p>
+	Data/Background <a href="https://godoc.org/github.com/rmadar/tree-gonalyzer/ana#ex-Maker--ASimpleUseCase" _target="blank">[code]</a></p>
     </td>
-    <td><p align="center"><img src="ana/testdata/Plots_simpleUseCase/DphiLL_golden.png">
-	Shape comparison <a href="ana-show/main.go" _target="blank">[code]</a></p>
+    <td><p align="center"><img src="ana/testdata/Plots_shapeComparison/DphiLL_golden.png">
+	Shape comparison <a href="https://godoc.org/github.com/rmadar/tree-gonalyzer/ana#ex-Maker--ShapeComparison" _target="blank">[code]</a></p>
     </td>
         <td><p align="center"><img src="ana/testdata/Plots_simpleUseCase/DphiLL_golden.png">
 	Shape comparison <a href="ana-show/main.go" _target="blank">[code]</a></p>
