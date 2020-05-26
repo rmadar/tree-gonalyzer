@@ -18,13 +18,6 @@ func TestSimpleUseCase(t *testing.T) {
 	)
 }
 
-func TestMultiComponentSamples(t *testing.T) {
-	cmpimg.CheckPlot(Example_multiComponentSamples, t,
-		"Plots_multiComponents/Mttbar.png",
-		"Plots_multiComponents/DphiLL.png",
-	)
-}
-
 func TestShapeComparison(t *testing.T) {
 	cmpimg.CheckPlot(Example_shapeComparison, t,
 		"Plots_shapeComparison/Mttbar.png",
