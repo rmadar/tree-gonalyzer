@@ -122,10 +122,12 @@ func Example_multiComponentSamples() {
 func Example_shapeComparison() {
 	// Define samples
 	samples := []*ana.Sample{
-		ana.CreateSample("proc1", "bkg", `Proc 1`, fBkg1, tName,
-			ana.WithFillColor(shadowBlue),
+		ana.CreateSample("proc1", "bkg", `Simulation A`, fBkg1, tName,
+			ana.WithLineColor(darkBlue),
+			ana.WithLineWidth(2),
+			ana.WithBand(true),
 		),
-		ana.CreateSample("proc2", "bkg", `Proc 2`, fBkg2, tName,
+		ana.CreateSample("proc2", "bkg", `Simulation B`, fBkg2, tName,
 			ana.WithWeight(w3),
 			ana.WithLineColor(darkRed),
 			ana.WithLineWidth(2),
