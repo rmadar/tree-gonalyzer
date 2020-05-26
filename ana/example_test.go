@@ -122,13 +122,15 @@ func Example_multiComponentSamples() {
 func Example_shapeComparison() {
 	// Define samples
 	samples := []*ana.Sample{
+		ana.CreateSample("data", "data", `Data`, fBkg1, tName),
 		ana.CreateSample("proc1", "bkg", `Simulation A`, fBkg1, tName,
+			ana.WithWeight(w3),
 			ana.WithLineColor(darkBlue),
 			ana.WithLineWidth(2),
 			ana.WithBand(true),
 		),
 		ana.CreateSample("proc2", "bkg", `Simulation B`, fBkg2, tName,
-			ana.WithWeight(w3),
+			ana.WithWeight(w4),
 			ana.WithLineColor(darkRed),
 			ana.WithLineWidth(2),
 			ana.WithBand(true),
@@ -137,14 +139,17 @@ func Example_shapeComparison() {
 
 	// Define variables
 	variables := []*ana.Variable{
-		ana.NewVariable("Mttbar", "ttbar_m", new(float32), 25, 350, 1000),
-		ana.NewVariable("DphiLL", "truth_dphi_ll", new(float64), 10, 0, math.Pi, ana.WithLegLeft(true)),
+		ana.NewVariable("Mttbar", "t_pt", new(float32), 10, 0, 500),
+		ana.NewVariable("DphiLL", "truth_dphi_ll", new(float64), 10, 0, math.Pi,
+			ana.WithLegLeft(true)),
 	}
 
 	// Create analyzer object
 	analyzer := ana.New(samples, variables,
+		ana.WithNevts(500),
 		ana.WithHistoStack(false),
 		ana.WithHistoNorm(true),
+		ana.WithRatioPlot(false),
 		ana.WithSaveFormat("png"),
 		ana.WithSavePath("testdata/Plots_shapeComparison"),
 	)
@@ -242,6 +247,10 @@ var (
 	w3 = ana.TreeFunc{
 		VarsName: []string{"t_pt"},
 		Fct:      func(pt float32) float64 { return 1.0 + float64(pt)/50. },
+	}
+	w4 = ana.TreeFunc{
+		VarsName: []string{"t_pt"},
+		Fct:      func(pt float32) float64 { return 1.0 - float64(pt)/250. },
 	}
 	
 	// Some colors
