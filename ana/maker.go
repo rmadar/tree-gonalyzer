@@ -45,6 +45,7 @@ type Maker struct {
 	RatioPlot    bool        // Enable ratio plot (default: true).
 	HistoStack   bool        // Enable histogram stacking (default: true).
 	HistoNorm    bool        // Normalize distributions to unit area (default: false).
+	TotalBand    bool        // Enable total error band for stacked histo (default: true).
 	ErrBandColor color.NRGBA // Color for the uncertainty band (default: gray).
 
 	// Histograms for {variables x samples x selection}
@@ -87,6 +88,7 @@ func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 		WithHistoStack(true),
 		WithHistoNorm(false),
 		WithRatioPlot(true),
+		WithTotalBand(true),
 		WithErrBandColor(color.NRGBA{A: 100}),
 		WithKinemCuts([]*Selection{NewSelection()}),
 	)
@@ -107,6 +109,7 @@ func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 	a.RatioPlot = cfg.RatioPlot
 	a.HistoStack = cfg.HistoStack
 	a.HistoNorm = cfg.HistoNorm
+	a.TotalBand = cfg.TotalBand
 	a.ErrBandColor = cfg.ErrBandColor
 
 	// Get mappings between slice indices and object names
@@ -356,11 +359,7 @@ func (ana *Maker) PlotHistos() error {
 				}
 
 				// Get plottable histogram and add it to the legend
-				withBand := false
-				if !ana.Samples[is].IsData() {
-					withBand = true
-				}
-				hplt := ana.Samples[is].CreateHisto(h, hplot.WithBand(withBand))
+				hplt := ana.Samples[is].CreateHisto(h)
 				p.Legend.Add(ana.Samples[is].LegLabel, hplt)
 				ana.HplotHistos[iv][isel][is] = hplt
 
@@ -390,9 +389,9 @@ func (ana *Maker) PlotHistos() error {
 				}
 
 				// Stacking the background histo
-				stack := hplot.NewHStack(phBkgs, hplot.WithBand(true))
+				stack := hplot.NewHStack(phBkgs, hplot.WithBand(ana.TotalBand))
 				stack.Band.FillColor = ana.ErrBandColor
-				if ana.HistoStack {
+				if ana.HistoStack && ana.TotalBand {
 					hBand := hplot.NewH1D(hbook.NewH1D(1, 0, 1), hplot.WithBand(true))
 					hBand.Band = stack.Band
 					hBand.LineStyle.Width = 0

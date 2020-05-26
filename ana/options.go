@@ -32,6 +32,7 @@ type config struct {
 	RatioPlot    bool         // Enable ratio plot.
 	HistoStack   bool         // Disable histogram stacking (e.g. compare various processes).
 	HistoNorm    bool         // Normalize distributions to unit area (when stacked, the total is normalized).
+	TotalBand    bool         // Enable total error band for stacks.
 	ErrBandColor color.NRGBA  // Color for the uncertainty band.
 
 	// Sample options
@@ -43,6 +44,7 @@ type config struct {
 	CircleMarkers     bool        // Use of circled marker
 	CircleSize        vg.Length   // Size of the markers
 	CircleColor       color.NRGBA // Color of the markers
+	Band              bool        // Enable error band display
 	YErrBars          bool        // Use of y error bars
 	YErrBarsLineWidth vg.Length   // Line width of the y error bar
 	YErrBarsCapWidth  vg.Length   // Width of the y error bar caps
@@ -132,6 +134,14 @@ func WithHistoStack(b bool) Options {
 	}
 }
 
+// WithHistoStack enables histogram stacking for
+// bkg-typed samples.
+func WithTotalBand(b bool) Options {
+	return func(cfg *config) {
+		cfg.TotalBand = b
+	}
+}
+
 // WithHistoNorm enables histogram normalization to unity.
 func WithHistoNorm(b bool) Options {
 	return func(cfg *config) {
@@ -203,6 +213,13 @@ func WithCircleSize(s vg.Length) SampleOptions {
 func WithCircleColor(c color.NRGBA) SampleOptions {
 	return func(cfg *config) {
 		cfg.CircleColor = c
+	}
+}
+
+// WithBand enables y error band.
+func WithBand(b bool) SampleOptions {
+	return func(cfg *config) {
+		cfg.Band = b
 	}
 }
 
