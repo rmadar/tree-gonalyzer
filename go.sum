@@ -169,6 +169,8 @@ go-hep.org/x/hep v0.26.1-0.20200519131915-b5f389640bd9 h1:VAgrFiscVIkoeyNiSxCaU8
 go-hep.org/x/hep v0.26.1-0.20200519131915-b5f389640bd9/go.mod h1:zS28ZIH/9eQX/yN93xqmAcxzRQQfkn/7vumDD47ZVhY=
 go-hep.org/x/hep v0.27.1-0.20200522154754-56834a477c31 h1:aH/En2Av3T52LlBVEp+eUEFHODx7bgSX6R8i3wTbBSk=
 go-hep.org/x/hep v0.27.1-0.20200522154754-56834a477c31/go.mod h1:zS28ZIH/9eQX/yN93xqmAcxzRQQfkn/7vumDD47ZVhY=
+go-hep.org/x/hep v0.27.1-0.20200526200243-e1d8871a38f0 h1:lyztvcehFTp1IUrBSCT8HSFmfjSFkULW2EuZPcOpbGs=
+go-hep.org/x/hep v0.27.1-0.20200526200243-e1d8871a38f0/go.mod h1:6e2bMlQQKxIljS9dsWZVqsfqTBqegTu57cpOcgMcNDQ=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
 golang.org/x/crypto v0.0.0-20190510104115-cbcb75029529/go.mod h1:yigFU9vqHzYiE8UmvKecakEJjdnWj3jj499lnFckfCI=
 golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550/go.mod h1:yigFU9vqHzYiE8UmvKecakEJjdnWj3jj499lnFckfCI=
@@ -302,6 +304,7 @@ modernc.org/lldb v1.0.0/go.mod h1:jcRvJGWfCGodDZz8BPwiKMJxGJngQ/5DrRapkQnLob8=
 modernc.org/mathutil v1.0.0/go.mod h1:wU0vUrJsVWBZ4P6e7xtFJEhFSNsfRLJ8H458uRjg03k=
 modernc.org/ql v1.0.0/go.mod h1:xGVyrLIatPcO2C1JvI/Co8c0sr6y91HKFNy4pt9JXEY=
 modernc.org/ql v1.0.1/go.mod h1:Fj1ylcVyzcu/fgWZTrvBO9j/aEUg/ixLFnGtmzh7quI=
+modernc.org/ql v1.1.0/go.mod h1:Fj1ylcVyzcu/fgWZTrvBO9j/aEUg/ixLFnGtmzh7quI=
 modernc.org/sortutil v1.0.0/go.mod h1:1QO0q8IlIlmjBIwm6t/7sof874+xCfZouyqZMLIAtxM=
 modernc.org/strutil v1.0.0/go.mod h1:lstksw84oURvj9y3tn8lGvRxyRC1S2+g5uuIzNfIOBs=
 modernc.org/strutil v1.1.0/go.mod h1:lstksw84oURvj9y3tn8lGvRxyRC1S2+g5uuIzNfIOBs=

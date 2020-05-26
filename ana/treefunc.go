@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"go-hep.org/x/hep/groot/rtree"
+	"go-hep.org/x/hep/groot/rtree/rfunc"
 )
 
 // TreeFunc is a wrapper to use rtree.FormulaFunc in an easy way.
@@ -74,7 +75,7 @@ func NewTreeFuncValF64(v float64) TreeFunc {
 
 // FormulaFuncFromReader returns the rtree.FormulaFunc function associated
 // to the TreeFunc f, from a give rtree.Reader r.
-func (f *TreeFunc) FormulaFuncFromReader(r *rtree.Reader) *rtree.FormulaFunc {
+func (f *TreeFunc) FormulaFuncFromReader(r *rtree.Reader) rfunc.Formula {
 	ff, err := r.FormulaFunc(f.VarsName, f.Fct)
 	if err != nil {
 		log.Fatalf("could not create formulaFunc: %+v", err)
