@@ -36,13 +36,16 @@ analyzer.Run()
 
 <table>
   <tr>
-    <td style="text-align:center;">
-        <p align="center"><img src="ana-show/eg-plot.png">
+    <td><p align="center"><img src="ana-show/eg-plot.png">
+	Data/Background <a href="ana-show/main.go" _target="blank">[code]</a></p>
+    </td>
+    <td><p align="center"><img src="ana-show/eg-plot.png">
+	Shape comparison <a href="ana-show/main.go" _target="blank">[code]</a></p>
+    </td>
+    <td><p align="center"><img src="ana-show/eg-plot.png">
 	Shape distortion <a href="ana-show/main.go" _target="blank">[code]</a></p>
     </td>
-    <td valign="top">
-    	<center><img src="ana-show/eg-plot.png"> Shape distortion <a href="ana-show/main.go" _target="blank">[code]</a> </center>
-    </td>
+
   </tr>
 
 
