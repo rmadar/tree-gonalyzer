@@ -1,4 +1,4 @@
-// Showing how gonalyzer/ana package works
+// Example of realistic analysis using ana package.
 package main
 
 import (
