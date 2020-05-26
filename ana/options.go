@@ -281,10 +281,16 @@ func WithYRange(min, max float64) VariableOptions {
 	}
 }
 
-// WithLegPosition sets the legend position on the plot.
-func WithLegPosition(top, left bool) VariableOptions {
+// WithLegLeft sets the legend left/right position on the plot.
+func WithLegLeft(left bool) VariableOptions {
+	return func(cfg *config) {
+		cfg.LegPosLeft = left
+	}
+}
+
+// WithLegTop sets the legend top/bottom position on the plot.
+func WithLegTop(top bool) VariableOptions {
 	return func(cfg *config) {
 		cfg.LegPosTop = top
-		cfg.LegPosLeft = left
 	}
 }

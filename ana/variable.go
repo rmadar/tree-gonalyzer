@@ -46,7 +46,8 @@ func NewVariable(name, tname string, value interface{},
 	cfg := newConfig(
 		WithSaveName(v.Name),
 		WithAxisLabels(`Variable`, `Events`),
-		WithLegPosition(true, false),
+		WithLegTop(true),
+		WithLegLeft(false),
 	)
 
 	// Update the configuration looping over functional options
