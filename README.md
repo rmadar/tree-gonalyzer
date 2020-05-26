@@ -40,7 +40,7 @@ analyzer.Run()
     <td><p align="center"><img src="ana/testdata/Plots_simpleUseCase/Mttbar_golden.png">
 	Data/Background <a href="ana-show/main.go" _target="blank">[code]</a></p>
     </td>
-    <td><p align="center"><img src="ana-show/eg-plot.png">
+    <td><p align="center"><img src="ana/testdata/Plots_simpleUseCase/DphiLL_golden.png">
 	Shape comparison <a href="ana-show/main.go" _target="blank">[code]</a></p>
     </td>
     <td><p align="center"><img src="ana-show/eg-plot.png">
