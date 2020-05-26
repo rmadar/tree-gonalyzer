@@ -43,9 +43,6 @@ analyzer.Run()
     <td><p align="center"><img src="ana/testdata/Plots_shapeComparison/DphiLL_golden.png">
 	Shape comparison <a href="https://github.com/rmadar/tree-gonalyzer/blob/master/ana/example_maker_test.go#L112" _target="blank">[code]</a></p>
     </td>
-        <td><p align="center"><img src="ana/testdata/Plots_simpleUseCase/DphiLL_golden.png">
-	Shape comparison <a href="ana-show/main.go" _target="blank">[code]</a></p>
-    </td>
   </tr>
 
 
