@@ -3,30 +3,33 @@ package ana_test
 import (
 	"math"
 	"image/color"
+	"testing"
+
+	"gonum.org/v1/plot/cmpimg"
 	
 	"github.com/rmadar/tree-gonalyzer/ana"
 )
 
-var (
-	// Some files and trees names
-	fData = "../testdata/file1.root"
-	fBkg1 = "../testdata/file2.root"
-	fBkg2 = "../testdata/file3.root"
-	tName = "truth"
+func TestSimpleUseCase(t *testing.T) {
+	cmpimg.CheckPlot(Example_aSimpleUseCase, t,
+		"Plots_simpleUseCase/Mttbar.png",
+		"Plots_simpleUseCase/DphiLL.png",
+	)
+}
 
-	// Some weights
-	w1 = ana.NewTreeFuncValF64(1.0)
-	w2 = ana.NewTreeFuncValF64(0.5)
-	w3 = ana.TreeFunc{
-		VarsName: []string{"t_pt"},
-		Fct:      func(pt float32) float64 { return 1.0 + float64(pt)/50. },
-	}
+func TestMultiComponentSamples(t *testing.T) {
+	cmpimg.CheckPlot(Example_multiComponentSamples, t,
+		"Plots_multiComponents/Mttbar.png",
+		"Plots_multiComponents/DphiLL.png",
+	)
+}
 
-	// Some colors
-	noColor = color.NRGBA{}
-	shadowBlue = color.NRGBA{R: 50, G: 20, B: 150, A: 20}
-	darkRed = color.NRGBA{R: 180, G: 30, B: 50, A: 200}
-)
+func TestShapeComparison(t *testing.T) {
+	cmpimg.CheckPlot(Example_shapeComparison, t,
+		"Plots_shapeComparison/Mttbar.png",
+		"Plots_shapeComparison/DphiLL.png",
+	)
+}
 
 // Creation of the default analysis maker type with
 // single-component samples.
@@ -150,8 +153,86 @@ func Example_systematicVariations() {
 
 func Example_shapeDistortion() {
 
+	// Selections as TreeFunc's
+	ptTopGT10 := ana.TreeFunc{
+		VarsName: []string{"t_pt"},
+		Fct:      func(pt float32) bool { return pt > 10. },
+	}
+	ptTopGT50 := ana.TreeFunc{
+		VarsName: []string{"t_pt"},
+		Fct:      func(pt float32) bool { return pt > 50. },
+	}
+	ptTopGT100 := ana.TreeFunc{
+		VarsName: []string{"t_pt"},
+		Fct:      func(pt float32) bool { return pt > 100. },
+	}
+
+	// Samples
+	samples := []*ana.Sample{
+		ana.CreateSample("noCut", "bkg", `No cut`, fBkg1, tName,
+			ana.WithFillColor(shadowBlue),
+		),
+		ana.CreateSample("cut1", "bkg", `pT[top]>10`, fBkg1, tName,
+			ana.WithCut(ptTopGT10),
+			ana.WithLineColor(darkRed),
+			ana.WithLineWidth(2),
+		),
+		ana.CreateSample("cut2", "bkg", `pT[top]>50`, fBkg1, tName,
+			ana.WithCut(ptTopGT50),
+			ana.WithLineColor(darkBlue),
+			ana.WithLineWidth(2),
+		),
+		ana.CreateSample("cut3", "bkg", `pT[top]>100`, fBkg1, tName,
+			ana.WithCut(ptTopGT100),
+			ana.WithLineColor(darkGreen),
+			ana.WithLineWidth(2),
+		),
+	}	
+
+	// Define variables
+	variables := []*ana.Variable{
+		ana.NewVariable("Mttbar", "ttbar_m", new(float32), 25, 350, 1000),
+		ana.NewVariable("DphiLL", "truth_dphi_ll", new(float64), 10, 0, math.Pi, ana.WithLegLeft(true)),
+	}
+	
+	// Create analyzer object
+	analyzer := ana.New(samples, variables,
+		ana.WithHistoStack(false),
+		ana.WithHistoNorm(true),
+		ana.WithSaveFormat("png"),
+		ana.WithSavePath("testdata/Plots_shapeDistortion"),
+	)
+	
+	// Run the analyzer to produce all the plots
+	if err := analyzer.Run(); err != nil {
+		panic(err)
+	}
 }
 
 func Example_withKinemCuts() {
 
 }
+
+
+var (
+	// Some files and trees names
+	fData = "../testdata/file1.root"
+	fBkg1 = "../testdata/file2.root"
+	fBkg2 = "../testdata/file3.root"
+	tName = "truth"
+
+	// Some weights and cut TreeFunc's
+	w1 = ana.NewTreeFuncValF64(1.0)
+	w2 = ana.NewTreeFuncValF64(0.5)
+	w3 = ana.TreeFunc{
+		VarsName: []string{"t_pt"},
+		Fct:      func(pt float32) float64 { return 1.0 + float64(pt)/50. },
+	}
+	
+	// Some colors
+	noColor = color.NRGBA{}
+	shadowBlue = color.NRGBA{R: 50, G: 20, B: 150, A: 20}
+	darkRed = color.NRGBA{R: 180, G: 30, B: 50, A: 200}
+	darkGreen = color.NRGBA{G: 180, R: 30, B: 50, A: 200}
+	darkBlue = color.NRGBA{B: 180, G: 30, R: 50, A: 200}
+)
