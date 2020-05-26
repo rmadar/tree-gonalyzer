@@ -43,7 +43,8 @@ analyzer.Run()
     	<center><img src="ana-show/eg-plot.png"> Shape distortion <a href="ana-show/main.go" _target="blank">[code]</a> </center>
     </td>
     <td valign="top">
-    	<center><img src="ana-show/eg-plot.png"> Shape distortion <a href="ana-show/main.go" _target="blank">[code]</a> </center>
+      <img src="ana-show/eg-plot.png"> <br>
+      <center> Shape distortion <a href="ana-show/main.go" _target="blank">[code]</a> </center>
     </td>
   </tr>
  </table>
