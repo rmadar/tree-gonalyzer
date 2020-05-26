@@ -40,6 +40,7 @@ type config struct {
 	CutFunc           TreeFunc  // Cut applied to the sample
 	LineColor         color.NRGBA // Line color of the sample histogram
 	LineWidth         vg.Length   // Line width of the sample histogram
+	LineDashes        []vg.Length // Line dashes format
 	FillColor         color.NRGBA // Fill color of the sample histogram
 	CircleMarkers     bool        // Use of circled marker
 	CircleSize        vg.Length   // Size of the markers
@@ -184,6 +185,14 @@ func WithLineColor(c color.NRGBA) SampleOptions {
 func WithLineWidth(w vg.Length) SampleOptions {
 	return func(cfg *config) {
 		cfg.LineWidth = w
+	}
+
+}
+
+// WithLineWidth sets line width of the sample histogram.
+func WithLineDashes(s []vg.Length) SampleOptions {
+	return func(cfg *config) {
+		cfg.LineDashes = s
 	}
 
 }

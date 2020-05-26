@@ -34,11 +34,12 @@ type Sample struct {
 	// all components.
 	CutFunc    TreeFunc
 	WeightFunc TreeFunc
-
+	
 	// Cosmetic settings
 	DataStyle         bool        // Enable data-like style (default: Type == 'data').
 	LineColor         color.NRGBA // Line color of the histogram (default: blue).
 	LineWidth         vg.Length   // Line width of the histogram (default: 1.5).
+	LineDashes        []vg.Length // Line dashes format (default: continous).
 	FillColor         color.NRGBA // Fill color of the histogram (default: none).
 	CircleMarkers     bool        // Enable circle markers (default: false).
 	CircleSize        vg.Length   // Circle size (default: 0).
@@ -89,6 +90,7 @@ func NewSample(sname, stype, sleg string, opts ...SampleOptions) *Sample {
 	s.CutFunc = cfg.CutFunc
 	s.LineColor = cfg.LineColor
 	s.LineWidth = cfg.LineWidth
+	s.LineDashes = cfg.LineDashes
 	s.FillColor = cfg.FillColor
 	s.CircleMarkers = cfg.CircleMarkers
 	s.CircleSize = cfg.CircleSize
@@ -166,6 +168,11 @@ func (s Sample) CreateHisto(hdata *hbook.H1D, opts ...hplot.Options) *hplot.H1D 
 		h.LineStyle.Color = s.LineColor
 	}
 
+	// Line dashes
+	if len(s.LineDashes) > 0 {
+		h.LineStyle.Dashes = s.LineDashes
+	}
+	
 	// Fill color
 	if s.FillColor != colorNil {
 		h.FillColor = s.FillColor

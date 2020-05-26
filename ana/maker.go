@@ -450,33 +450,27 @@ func (ana *Maker) PlotHistos() error {
 					hps2d_ratio := hplot.NewS2D(hbs2d_ratio, hplot.WithYErrBars(true),
 						hplot.WithStepsKind(hplot.HiSteps),
 					)
-					// TODO: copy style from bhData when a function hplot-style will be ready.
-					//if ana.Samples[is].DataStyle {
-					style.ApplyToDataS2D(hps2d_ratio)
-					//}
+					style.CopyStyleH1DtoS2D(hps2d_ratio, phData)
 
 					// MC to MC
-					hbs2d_ratio1, err := hbook.DivideH1D(bhBkgTot, bhBkgTot, hbook.DivIgnoreNaNs())
+					hbs2d_ratioMC, err := hbook.DivideH1D(bhBkgTot, bhBkgTot, hbook.DivIgnoreNaNs())
 					if err != nil {
 						log.Fatal("cannot divide histo for the ratio plot")
 					}
-					hps2d_ratio1 := hplot.NewS2D(hbs2d_ratio1, hplot.WithBand(true),
+					hps2d_ratioMC := hplot.NewS2D(hbs2d_ratioMC, hplot.WithBand(true),
 						hplot.WithStepsKind(hplot.HiSteps),
 					)
-					//if ana.Samples[is].DataStyle {
-					//style.ApplyToDataS2D(hps2d_ratio1)
-					//}
-					hps2d_ratio1.GlyphStyle.Radius = 0
-					hps2d_ratio1.LineStyle.Width = 0.0
-					hps2d_ratio1.Band.FillColor = ana.ErrBandColor
-					rp.Bottom.Add(hps2d_ratio1)
+					hps2d_ratioMC.GlyphStyle.Radius = 0
+					hps2d_ratioMC.LineStyle.Width = 0.0
+					hps2d_ratioMC.Band.FillColor = ana.ErrBandColor
+					rp.Bottom.Add(hps2d_ratioMC)
 					rp.Bottom.Add(hps2d_ratio)
 
 				default:
 					// [FIX-ME 0 (rmadar)] Ratio wrt data (or 1 bkg if data is empty) -> to be specied as an option?
 					// [FIX-ME 1 (rmadar)] loop is over bhBkgs_postnorm while 'ana.Samples[is]' runs also over data.
 					for is, h := range bhBkgs_postnorm {
-
+						
 						href := bhData
 						if bhData.Entries() == 0 {
 							href = bhBkgs_postnorm[0]
@@ -489,9 +483,9 @@ func (ana *Maker) PlotHistos() error {
 						hps2d_ratio := hplot.NewS2D(hbs2d_ratio, hplot.WithBand(true),
 							hplot.WithStepsKind(hplot.HiSteps),
 						)
-						hps2d_ratio.GlyphStyle.Radius = 0
-						hps2d_ratio.LineStyle.Color = ana.Samples[is].LineColor
-						ana.Samples[is].setBandStyle(hps2d_ratio.Band)
+						// FIX-ME (rmadar): issue with band style passed through
+						//                  style.CopyStyleH1DtoS2D()
+						style.CopyStyleH1DtoS2D(hps2d_ratio, phBkgs[is])
 						rp.Bottom.Add(hps2d_ratio)
 					}
 				}
@@ -501,7 +495,7 @@ func (ana *Maker) PlotHistos() error {
 				// rp.Bottom.Y.Min = 0.7
 				// rp.Bottom.Y.Max = 1.3
 			}
-
+			
 			// Save the figure
 			f := hplot.Figure(plt)
 			style.ApplyToFigure(f)

@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"gonum.org/v1/plot/cmpimg"
+	"gonum.org/v1/plot/vg"
 	
 	"github.com/rmadar/tree-gonalyzer/ana"
 )
@@ -28,6 +29,13 @@ func TestShapeComparison(t *testing.T) {
 	cmpimg.CheckPlot(Example_shapeComparison, t,
 		"Plots_shapeComparison/Mttbar.png",
 		"Plots_shapeComparison/DphiLL.png",
+	)
+}
+
+func TestSystVariations(t *testing.T) {
+	cmpimg.CheckPlot(Example_systematicVariations, t,
+		"Plots_systematicVariations/Mttbar.png",
+		"Plots_systematicVariations/DphiLL.png",
 	)
 }
 
@@ -162,7 +170,47 @@ func Example_shapeComparison() {
 }
 
 func Example_systematicVariations() {
-
+	
+	// Samples
+	samples := []*ana.Sample{
+		ana.CreateSample("nom", "bkg", `Nominal`, fBkg1, tName,
+			ana.WithLineColor(softBlack),
+			ana.WithLineWidth(2.0),
+			ana.WithBand(true),
+		),
+		ana.CreateSample("up", "bkg", `Up`, fBkg1, tName,
+			ana.WithWeight(w3),
+			ana.WithLineColor(darkRed),
+			ana.WithLineWidth(1.5),
+			ana.WithLineDashes([]vg.Length{3, 2}),
+		),
+		ana.CreateSample("down", "bkg", `Down`, fBkg1, tName,
+			ana.WithWeight(w4),
+			ana.WithLineColor(darkBlue),
+			ana.WithLineWidth(1.5),
+			ana.WithLineDashes([]vg.Length{3, 2}),
+		),
+	}	
+	
+	// Define variables
+	variables := []*ana.Variable{
+		ana.NewVariable("Mttbar", "ttbar_m", new(float32), 25, 350, 1500),
+		ana.NewVariable("DphiLL", "truth_dphi_ll", new(float64), 10, 0, math.Pi),
+	}
+	
+	// Create analyzer object
+	analyzer := ana.New(samples, variables,
+		ana.WithRatioPlot(false),
+		ana.WithHistoStack(false),
+		ana.WithHistoNorm(true),
+		ana.WithSaveFormat("png"),
+		ana.WithSavePath("testdata/Plots_systVariations"),
+	)
+	
+	// Run the analyzer to produce all the plots
+	if err := analyzer.Run(); err != nil {
+		panic(err)
+	}	
 }
 
 func Example_shapeDistortion() {
@@ -255,6 +303,7 @@ var (
 	
 	// Some colors
 	noColor = color.NRGBA{}
+	softBlack = color.NRGBA{R: 50, G: 30, B: 50, A: 200}
 	shadowBlue = color.NRGBA{R: 50, G: 20, B: 150, A: 20}
 	darkRed = color.NRGBA{R: 180, G: 30, B: 50, A: 200}
 	darkGreen = color.NRGBA{G: 180, R: 30, B: 50, A: 200}
