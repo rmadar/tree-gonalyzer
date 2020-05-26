@@ -50,7 +50,7 @@ analyzer.Run()
     <td><p align="center"><img src="ana/testdata/Plots_XXX/Mttbar_golden.png">
 	Shape distortion <a href="https://github.com/rmadar/tree-gonalyzer/blob/master/ana/XXX">[code]</a></p>
     </td>
-    <td><p align="center"><img src="ana/testdata/Plots_shapeComparison/DphiLL_golden.png">
+    <td><p align="center"><img src="ana/testdata/Plots_XXX/DphiLL_golden.png">
 	Systematic variation <a href="https://github.com/rmadar/tree-gonalyzer/blob/master/ana/XXX">[code]</a></p>
     </td>
   </tr>
