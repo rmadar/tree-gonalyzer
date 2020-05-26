@@ -11,6 +11,8 @@ var (
 	fBkg1 = "../testdata/file2.root"
 	fBkg2 = "../testdata/file3.root"
 	tName = "truth"
+	w1 = ana.NewTreeFuncValF64(1.0)
+	w2 = ana.NewTreeFuncValF64(0.5)
 )
 
 // Creation of the default analysis maker type with
@@ -19,15 +21,19 @@ func ExampleMaker_aSimpleUseCase() {
 	// Define samples
 	samples := []*ana.Sample{
 		ana.CreateSample("data", "data", `Data`, fData, tName),
-		ana.CreateSample("bkg1", "bkg", `Proc 1`, fBkg1, tName),
-		ana.CreateSample("bkg2", "bkg", `Proc 2`, fBkg2, tName),
-		ana.CreateSample("bkg3", "bkg", `Proc 3`, fBkg1, tName),
+		ana.CreateSample("bkg1", "bkg", `Proc 1`, fBkg1, tName, ana.WithWeight(w1)),
+		ana.CreateSample("bkg2", "bkg", `Proc 2`, fBkg2, tName, ana.WithWeight(w2)),
+		ana.CreateSample("bkg3", "bkg", `Proc 3`, fBkg1, tName, ana.WithWeight(w2)),
 	}
 
 	// Define variables
 	variables := []*ana.Variable{
-		ana.NewVariable("Mttbar", "ttbar_m", new(float32), 50, 0, 1000),
-		ana.NewVariable("DphiLL", "truth_dphi_ll", new(float64), 25, 0, math.Pi),
+		ana.NewVariable("Mttbar", "ttbar_m", new(float32), 25, 350, 1000,
+			ana.WithAxisLabels("M(t,t) [GeV]", "Events Yields"),
+		),
+		ana.NewVariable("DphiLL", "truth_dphi_ll", new(float64), 10, 0, math.Pi,
+			ana.WithAxisLabels("dPhi(l,l)", "Events Yields"),
+			ana.WithLegLeft(true)),
 	}
 
 	// Create analyzer object
