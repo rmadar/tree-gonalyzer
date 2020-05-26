@@ -30,7 +30,7 @@ var (
 
 // Creation of the default analysis maker type with
 // single-component samples.
-func ExampleMaker_aSimpleUseCase() {
+func Example_aSimpleUseCase() {
 	// Define samples
 	samples := []*ana.Sample{
 		ana.CreateSample("data", "data", `Data`, fData, tName),
@@ -65,7 +65,7 @@ func ExampleMaker_aSimpleUseCase() {
 // Creation of the default analysis maker type with
 // multi-component samples. The files, trees and
 // variables are dummy, they are here just for the example.
-func ExampleMaker_multiComponentSamples() {
+func Example_multiComponentSamples() {
 	// Weights and cuts
 	w := ana.NewTreeFuncVarF32("weight")
 	isQQ := ana.NewTreeFuncVarBool("init_qq")
@@ -109,7 +109,7 @@ func ExampleMaker_multiComponentSamples() {
 	}
 }
 
-func ExampleMaker_shapeComparison() {
+func Example_shapeComparison() {
 	// Define samples
 	samples := []*ana.Sample{
 		ana.CreateSample("proc1", "bkg", `Proc 1`, fBkg1, tName,
@@ -144,14 +144,14 @@ func ExampleMaker_shapeComparison() {
 
 }
 
-func ExampleMaker_systematicVariations() {
+func Example_systematicVariations() {
 
 }
 
-func ExampleMaker_shapeDistortion() {
+func Example_shapeDistortion() {
 
 }
 
-func ExampleMaker_withKinemCuts() {
+func Example_withKinemCuts() {
 
 }
