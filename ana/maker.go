@@ -502,7 +502,6 @@ func (ana *Maker) PlotHistos() error {
 							hplot.WithStepsKind(hplot.HiSteps),
 						)
 						style.CopyStyleH1DtoS2D(hps2d_ratio, phBkgs[ib])
-						fmt.Println(hps2d_ratio.Band)
 						rp.Bottom.Add(hps2d_ratio)
 					}
 				}
