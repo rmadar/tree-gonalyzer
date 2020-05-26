@@ -36,9 +36,8 @@ analyzer.Run()
 
 <table>
   <tr>
-    <td valign="top">
-    	![example1](ana-show/eg-plot.png) 
-        Data/Bkg comparison [[code]](ana-show/main.go)
+    <td valign="top" style="text-align:center;">
+        <img src="ana-show/eg-plot.png"> Shape distortion <a href="ana-show/main.go" _target="blank">[code]</a>
     </td>
     <td valign="top">
     	<center><img src="ana-show/eg-plot.png"> Shape distortion <a href="ana-show/main.go" _target="blank">[code]</a> </center>
