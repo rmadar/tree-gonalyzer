@@ -73,6 +73,60 @@ func NewValF64(v float64) TreeFunc {
 	}
 }
 
+// NewVarF64s returns a TreeFunc to get a slice of
+// float64 branch-based variable. The output value is a float64.
+func NewVarF64s(v string) TreeFunc {
+	return TreeFunc{
+		VarsName: []string{v},
+		Fct: func(xs []float64) []float64 { return xs },
+	}
+}
+
+// NewVarF32s returns a TreeFunc to get a slice of
+// float32 branch-based variable. The output  value is a float64.
+func NewVarF32s(v string) TreeFunc {
+	return TreeFunc{
+		VarsName: []string{v},
+		Fct: func(xs []float32) []float64 {
+			res := make([]float64, len(xs))
+			for i, x := range xs {
+				res[i] = float64(x)
+			}
+			return res
+		},
+	}
+}
+
+// NewVarI64s returns a TreeFunc to get a slice of
+// int64 branch-based variable. The output value is a float64.
+func NewVarI64s(v string) TreeFunc {
+	return TreeFunc{
+		VarsName: []string{v},
+		Fct: func(xs []int64) []float64 {
+			res := make([]float64, len(xs))
+			for i, x := range xs {
+				res[i] = float64(x)
+			}
+			return res
+		},
+	}
+}
+
+// NewVarI32s returns a TreeFunc to get a slice of
+// int32 branch-based variable. The output value is a float64.
+func NewVarI32s(v string) TreeFunc {
+	return TreeFunc{
+		VarsName: []string{v},
+		Fct: func(xs []int32) []float64 {
+			res := make([]float64, len(xs))
+			for i, x := range xs {
+				res[i] = float64(x)
+			}
+			return res
+		},
+	}
+}
+
 // FormulaFrom returns the rtree.FormulaFunc function associated
 // to the TreeFunc f, from a give rtree.Reader r.
 func (f *TreeFunc) FormulaFrom(r *rtree.Reader) rfunc.Formula {
@@ -87,6 +141,12 @@ func (f *TreeFunc) FormulaFrom(r *rtree.Reader) rfunc.Formula {
 // the float64 value computed in f.Fct function.
 func (f *TreeFunc) GetFuncF64(r *rtree.Reader) func() float64 {
 	return f.FormulaFrom(r).Func().(func() float64)
+}
+
+// GetFuncF64s returns a function to be called in the event loop to get
+// a slice []float64 values computed in f.Fct function.
+func (f *TreeFunc) GetFuncF64s(r *rtree.Reader) func() []float64 {
+	return f.FormulaFrom(r).Func().(func() []float64)
 }
 
 // GetFuncBool returns the function to be called in the event loop to get
