@@ -58,7 +58,7 @@ func ExampleNewTreeFuncVarBool() {
 	varName := "init_qq"
 
 	// TreeFunc object
-	treeFunc := ana.NewTreeFuncVarBool(varName)
+	treeFunc := ana.NewVarBool(varName)
 
 	// rtree.FormulaFunc object
 	formFunc := treeFunc.FormulaFuncFromReader(r)
@@ -94,7 +94,7 @@ func ExampleNewTreeFuncVarF64() {
 	varName := "truth_dphi_ll"
 
 	// TreeFunc object
-	treeFunc := ana.NewTreeFuncVarF64(varName)
+	treeFunc := ana.NewVarF64(varName)
 
 	// rtree.FormulaFunc object
 	formFunc := treeFunc.FormulaFuncFromReader(r)
@@ -129,7 +129,7 @@ func ExampleNewTreeFuncValF64() {
 	defer r.Close()
 
 	// TreeFunc object
-	treeFunc := ana.NewTreeFuncValF64(0.33)
+	treeFunc := ana.NewValF64(0.33)
 
 	// Go function to be called in the event loop
 	getValue := treeFunc.GetFuncF64(r)

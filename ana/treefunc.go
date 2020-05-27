@@ -21,7 +21,7 @@ type TreeFunc struct {
 // NewTreeFuncVarBool returns a TreeFunc to get
 // a single boolean branch-based variable.
 // The output value is a boolean.
-func NewTreeFuncVarBool(v string) TreeFunc {
+func NewVarBool(v string) TreeFunc {
 	return TreeFunc{
 		VarsName: []string{v},
 		Fct:      func(x bool) bool { return x },
@@ -30,7 +30,7 @@ func NewTreeFuncVarBool(v string) TreeFunc {
 
 // NewTreeFuncVarF64 returns a TreeFunc to get a single
 // float64 branch-based variable. The output value is a float64.
-func NewTreeFuncVarF64(v string) TreeFunc {
+func NewVarF64(v string) TreeFunc {
 	return TreeFunc{
 		VarsName: []string{v},
 		Fct:      func(x float64) float64 { return x },
@@ -39,7 +39,7 @@ func NewTreeFuncVarF64(v string) TreeFunc {
 
 // NewTreeFuncVarF32 returns a TreeFunc to get a single
 // float32 branch-based variable. The output  value is a float64.
-func NewTreeFuncVarF32(v string) TreeFunc {
+func NewVarF32(v string) TreeFunc {
 	return TreeFunc{
 		VarsName: []string{v},
 		Fct:      func(x float32) float64 { return float64(x) },
@@ -48,7 +48,7 @@ func NewTreeFuncVarF32(v string) TreeFunc {
 
 // NewTreeFuncVarI64 returns a TreeFunc to get a single
 // int64 branch-based variable. The output value is a float64.
-func NewTreeFuncVarI64(v string) TreeFunc {
+func NewVarI64(v string) TreeFunc {
 	return TreeFunc{
 		VarsName: []string{v},
 		Fct:      func(x int64) float64 { return float64(x) },
@@ -57,7 +57,7 @@ func NewTreeFuncVarI64(v string) TreeFunc {
 
 // NewTreeFuncVarI32 returns a TreeFunc to get a single
 // int32 branch-based variable. The output value is a float64.
-func NewTreeFuncVarI32(v string) TreeFunc {
+func NewVarI32(v string) TreeFunc {
 	return TreeFunc{
 		VarsName: []string{v},
 		Fct:      func(x int32) float64 { return float64(x) },
@@ -66,7 +66,7 @@ func NewTreeFuncVarI32(v string) TreeFunc {
 
 // NewTreeFuncValF64 returns a TreeFunc to get float value,
 // ie not a branch-based variable.
-func NewTreeFuncValF64(v float64) TreeFunc {
+func NewValF64(v float64) TreeFunc {
 	return TreeFunc{
 		VarsName: []string{},
 		Fct:      func() float64 { return v },
@@ -86,19 +86,11 @@ func (f *TreeFunc) FormulaFuncFromReader(r *rtree.Reader) rfunc.Formula {
 // GetFuncF64 returns a function to be called in the event loop to get
 // the float64 value computed in f.Fct function.
 func (f *TreeFunc) GetFuncF64(r *rtree.Reader) func() float64 {
-	if len(f.VarsName) > 0 {
-		return f.FormulaFuncFromReader(r).Func().(func() float64)
-	} else {
-		return f.Fct.(func() float64)
-	}
+	return f.FormulaFuncFromReader(r).Func().(func() float64)
 }
 
 // GetFuncBool returns the function to be called in the event loop to get
 // the boolean value computed in f.Fct function.
 func (f *TreeFunc) GetFuncBool(r *rtree.Reader) func() bool {
-	if len(f.VarsName) > 0 {
-		return f.FormulaFuncFromReader(r).Func().(func() bool)
-	} else {
-		return f.Fct.(func() bool)
-	}
+	return f.FormulaFuncFromReader(r).Func().(func() bool)
 }

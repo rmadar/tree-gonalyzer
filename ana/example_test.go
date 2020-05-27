@@ -78,8 +78,8 @@ func Example_aSimpleUseCase() {
 // variables are dummy, they are here just for the example.
 func Example_multiComponentSamples() {
 	// Weights and cuts
-	w := ana.NewTreeFuncVarF32("weight")
-	isQQ := ana.NewTreeFuncVarBool("init_qq")
+	w := ana.NewVarF32("weight")
+	isQQ := ana.NewVarBool("init_qq")
 
 	// Data sample.
 	data := ana.NewSample("data", "data", `Data 18-20`)
@@ -286,11 +286,11 @@ var (
 	tName = "truth"
 
 	// Some variable, weights and cutw TreeFunc's
-	topPtFunc = ana.NewTreeFuncVarF32("t_pt")
-	mttFunc = ana.NewTreeFuncVarF32("ttbar_m")
-	dphiFunc = ana.NewTreeFuncVarF64("truth_dphi_ll")
-	w1 = ana.NewTreeFuncValF64(1.0)
-	w2 = ana.NewTreeFuncValF64(0.5)
+	topPtFunc = ana.NewVarF32("t_pt")
+	mttFunc = ana.NewVarF32("ttbar_m")
+	dphiFunc = ana.NewVarF64("truth_dphi_ll")
+	w1 = ana.NewValF64(1.0)
+	w2 = ana.NewValF64(0.5)
 	w3 = ana.TreeFunc{
 		VarsName: []string{"t_pt"},
 		Fct:      func(pt float32) float64 { return 1.0 + float64(pt)/50. },
