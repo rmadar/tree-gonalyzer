@@ -1,16 +1,9 @@
 # Performance study
 
-## Summary of running times in ms/kEvts
-
-|   setup   | variable | cut & weights |  1 vars | 20 vars | 40 vars | 60 vars |
-|:---------:|:--------:|:-------------:|:-------:|:-------:|:-------:|:-------:|
-|   **1**   |  direct  |     direct    |         |         |         |         |
-|   **2**   |  formula |     direct    |         |         |         |         |
-|   **3**   |  direct  |    formula    |         |         |         |         |
-|   **4**   |  formula |    formula    |         |         |         |         |
+![benchmarking](perf.png)
 
 
-## Setup definition
+## How to run each setup?
 
 **1.** Use explicit loading for variables and `rtree.Formula` for weight and cuts:
 ```
