@@ -2,6 +2,7 @@
 package main
 
 import (
+	"fmt"
 	"flag"
 	"math"
 
@@ -13,11 +14,10 @@ func main() {
 
 	// Options passed by command lines.
 	var (
-		doLatex                 = flag.Bool("latex", false, "On-the-fly LaTeX compilation of produced figure")
-		useVarFormula           = flag.Bool("varFormula", false, "Use TreeFormulaFunc for variables")
-		dontUseCutWeightFormula = flag.Bool("noCutFormula", false, "Disable cuts and weights, avoiding TreeFormulaFunc")
-		dontUseFunctions        = flag.Bool("noFunc", false, "Disable all 'dummy' function calls")
-		noRatio                 = flag.Bool("r", false, "Disable ratio plot")
+		compileLatex = flag.Bool("latex", false, "On-the-fly LaTeX compilation of produced figure.")
+		varFormula   = flag.Bool("varFormula", false, "Use TreeFormula for variables.")
+		nVariables   = flag.Int("nVars", -1, "Number of variables to loop over.")
+		noCutWeight  = flag.Bool("noCutWeight", false, "Disable cuts and weights, avoiding TreeFormula.")
 	)
 	flag.Parse()
 
@@ -34,49 +34,56 @@ func main() {
 	loadManyComponents(splBkg2)
 
 	// Background 3
-	splBkg3 := ana.NewSample("bkg3", "bkg", `Proc 3`, ana.WithWeight(w1))
+	splBkg3 := ana.NewSample("bkg3", "bkg", `Proc 3`)
 	loadManyComponents(splBkg3)
 
 	// Background 4
-	splBkg4 := ana.NewSample("bkg3", "bkg", `Proc 3`, ana.WithWeight(w1))
+	splBkg4 := ana.NewSample("bkg3", "bkg", `Proc 3`)
 	loadManyComponents(splBkg4)
 
 	// Group samples together
 	samples := []*ana.Sample{splData, splBkg1, splBkg2, splBkg3, splBkg4}
 
-	// Variables
+	// Variables, organized in bunch of 15
 	variables := []*ana.Variable{
-		var_dphi,
-		var_m_tt,
-		var_eta_t,
-		var_pt_lep,
-		var_Ckk,
-		var_Crr,
-		var_Cnn,
-		var_pt_lep,
-		var_eta_lep,
-		var_pt_b,
-		var_eta_b,
-		var_pt_vsum,
-		var_pt_t,
-		var_pt_tt,
-		var_x1,
+		var_dphi, var_m_tt, var_eta_t, var_pt_lep, var_Ckk,
+		var_Crr, var_Cnn, var_pt_lep, var_eta_lep, var_pt_b,
+		var_eta_b, var_pt_vsum, var_pt_t, var_pt_tt, var_x1,
+
+		var_dphi, var_m_tt, var_eta_t, var_pt_lep, var_Ckk,
+		var_Crr, var_Cnn, var_pt_lep, var_eta_lep, var_pt_b,
+		var_eta_b, var_pt_vsum, var_pt_t, var_pt_tt, var_x1,
+
+		var_dphi, var_m_tt, var_eta_t, var_pt_lep, var_Ckk,
+		var_Crr, var_Cnn, var_pt_lep, var_eta_lep, var_pt_b,
+		var_eta_b, var_pt_vsum, var_pt_t, var_pt_tt, var_x1,
+
+		var_dphi, var_m_tt, var_eta_t, var_pt_lep, var_Ckk,
+		var_Crr, var_Cnn, var_pt_lep, var_eta_lep, var_pt_b,
+		var_eta_b, var_pt_vsum, var_pt_t, var_pt_tt, var_x1,
 	}
 
+	// Protection for too high number of variables
+	nVars := len(variables)
+	if *nVariables > -1 {
+		nVars = *nVariables
+	}
+	if nVars > len(variables) {
+		panic(fmt.Errorf("Too much variables (max 60, got %v)", nVars))
+	}
+	
 	// Create analyzer object with options
-	analyzer := ana.New(samples, variables,
+	analyzer := ana.New(samples, variables[:nVars],
 		ana.WithAutoStyle(true),
 		ana.WithPlotTitle(`GOnalyzer Performance Test`),
-		ana.WithCompileLatex(*doLatex),
-		ana.WithRatioPlot(!*noRatio),
+		ana.WithCompileLatex(*compileLatex),
 		ana.WithHistoNorm(true),
 		ana.WithHistoStack(true),
 	)
 
 	// Few handles for benchmarking
-	analyzer.WithVarsTreeFormula = *useVarFormula
-	analyzer.NoTreeFormula = *dontUseCutWeightFormula
-	analyzer.NoFuncCall = *dontUseFunctions
+	analyzer.WithVarsTreeFormula = *varFormula
+	analyzer.NoTreeFormula = *noCutWeight
 
 	// Run the analyzer and produce all plots
 	if err := analyzer.Run(); err != nil {
