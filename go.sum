@@ -106,6 +106,8 @@ github.com/rmadar/hplot-style v0.0.0-20200503202946-6028c8e69f2d h1:BXqkDyRhZG0z
 github.com/rmadar/hplot-style v0.0.0-20200503202946-6028c8e69f2d/go.mod h1:EQXTn/P8KD0WH0+YrEfuaOsaovM5MWkQcdQj/0Gj1dE=
 github.com/rmadar/hplot-style v0.0.0-20200520134309-407e13ffe0f5 h1:a95uDSwikboKOx+8Ev5CEWwjCOmQb0p7lSPVBMhzejg=
 github.com/rmadar/hplot-style v0.0.0-20200520134309-407e13ffe0f5/go.mod h1:EQXTn/P8KD0WH0+YrEfuaOsaovM5MWkQcdQj/0Gj1dE=
+github.com/rmadar/hplot-style v0.0.0-20200526215101-0690a1dea78f h1:K29BdrJhAvhr2yQWXipFn6l3lLmU/zKEFfkcfQjF5yY=
+github.com/rmadar/hplot-style v0.0.0-20200526215101-0690a1dea78f/go.mod h1:EQXTn/P8KD0WH0+YrEfuaOsaovM5MWkQcdQj/0Gj1dE=
 github.com/ruudk/golang-pdf417 v0.0.0-20181029194003-1af4ab5afa58/go.mod h1:6lfFZQK844Gfx8o5WFuvpxWRwnSoipWe/p622j1v06w=
 github.com/sbinet/npyio v0.2.0/go.mod h1:Wk81yG1hlHgHAy4KXRQ59EfpZoAzT+2V4Pjyv7rUEM0=
 github.com/sbinet/npyio v0.3.0/go.mod h1:dJ6OpFwUDVVuDSqP5b8paU3yd7Rcs2TZiFimWwD30nc=
@@ -217,6 +219,7 @@ golang.org/x/net v0.0.0-20190404232315-eb5bcb51f2a3/go.mod h1:t9HGtf8HONx5eT2rtn
 golang.org/x/net v0.0.0-20190620200207-3b0461eec859/go.mod h1:z5CRVTTTmAJ677TzLLGU+0bjPO0LkuOLi4/5GtJWs/s=
 golang.org/x/net v0.0.0-20191011234655-491137f69257/go.mod h1:z5CRVTTTmAJ677TzLLGU+0bjPO0LkuOLi4/5GtJWs/s=
 golang.org/x/net v0.0.0-20200114155413-6afb5195e5aa/go.mod h1:z5CRVTTTmAJ677TzLLGU+0bjPO0LkuOLi4/5GtJWs/s=
+golang.org/x/net v0.0.0-20200226121028-0de0cce0169b h1:0mm1VjtFUOIlE1SbDlwjYaDxZVDP2S5ou6y0gSgXHu8=
 golang.org/x/net v0.0.0-20200226121028-0de0cce0169b/go.mod h1:z5CRVTTTmAJ677TzLLGU+0bjPO0LkuOLi4/5GtJWs/s=
 golang.org/x/sync v0.0.0-20190423024810-112230192c58 h1:8gQV6CLnAEikrhgkHFbMAEhagSSnXWGV915qUMm9mrU=
 golang.org/x/sync v0.0.0-20190423024810-112230192c58/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
@@ -249,6 +252,8 @@ golang.org/x/tools v0.0.0-20200513022744-65e69ff2d148 h1:X3wiF+nWEwv11fBoJVQN0dS
 golang.org/x/tools v0.0.0-20200513022744-65e69ff2d148/go.mod h1:EkVYQZoAsY45+roYkvgYkIh4xh/qjgUK9TdY2XT94GE=
 golang.org/x/tools v0.0.0-20200521211927-2b542361a4fc h1:6m2YO+AmBApbUOmhsghW+IfRyZOY4My4UYvQQrEpHfY=
 golang.org/x/tools v0.0.0-20200521211927-2b542361a4fc/go.mod h1:EkVYQZoAsY45+roYkvgYkIh4xh/qjgUK9TdY2XT94GE=
+golang.org/x/tools v0.0.0-20200526224456-8b020aee10d2 h1:21BqcH/onxtGHn1A2GDOJjZnbt4Nlez629S3eaR+eYs=
+golang.org/x/tools v0.0.0-20200526224456-8b020aee10d2/go.mod h1:EkVYQZoAsY45+roYkvgYkIh4xh/qjgUK9TdY2XT94GE=
 golang.org/x/xerrors v0.0.0-20190717185122-a985d3407aa7/go.mod h1:I/5z698sn9Ka8TeJc9MKroUUfqBBauWjQqLJ2OPfmY0=
 golang.org/x/xerrors v0.0.0-20191011141410-1b5146add898/go.mod h1:I/5z698sn9Ka8TeJc9MKroUUfqBBauWjQqLJ2OPfmY0=
 golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543 h1:E7g+9GITq07hpfrRu66IVDexMakfv52eLZ2CXBWiKr4=

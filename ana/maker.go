@@ -238,19 +238,19 @@ func (ana *Maker) FillHistos() error {
 					
 					// Loop over selection and variables
 					for ic := range ana.KinemCuts {
-						
+
+						// Look at the next selection if the event is not selected.
 						if !passKinemCut[ic]() {
 							continue
 						}
-						
+
+						// Otherwise, loop over variables.
 						for iv, v := range ana.Variables {
-							val := 0.0
 							if ana.WithVarsTreeFormula {
-								val = varFormula[iv]()
+								ana.HbookHistos[iv][ic][iSamp].Fill(varFormula[iv](), w)
 							} else {
-								val = v.getValue()
+								ana.HbookHistos[iv][ic][iSamp].Fill(v.getValue(), w)
 							}
-							ana.HbookHistos[iv][ic][iSamp].Fill(val, w)
 						}
 					}
 					
@@ -535,25 +535,31 @@ func (ana *Maker) PlotHistos() error {
 func (ana Maker) PrintReport() {
 
 	// Event, histo info
-	nvars, nsamples, ncuts := len(ana.Variables), len(ana.Samples), len(ana.KinemCuts)
-	nhist := nvars * nsamples
+	nfiles := 0
+	for _, s := range ana.Samples {
+		for _ = range s.Components {
+			nfiles++
+		}
+	}
+	nvars, ncuts := len(ana.Variables), len(ana.KinemCuts)
+	nhist := nvars * nfiles
 	if ncuts > 0 {
 		nhist *= ncuts
 	}
 	nkevt := float64(ana.nEvents) / 1e3
-
+	
 	// Timing info
 	dtLoop := float64(ana.timeLoop) / float64(time.Millisecond)
 	dtPlot := float64(ana.timePlot) / float64(time.Millisecond)
 
 	// Formating
 	str_template := "\n Processing report:\n"
-	str_template += "    - %v histograms filled over %.0f kEvts (%v samples, %v variables, %v selections)\n"
+	str_template += "    - %v histograms filled over %.0f kEvts (%v files, %v variables, %v selections)\n"
 	str_template += "    - running time: %.1f ms/kEvt (%s for %.0f kEvts)\n"
 	str_template += "    - time fraction: %.0f%% (event loop), %.0f%% (plotting)\n\n"
 
 	fmt.Printf(str_template,
-		nhist, nkevt, nsamples, nvars, ncuts,
+		nhist, nkevt, nfiles, nvars, ncuts,
 		(dtLoop+dtPlot)/nkevt, fmtDuration(ana.timeLoop+ana.timePlot), nkevt,
 		dtLoop/(dtLoop+dtPlot)*100., dtPlot/(dtLoop+dtPlot)*100.,
 	)
