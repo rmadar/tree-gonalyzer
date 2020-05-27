@@ -16,6 +16,8 @@ type Variable struct {
 	RangeYmin, RangeYmax     float64 // Y-axis range (default: hplot default).
 	RatioYmin, RatioYmax     float64 // Ratio Y-axis range (default: hplot default).
 	LegPosTop, LegPosLeft bool // Legend position (default: true, false)
+
+	isSlice bool
 }
 
 // NewVariable creates a new variable value with
@@ -31,6 +33,20 @@ func NewVariable(name string, tFunc TreeFunc, nBins int, xMin, xMax float64, opt
 		Xmax:     xMax,
 	}
 
+	// Set the slice label
+	switch tFunc.Fct.(type) {
+	case (func ([]float64) []float64):
+		v.isSlice = true
+	case (func ([]float32) []float64):
+		v.isSlice = true
+	case (func ([]int64) []float64):
+		v.isSlice = true
+	case (func ([]int32) []float64):
+		v.isSlice = true
+	default:
+		v.isSlice = false
+	}
+	
 	// Configuration with default values for all optional fields
 	cfg := newConfig(
 		WithSaveName(v.Name),

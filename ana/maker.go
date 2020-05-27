@@ -168,10 +168,15 @@ func (ana *Maker) FillHistos() error {
 				defer r.Close()
 
 				// Prepare variables
-				getVar := make([]func() float64, len(ana.Variables))
+				getVar  := make([]func() float64, len(ana.Variables))
+				getVars := make([]func() []float64, len(ana.Variables))
 				for iv, v := range ana.Variables {
 					idx := iv
-					getVar[idx] = v.TreeFunc.GetFuncF64(r)
+					if v.isSlice {
+						getVars[idx] = v.TreeFunc.GetFuncF64s(r)
+					} else {
+						getVar[idx] = v.TreeFunc.GetFuncF64(r)
+					}
 				}
 
 				// Prepare the sample global weight
@@ -225,8 +230,15 @@ func (ana *Maker) FillHistos() error {
 						}
 
 						// Otherwise, loop over variables.
-						for iv := range ana.Variables {
-							ana.HbookHistos[iv][ic][iSamp].Fill(getVar[iv](), w)
+						for iv, v := range ana.Variables {
+							if v.isSlice {
+								fmt.Println(ctx.Entry, getVars[iv]())
+								for _, x := range getVars[iv]() {
+									ana.HbookHistos[iv][ic][iSamp].Fill(x, w)
+								}
+							} else {
+								ana.HbookHistos[iv][ic][iSamp].Fill(getVar[iv](), w)
+							}
 						}
 					}
 					
@@ -250,7 +262,7 @@ func (ana *Maker) FillHistos() error {
 
 	// End timing.
 	ana.timeLoop = time.Now().Sub(start)
-
+	
 	return nil
 }
 

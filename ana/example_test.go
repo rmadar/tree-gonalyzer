@@ -39,6 +39,12 @@ func TestShapeDistortion(t *testing.T) {
 	)
 }
 
+func TestSliceVariables(t *testing.T) {
+	cmpimg.CheckPlot(Example_withSliceVariables, t,
+		"Plots_withSliceVariables/hitTimes.png",
+	)
+}
+
 // Creation of the default analysis maker type with
 // single-component samples.
 func Example_aSimpleUseCase() {
@@ -276,6 +282,35 @@ func Example_shapeDistortion() {
 
 func Example_withKinemCuts() {
 
+}
+
+func Example_withSliceVariables() {
+	// Few definitions
+	fName, tName := "../testdata/fileSlices.root", "modules"
+	hitTimes := ana.NewVarF32s("hits_time_mc")
+	
+	// Samples
+	samples := []*ana.Sample{
+		ana.CreateSample("HGTD", "bkg", `w/o calib.`, fName, tName),
+	}
+
+	// Variables
+	variables := []*ana.Variable{
+		ana.NewVariable("hitTimes", hitTimes, 50, 10, 20),
+	}
+
+	// Analyzer
+	analyzer := ana.New(samples, variables,
+		ana.WithHistoStack(false),
+		ana.WithRatioPlot(false),
+		ana.WithSaveFormat("png"),
+		ana.WithSavePath("testdata/Plots_withSliceVariables"),
+	)
+
+	// Run the analyzer to produce all the plots
+	if err := analyzer.Run(); err != nil {
+		panic(err)
+	}
 }
 
 var (
