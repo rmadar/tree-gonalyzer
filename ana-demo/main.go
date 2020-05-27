@@ -1,4 +1,4 @@
-// Example of realistic analysis using ana package.
+// Package featuring a realistic example of analysis using ana package.
 package main
 
 import (

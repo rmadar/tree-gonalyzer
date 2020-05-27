@@ -1,4 +1,4 @@
-// 
+// Package allowing to benchmark performances of the ana package.
 package main
 
 import (
@@ -13,14 +13,14 @@ func main() {
 
 	// Options passed by command lines.
 	var (
-		doLatex = flag.Bool("latex", false, "On-the-fly LaTeX compilation of produced figure")
-		useVarFormula = flag.Bool("varFormula", false, "Use TreeFormulaFunc for variables")
+		doLatex                 = flag.Bool("latex", false, "On-the-fly LaTeX compilation of produced figure")
+		useVarFormula           = flag.Bool("varFormula", false, "Use TreeFormulaFunc for variables")
 		dontUseCutWeightFormula = flag.Bool("noCutFormula", false, "Disable cuts and weights, avoiding TreeFormulaFunc")
-		dontUseFunctions = flag.Bool("noFunc", false, "Disable all 'dummy' function calls")
-		noRatio = flag.Bool("r", false, "Disable ratio plot")
+		dontUseFunctions        = flag.Bool("noFunc", false, "Disable all 'dummy' function calls")
+		noRatio                 = flag.Bool("r", false, "Disable ratio plot")
 	)
 	flag.Parse()
-	
+
 	// Data
 	splData := ana.NewSample("data", "data", `Pseudo-data`)
 	loadManyComponents(splData)
@@ -28,27 +28,27 @@ func main() {
 	// Background 1
 	splBkg1 := ana.NewSample("bkg1", "bkg", `Proc 1`, ana.WithWeight(w1), ana.WithCut(isGG))
 	loadManyComponents(splBkg1)
-	
+
 	// Background 2
 	splBkg2 := ana.NewSample("bkg2", "bkg", `Proc 2`, ana.WithWeight(w2), ana.WithCut(isQQ))
 	loadManyComponents(splBkg2)
-	
+
 	// Background 3
 	splBkg3 := ana.NewSample("bkg3", "bkg", `Proc 3`, ana.WithWeight(w1))
 	loadManyComponents(splBkg3)
-	
+
 	// Background 4
 	splBkg4 := ana.NewSample("bkg3", "bkg", `Proc 3`, ana.WithWeight(w1))
 	loadManyComponents(splBkg4)
-	
+
 	// Group samples together
 	samples := []*ana.Sample{splData, splBkg1, splBkg2, splBkg3, splBkg4}
 
 	// Variables
 	variables := []*ana.Variable{
 		var_dphi,
-                var_m_tt,
-                var_eta_t,
+		var_m_tt,
+		var_eta_t,
 		var_pt_lep,
 		var_Ckk,
 		var_Crr,
@@ -93,18 +93,18 @@ var (
 	tname = "truth"
 
 	// Some TreeFunc: weights and cuts
-	w1 = ana.NewTreeFuncValF64(0.5)
-	w2 = ana.NewTreeFuncValF64(2.0)
+	w1   = ana.NewTreeFuncValF64(0.5)
+	w2   = ana.NewTreeFuncValF64(2.0)
 	isGG = ana.NewTreeFuncVarBool("init_gg")
 	isQQ = ana.NewTreeFuncVarBool("init_qq")
-		
+
 	// Variables
 	var_dphi = &ana.Variable{
 		Name:       "truth_dphi_ll",
 		SaveName:   "truth_dphi_ll",
 		TreeName:   "truth_dphi_ll",
 		Value:      new(float64),
-		TreeVar:   ana.NewTreeFuncVarF64("truth_dphi_ll"),
+		TreeVar:    ana.NewTreeFuncVarF64("truth_dphi_ll"),
 		Nbins:      15,
 		Xmin:       0,
 		Xmax:       math.Pi,
@@ -120,7 +120,7 @@ var (
 		SaveName:   "truth_Ckk",
 		TreeName:   "truth_Ckk",
 		Value:      new(float64),
-		TreeVar:   ana.NewTreeFuncVarF64("truth_Ckk"),
+		TreeVar:    ana.NewTreeFuncVarF64("truth_Ckk"),
 		Nbins:      25,
 		Xmin:       -1,
 		Xmax:       1,
@@ -137,7 +137,7 @@ var (
 		SaveName:   "truth_Crr",
 		TreeName:   "truth_Crr",
 		Value:      new(float64),
-		TreeVar:   ana.NewTreeFuncVarF64("truth_Crr"),
+		TreeVar:    ana.NewTreeFuncVarF64("truth_Crr"),
 		Nbins:      25,
 		Xmin:       -1,
 		Xmax:       1,
@@ -154,7 +154,7 @@ var (
 		SaveName:   "truth_Cnn",
 		TreeName:   "truth_Cnn",
 		Value:      new(float64),
-		TreeVar:   ana.NewTreeFuncVarF64("truth_Cnn"),
+		TreeVar:    ana.NewTreeFuncVarF64("truth_Cnn"),
 		Nbins:      25,
 		Xmin:       -1,
 		Xmax:       1,
@@ -171,7 +171,7 @@ var (
 		SaveName:   "pt_lep",
 		TreeName:   "l_pt",
 		Value:      new(float32),
-		TreeVar:   ana.NewTreeFuncVarF32("l_pt"),
+		TreeVar:    ana.NewTreeFuncVarF32("l_pt"),
 		Nbins:      25,
 		Xmin:       0,
 		Xmax:       500,
@@ -186,7 +186,7 @@ var (
 		SaveName:   "eta_lep",
 		TreeName:   "l_eta",
 		Value:      new(float32),
-		TreeVar:   ana.NewTreeFuncVarF32("l_eta"),
+		TreeVar:    ana.NewTreeFuncVarF32("l_eta"),
 		Nbins:      25,
 		Xmin:       -5,
 		Xmax:       5,
@@ -202,7 +202,7 @@ var (
 		SaveName:   "pt_b",
 		TreeName:   "b_pt",
 		Value:      new(float32),
-		TreeVar:   ana.NewTreeFuncVarF32("b_pt"),
+		TreeVar:    ana.NewTreeFuncVarF32("b_pt"),
 		Nbins:      25,
 		Xmin:       0,
 		Xmax:       500,
@@ -217,7 +217,7 @@ var (
 		SaveName:   "eta_b",
 		TreeName:   "b_eta",
 		Value:      new(float32),
-		TreeVar:   ana.NewTreeFuncVarF32("b_eta"),
+		TreeVar:    ana.NewTreeFuncVarF32("b_eta"),
 		Nbins:      25,
 		Xmin:       -5,
 		Xmax:       5,
@@ -233,7 +233,7 @@ var (
 		SaveName:    "pt_vsum",
 		TreeName:    "vsum_pt",
 		Value:       new(float32),
-		TreeVar:    ana.NewTreeFuncVarF32("vsum_pt"),
+		TreeVar:     ana.NewTreeFuncVarF32("vsum_pt"),
 		Nbins:       25,
 		Xmin:        0,
 		Xmax:        250,
@@ -245,15 +245,15 @@ var (
 	}
 
 	var_pt_t = &ana.Variable{
-		Name:      "t_pt",
-		SaveName:  "pt_t",
-		TreeName:  "t_pt",
-		Value:     new(float32),
+		Name:     "t_pt",
+		SaveName: "pt_t",
+		TreeName: "t_pt",
+		Value:    new(float32),
 		TreeVar:  ana.NewTreeFuncVarF32("t_pt"),
-		Nbins:     100,
-		Xmin:      0,
-		Xmax:      500,
-		XLabel:    `$p^{t}_{T}$ [GeV]`,
+		Nbins:    100,
+		Xmin:     0,
+		Xmax:     500,
+		XLabel:   `$p^{t}_{T}$ [GeV]`,
 		// YLabel: `Number of Entries`,
 		YLabel:     `PDF($p^{t}_{T}$)`,
 		LegPosTop:  true,
@@ -266,7 +266,7 @@ var (
 		SaveName:   "eta_t",
 		TreeName:   "t_eta",
 		Value:      new(float32),
-		TreeVar:   ana.NewTreeFuncVarF32("t_eta"),
+		TreeVar:    ana.NewTreeFuncVarF32("t_eta"),
 		Nbins:      25,
 		Xmin:       -5,
 		Xmax:       5,
@@ -283,7 +283,7 @@ var (
 		SaveName:   "m_tt",
 		TreeName:   "ttbar_m",
 		Value:      new(float32),
-		TreeVar:   ana.NewTreeFuncVarF32("ttbar_m"),
+		TreeVar:    ana.NewTreeFuncVarF32("ttbar_m"),
 		Nbins:      25,
 		Xmin:       300,
 		Xmax:       1500,
@@ -298,7 +298,7 @@ var (
 		SaveName:   "pt_tt",
 		TreeName:   "ttbar_pt",
 		Value:      new(float32),
-		TreeVar:   ana.NewTreeFuncVarF32("ttbar_pt"),
+		TreeVar:    ana.NewTreeFuncVarF32("ttbar_pt"),
 		Nbins:      25,
 		Xmin:       0,
 		Xmax:       150,
@@ -312,7 +312,7 @@ var (
 		TreeName: "init_x1",
 		Value:    new(float32),
 		SaveName: "init_x1",
-		TreeVar: ana.NewTreeFuncVarF32("init_x1"),
+		TreeVar:  ana.NewTreeFuncVarF32("init_x1"),
 		Nbins:    25,
 		Xmin:     0,
 		Xmax:     1,
@@ -330,8 +330,7 @@ var (
 		Xmin:  0,
 		Xmax:  1,
 	}
-	
-	
+
 	sel1 = &ana.Selection{
 		Name: "cut1",
 		TreeFunc: ana.TreeFunc{
@@ -339,7 +338,7 @@ var (
 			Fct:      func(pt float32) bool { return pt > 20 },
 		},
 	}
-	
+
 	sel2 = &ana.Selection{
 		Name: "cut2",
 		TreeFunc: ana.TreeFunc{
@@ -355,7 +354,7 @@ var (
 			Fct:      func(pt float32) bool { return pt > 100 },
 		},
 	}
-	
+
 	sel4 = &ana.Selection{
 		Name: "cut4",
 		TreeFunc: ana.TreeFunc{
@@ -363,7 +362,6 @@ var (
 			Fct:      func(pt float32) bool { return pt > 150 },
 		},
 	}
-	
 )
 
 // Helper function to add many components to a sample
@@ -385,5 +383,5 @@ func loadManyComponents(s *ana.Sample) {
 	s.AddComponent(file3, tname)
 	s.AddComponent(file1, tname)
 	s.AddComponent(file2, tname)
-	s.AddComponent(file3, tname)	
+	s.AddComponent(file3, tname)
 }
