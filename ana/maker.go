@@ -55,7 +55,6 @@ type Maker struct {
 	// Fields for benchmarking (TEMP)
 	WithVarsTreeFormula bool
 	NoTreeFormula       bool
-	NoFuncCall          bool
 
 	// Internal fields
 	cutIdx      map[string]int // Linking cut name and cut index
@@ -219,64 +218,53 @@ func (ana *Maker) FillHistos() error {
 				passKinemCut := make([]func() bool, len(ana.KinemCuts))
 				for ic, cut := range ana.KinemCuts {
 					idx := ic
-					if !ana.NoTreeFormula {
-						passKinemCut[idx] = cut.TreeFunc.GetFuncBool(r)
-					} else {
+					if ana.NoTreeFormula {
 						_, passKinemCut[idx] = cut, func() bool { return true }
+					} else {
+						passKinemCut[idx] = cut.TreeFunc.GetFuncBool(r)
 					}
 				}
 
 				// Read the tree (event loop)
 				err = r.Read(func(ctx rtree.RCtx) error {
 
-					// No call to function at all
-					if ana.NoFuncCall {
-						for ic := range ana.KinemCuts {
-							for iv, v := range ana.Variables {
-								ana.HbookHistos[iv][ic][iSamp].Fill(v.getValue(), 1.0)
-							}
+					// Sample-level and component-level cut
+					if !(passCutSamp() && passCutComp()) {
+						return nil
+					}
+					
+					// Get the event weight
+					w := getWeightSamp() * getWeightComp()
+					
+					// Loop over selection and variables
+					for ic := range ana.KinemCuts {
+						
+						if !passKinemCut[ic]() {
+							continue
 						}
-
-					} else {
-
-						// Sample-level and component-level cut
-						if !(passCutSamp() && passCutComp()) {
-							return nil
-						}
-
-						// Get the event weight
-						w := getWeightSamp() * getWeightComp()
-
-						// Loop over selection and variables
-						for ic := range ana.KinemCuts {
-
-							if !passKinemCut[ic]() {
-								continue
+						
+						for iv, v := range ana.Variables {
+							val := 0.0
+							if ana.WithVarsTreeFormula {
+								val = varFormula[iv]()
+							} else {
+								val = v.getValue()
 							}
-
-							for iv, v := range ana.Variables {
-								val := 0.0
-								if ana.WithVarsTreeFormula {
-									val = varFormula[iv]()
-								} else {
-									val = v.getValue()
-								}
-								ana.HbookHistos[iv][ic][iSamp].Fill(val, w)
-							}
+							ana.HbookHistos[iv][ic][iSamp].Fill(val, w)
 						}
 					}
-
+					
 					return nil
 				})
-
+				
 				// Keep track of the number of processed events
 				ana.nEvents += t.Entries()
-
+				
 				return nil
 			}(iComp)
 		}
 	}
-
+	
 	ana.histoFilled = true
 
 	// End timing
