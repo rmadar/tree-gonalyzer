@@ -1,11 +1,11 @@
 # Performance study
 
-| setup | variable | cut & weights | 60 vars | 40 vars | 20 vars | 1 vars |
-|:-----:|:--------:|:-------------:|:-------:|:-------:|:-------:|:------:|
-|   1   |  direct  |     direct    |         |         |         |        |
-|   2   |  formula |     direct    |         |         |         |        |
-|   3   |  direct  |    formula    |         |         |         |        |
-|   4   |  formula |    formula    |         |         |         |        |
+|   setup   | variable | cut & weights | 60 vars | 40 vars | 20 vars | 1 vars |
+|:---------:|:--------:|:-------------:|:-------:|:-------:|:-------:|:------:|
+|   **1**   |  direct  |     direct    |         |         |         |        |
+|   **2**   |  formula |     direct    |         |         |         |        |
+|   **3**   |  direct  |    formula    |         |         |         |        |
+|   **4**   |  formula |    formula    |         |         |         |        |
 
 1. Use explicit loading for variables and `rtree.Formula` for weight and cuts:
 ```
