@@ -40,7 +40,7 @@ analyzer.Run()
     <td><p align="center"><img src="ana/testdata/Plots_simpleUseCase/Mttbar_golden.png">
 	Data/Background <a href="https://godoc.org/github.com/rmadar/tree-gonalyzer/ana#example-package--ASimpleUseCase">[code]</a></p>
     </td>
-    <td><p align="center"><img src="ana/testdata/Plots_shapeComparison/Mttbar_golden.png">
+    <td><p align="center"><img src="ana/testdata/Plots_shapeComparison/TopPt_golden.png">
 	Shape comparison <a href="https://godoc.org/github.com/rmadar/tree-gonalyzer/ana#example-package--ShapeComparison">[code]</a></p>
     </td>
   </tr>

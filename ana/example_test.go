@@ -20,7 +20,7 @@ func TestSimpleUseCase(t *testing.T) {
 
 func TestShapeComparison(t *testing.T) {
 	cmpimg.CheckPlot(Example_shapeComparison, t,
-		"Plots_shapeComparison/Mttbar.png",
+		"Plots_shapeComparison/TopPt.png",
 		"Plots_shapeComparison/DphiLL.png",
 	)
 }
@@ -52,10 +52,10 @@ func Example_aSimpleUseCase() {
 
 	// Define variables
 	variables := []*ana.Variable{
-		ana.NewVariable("Mttbar", "ttbar_m", new(float32), 25, 350, 1000,
+		ana.NewVariable("Mttbar", mttFunc, 25, 350, 1000,
 			ana.WithAxisLabels("M(t,t) [GeV]", "Events Yields"),
 		),
-		ana.NewVariable("DphiLL", "truth_dphi_ll", new(float64), 10, 0, math.Pi,
+		ana.NewVariable("DphiLL", dphiFunc, 10, 0, math.Pi,
 			ana.WithAxisLabels("dPhi(l,l)", "Events Yields"),
 			ana.WithLegLeft(true)),
 	}
@@ -102,8 +102,8 @@ func Example_multiComponentSamples() {
 
 	// Define variables
 	variables := []*ana.Variable{
-		ana.NewVariable("Mttbar", "ttbar_m", new(float32), 25, 350, 1000),
-		ana.NewVariable("DphiLL", "truth_dphi_ll", new(float64), 10, 0, math.Pi),
+		ana.NewVariable("Mttbar", mttFunc, 25, 350, 1000),
+		ana.NewVariable("DphiLL", dphiFunc, 10, 0, math.Pi),
 	}
 
 	// Create analyzer object with normalized histograms.
@@ -140,8 +140,8 @@ func Example_shapeComparison() {
 
 	// Define variables
 	variables := []*ana.Variable{
-		ana.NewVariable("Mttbar", "t_pt", new(float32), 10, 0, 500),
-		ana.NewVariable("DphiLL", "truth_dphi_ll", new(float64), 10, 0, math.Pi,
+		ana.NewVariable("TopPt", topPtFunc, 10, 0, 500),
+		ana.NewVariable("DphiLL", dphiFunc, 10, 0, math.Pi,
 			ana.WithLegLeft(true)),
 	}
 
@@ -186,9 +186,9 @@ func Example_systematicVariations() {
 
 	// Define variables
 	variables := []*ana.Variable{
-		ana.NewVariable("Mttbar", "ttbar_m", new(float32), 25, 350, 1500,
+		ana.NewVariable("Mttbar", mttFunc, 25, 350, 1500,
 			ana.WithRatioYRange(0.7, 1.3)),
-		ana.NewVariable("DphiLL", "truth_dphi_ll", new(float64), 10, 0, math.Pi,
+		ana.NewVariable("DphiLL", dphiFunc, 10, 0, math.Pi,
 			ana.WithRatioYRange(0.7, 1.3),
 			ana.WithYRange(0, 0.2),
 			ana.WithLegLeft(true),
@@ -249,10 +249,10 @@ func Example_shapeDistortion() {
 
 	// Define variables
 	variables := []*ana.Variable{
-		ana.NewVariable("Mttbar", "ttbar_m", new(float32), 25, 350, 1500,
+		ana.NewVariable("Mttbar", mttFunc, 25, 350, 1500,
 			ana.WithAxisLabels("M(t,t) [GeV]", "PDF"),
 		),
-		ana.NewVariable("DphiLL", "truth_dphi_ll", new(float64), 10, 0, math.Pi,
+		ana.NewVariable("DphiLL", dphiFunc, 10, 0, math.Pi,
 			ana.WithLegLeft(true),
 			ana.WithAxisLabels("dPhi(l,l)", "PDF"),
 			ana.WithYRange(0, 0.3),
@@ -285,7 +285,10 @@ var (
 	fBkg2 = "../testdata/file3.root"
 	tName = "truth"
 
-	// Some weights and cut TreeFunc's
+	// Some variable, weights and cutw TreeFunc's
+	topPtFunc = ana.NewTreeFuncVarF32("t_pt")
+	mttFunc = ana.NewTreeFuncVarF32("ttbar_m")
+	dphiFunc = ana.NewTreeFuncVarF64("truth_dphi_ll")
 	w1 = ana.NewTreeFuncValF64(1.0)
 	w2 = ana.NewTreeFuncValF64(0.5)
 	w3 = ana.TreeFunc{

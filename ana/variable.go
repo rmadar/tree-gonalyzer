@@ -1,46 +1,34 @@
 package ana
 
 import (
-	"fmt"
-
 	"go-hep.org/x/hep/hplot"
 )
 
 type Variable struct {
 	Name       string      // Variable name.
-	TreeName   string      // Name of the branch corresponding to the variable.
-	Value      interface{} // Pointer of the branch type (e.g. new(float64)).
+	TreeFunc   TreeFunc    // Variable definition from branches & functions.
 	Nbins      int         // Number of bins of final histograms.
 	Xmin, Xmax float64     // Mininum and maximum values of the histogram.
-
-	// Non-cosmetics options
-	TreeVar  TreeFunc // Complexe variable, eg. branches combination (default: nil).
 	SaveName string   // Name of the plot to be saved default (default 'Name').
-
-	// Axis cosmetics
 	XLabel, YLabel           string  // Axis labels (default: 'Variable', 'Events').
 	XTickFormat, YTickFormat string  // Axis tick formatting (default: hplot default).
 	RangeXmin, RangeXmax     float64 // X-axis range (default: hplot default).
 	RangeYmin, RangeYmax     float64 // Y-axis range (default: hplot default).
 	RatioYmin, RatioYmax     float64 // Ratio Y-axis range (default: hplot default).
-
-	// Legend cosmetics
 	LegPosTop, LegPosLeft bool // Legend position (default: true, false)
 }
 
 // NewVariable creates a new variable value with
 // default settings.
-func NewVariable(name, tname string, value interface{},
-	nbins int, xmin, xmax float64, opts ...VariableOptions) *Variable {
+func NewVariable(name string, tFunc TreeFunc, nBins int, xMin, xMax float64, opts ...VariableOptions) *Variable {
 
 	// Create the object
 	v := &Variable{
 		Name:     name,
-		TreeName: tname,
-		Value:    value,
-		Nbins:    nbins,
-		Xmin:     xmin,
-		Xmax:     xmax,
+		TreeFunc: tFunc,
+		Nbins:    nBins,
+		Xmin:     xMin,
+		Xmax:     xMax,
 	}
 
 	// Configuration with default values for all optional fields
@@ -58,7 +46,6 @@ func NewVariable(name, tname string, value interface{},
 
 	// Set fields with updaded configuration
 	v.SaveName = cfg.SaveName
-	v.TreeVar = cfg.TreeVar
 	v.XLabel = cfg.XLabel
 	v.YLabel = cfg.YLabel
 	v.XTickFormat = cfg.XTickFormat
@@ -73,30 +60,6 @@ func NewVariable(name, tname string, value interface{},
 	v.LegPosLeft = cfg.LegPosLeft
 
 	return v
-}
-
-// NewVariableFromTreeFunc creates a new variable from
-// a TreeFunc object.
-func NewVariableFromTreeFunc(name string, f TreeFunc, nbins int,
-	xmin, xmax float64, opts ...VariableOptions) *Variable {
-	v := NewVariable(name, "", nil, nbins, xmin, xmax, opts...)
-	v.TreeVar = f
-	return v
-}
-
-// getValue returns the value of the variable with the
-// proper type.
-func (v Variable) getValue() float64 {
-	switch v := v.Value.(type) {
-	case *float64:
-		return *v
-	case *float32:
-		return float64(*v)
-	case *bool:
-		return map[bool]float64{true: 1, false: 0}[*v]
-	default:
-		panic(fmt.Errorf("invalid variable value-type %T", v))
-	}
 }
 
 // SetPlotStyle sets the user-specified style on

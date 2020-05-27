@@ -52,10 +52,6 @@ type Maker struct {
 	HbookHistos [][][]*hbook.H1D
 	HplotHistos [][][]*hplot.H1D
 	
-	// Fields for benchmarking (TEMP)
-	WithVarsTreeFormula bool
-	NoTreeFormula       bool
-
 	// Internal fields
 	cutIdx      map[string]int // Linking cut name and cut index
 	samIdx      map[string]int // Linking sample name and sample index
@@ -164,65 +160,49 @@ func (ana *Maker) FillHistos() error {
 				f, t := getTreeFromFile(comp.FileName, comp.TreeName)
 				defer f.Close()
 
-				// Prepare variables to explicitely load
-				var rvars []rtree.ReadVar
-				if !ana.WithVarsTreeFormula {
-					for _, v := range ana.Variables {
-						rvars = append(rvars, rtree.ReadVar{Name: v.TreeName, Value: v.Value})
-					}
-				}
-
 				// Get the tree reader
-				r, err := rtree.NewReader(t, rvars, rtree.WithRange(0, ana.Nevts))
+				r, err := rtree.NewReader(t, []rtree.ReadVar{}, rtree.WithRange(0, ana.Nevts))
 				if err != nil {
 					log.Fatal("could not create tree reader: %w", err)
 				}
 				defer r.Close()
 
-				// Loading variable when using formulaFunc
-				// FIXME(rmadar): to be reshaped.
-				varFormula := make([]func() float64, len(ana.Variables))
-				if ana.WithVarsTreeFormula {
-					for i, v := range ana.Variables {
-						if v.TreeVar.Fct != nil {
-							varFormula[i] = v.TreeVar.GetFuncF64(r)
-						}
-					}
+				// Prepare variables
+				getVar := make([]func() float64, len(ana.Variables))
+				for iv, v := range ana.Variables {
+					idx := iv
+					getVar[idx] = v.TreeFunc.GetFuncF64(r)
 				}
 
 				// Prepare the sample global weight
 				getWeightSamp := func() float64 { return float64(1.0) }
-				if samp.WeightFunc.Fct != nil && !ana.NoTreeFormula {
+				if samp.WeightFunc.Fct != nil {
 					getWeightSamp = samp.WeightFunc.GetFuncF64(r)
 				}
-
+				
 				// Prepare the additional weight of the component
 				getWeightComp := func() float64 { return float64(1.0) }
-				if comp.WeightFunc.Fct != nil && !ana.NoTreeFormula {
+				if comp.WeightFunc.Fct != nil {
 					getWeightComp = comp.WeightFunc.GetFuncF64(r)
 				}
 
 				// Prepare the sample global cut
 				passCutSamp := func() bool { return true }
-				if samp.CutFunc.Fct != nil && !ana.NoTreeFormula {
+				if samp.CutFunc.Fct != nil {
 					passCutSamp = samp.CutFunc.GetFuncBool(r)
 				}
-
+				
 				// Prepare the component additional cut
 				passCutComp := func() bool { return true }
-				if comp.CutFunc.Fct != nil && !ana.NoTreeFormula {
+				if comp.CutFunc.Fct != nil {
 					passCutComp = comp.CutFunc.GetFuncBool(r)
 				}
-
+				
 				// Prepare the cut string for kinematics
 				passKinemCut := make([]func() bool, len(ana.KinemCuts))
 				for ic, cut := range ana.KinemCuts {
 					idx := ic
-					if ana.NoTreeFormula {
-						_, passKinemCut[idx] = cut, func() bool { return true }
-					} else {
-						passKinemCut[idx] = cut.TreeFunc.GetFuncBool(r)
-					}
+					passKinemCut[idx] = cut.TreeFunc.GetFuncBool(r)
 				}
 
 				// Read the tree (event loop)
@@ -245,19 +225,15 @@ func (ana *Maker) FillHistos() error {
 						}
 
 						// Otherwise, loop over variables.
-						for iv, v := range ana.Variables {
-							if ana.WithVarsTreeFormula {
-								ana.HbookHistos[iv][ic][iSamp].Fill(varFormula[iv](), w)
-							} else {
-								ana.HbookHistos[iv][ic][iSamp].Fill(v.getValue(), w)
-							}
+						for iv := range ana.Variables {
+							ana.HbookHistos[iv][ic][iSamp].Fill(getVar[iv](), w)
 						}
 					}
 					
 					return nil
 				})
 				
-				// Keep track of the number of processed events
+				// Keep track of the number of processed events.
 				if ana.Nevts == -1 {
 					ana.nEvents += t.Entries()
 				} else {
@@ -269,9 +245,10 @@ func (ana *Maker) FillHistos() error {
 		}
 	}
 	
+	// Histograms are now filled.
 	ana.histoFilled = true
 
-	// End timing
+	// End timing.
 	ana.timeLoop = time.Now().Sub(start)
 
 	return nil
