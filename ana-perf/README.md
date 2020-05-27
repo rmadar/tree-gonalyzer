@@ -22,12 +22,12 @@ go run ./main.go
 go run ./main.go -noCutWeight
 ```
 
-**3.** Use `rtree.Formula` for variables and disable `rtree.Formula` of weights and cuts:
+**3.** Use `rtree.Formula` for variables and disable `rtree.Formula` of weights and cuts (not applied):
 ```
 go run ./main.go -varFormula -noCutWeight
 ```
 
-**4.** Use `rtree.Formula` for variables and `rtree.Formula` for weight and cuts:
+**4.** Use `rtree.Formula` for variables and `rtree.Formula` for weights and cuts:
 ```
 go run ./main.go -varFormula
 ```
