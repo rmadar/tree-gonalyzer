@@ -1,12 +1,12 @@
 # Performance study
 
-| N[vars] | variable | cut & weights | time (ms/kEvts) |
-|:-------:|:--------:|:-------------:|:---------------:|
-|    60   |          |               |                 |
-|         |  direct  |     direct    |                 |
-|         |  formula |     direct    |                 |
-|         |  direct  |    formula    |                 |
-|         |  formula |    formula    |                 |
+
+| variables | cut & weights | 60 vars | 40 vars | 20 vars | 1 vars |
+|:---------:|:-------------:|:-------:|:-------:|:-------:|:------:|
+|  direct   |     direct    |         |         |         |        |
+|  formula  |     direct    |         |         |         |        |
+|  direct   |    formula    |         |         |         |        |
+|  formula  |    formula    |         |         |         |        |
 
 1. Use explicit loading for variables and `rtree.Formula` for weight and cuts:
 ```
