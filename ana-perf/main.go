@@ -3,17 +3,17 @@ package main
 
 import (
 	"fmt"
-	"math"
 	"log"
+	"math"
 
-	"gonum.org/v1/plot/vg"
 	"gonum.org/v1/plot/plotutil"
-	
+	"gonum.org/v1/plot/vg"
+
 	"go-hep.org/x/hep/hbook"
 	"go-hep.org/x/hep/hplot"
 
-	"github.com/rmadar/tree-gonalyzer/ana"
 	"github.com/rmadar/hplot-style/style"
+	"github.com/rmadar/tree-gonalyzer/ana"
 )
 
 // Run all the tests
@@ -21,23 +21,23 @@ func main() {
 
 	// Number of kEvents
 	n10kEvtsPerSample := 10
-	
+
 	// Scan the number of variables
 	nVars := []float64{1, 5, 10, 20, 30, 40, 50, 60}
 
 	// Containers
 	tVarOFFCutWeightOFF := make([]float64, len(nVars))
-	tVarOFFCutWeightON  := make([]float64, len(nVars))
-	tVarONCutWeightOFF  := make([]float64, len(nVars))
-	tVarONCutWeightON   := make([]float64, len(nVars))
+	tVarOFFCutWeightON := make([]float64, len(nVars))
+	tVarONCutWeightOFF := make([]float64, len(nVars))
+	tVarONCutWeightON := make([]float64, len(nVars))
 
 	// Run all test
 	for i, n := range nVars {
 		fmt.Println("Running for nVars =", n)
 		tVarOFFCutWeightOFF[i] = runTest(n10kEvtsPerSample, int(n), false, true)
-		tVarOFFCutWeightON[i]  = runTest(n10kEvtsPerSample, int(n), false, false)
-		tVarONCutWeightOFF[i]  = runTest(n10kEvtsPerSample, int(n), true , true)
-		tVarONCutWeightON[i]   = runTest(n10kEvtsPerSample, int(n), true, true)
+		tVarOFFCutWeightON[i] = runTest(n10kEvtsPerSample, int(n), false, false)
+		tVarONCutWeightOFF[i] = runTest(n10kEvtsPerSample, int(n), true, true)
+		tVarONCutWeightON[i] = runTest(n10kEvtsPerSample, int(n), true, true)
 	}
 
 	// Plot benchmarks
@@ -45,7 +45,7 @@ func main() {
 		tVarONCutWeightOFF, tVarONCutWeightON, nVars,
 	)
 	p.Title.Text = fmt.Sprintf("Benchmark with %v kEvts", n10kEvtsPerSample*50)
-	
+
 	f := hplot.Figure(p)
 	style.ApplyToFigure(f)
 	if err := hplot.Save(f, 10*vg.Inch, 4*vg.Inch, "perf.png"); err != nil {
@@ -82,7 +82,7 @@ func plotBenchmarks(s1, s2, s3, s4, n []float64) *hplot.Plot {
 	p.Legend.Left = true
 	p.Legend.XOffs = 12
 	p.Legend.YOffs = -8
-		
+
 	// Add graph to the plot
 	p.Add(g1)
 	p.Add(g2)
@@ -101,7 +101,7 @@ func applyStyle(g *hplot.S2D, icolor int) {
 
 // Run one test and returns the time in ms/kEvts
 func runTest(n10kEvtsPerSample, nVariables int, varFormula, noCutWeight bool) float64 {
-	
+
 	// Data
 	splData := ana.NewSample("data", "data", `Pseudo-data`)
 	loadManyComponents(splData, n10kEvtsPerSample)
@@ -127,21 +127,40 @@ func runTest(n10kEvtsPerSample, nVariables int, varFormula, noCutWeight bool) fl
 
 	// Variables, organized in bunch of 15
 	variables := []*ana.Variable{
-		var_dphi, var_m_tt, var_eta_t, var_pt_lep, var_Ckk,
-		var_Crr, var_Cnn, var_pt_lep, var_eta_lep, var_pt_b,
-		var_eta_b, var_pt_vsum, var_pt_t, var_pt_tt, var_x1,
+		var_dphi, var_Ckk, var_Crr, var_Cnn, var_dphi,
+		var_dphi, var_Ckk, var_Crr, var_Cnn, var_dphi,
+		var_dphi, var_Ckk, var_Crr, var_Cnn, var_dphi,
+		var_dphi, var_Ckk, var_Crr, var_Cnn, var_dphi,
+		var_dphi, var_Ckk, var_Crr, var_Cnn, var_dphi,
+		var_dphi, var_Ckk, var_Crr, var_Cnn, var_dphi,
+		var_dphi, var_Ckk, var_Crr, var_Cnn, var_dphi,
+		var_dphi, var_Ckk, var_Crr, var_Cnn, var_dphi,
+		var_dphi, var_Ckk, var_Crr, var_Cnn, var_dphi,
+		var_dphi, var_Ckk, var_Crr, var_Cnn, var_dphi,
+		var_dphi, var_Ckk, var_Crr, var_Cnn, var_dphi,
+		var_dphi, var_Ckk, var_Crr, var_Cnn, var_dphi,
+		var_dphi, var_Ckk, var_Crr, var_Cnn, var_dphi,
+		var_dphi, var_Ckk, var_Crr, var_Cnn, var_dphi,
+		var_dphi, var_Ckk, var_Crr, var_Cnn, var_dphi,
+		var_dphi, var_Ckk, var_Crr, var_Cnn, var_dphi,
 
-		var_dphi, var_m_tt, var_eta_t, var_pt_lep, var_Ckk,
-		var_Crr, var_Cnn, var_pt_lep, var_eta_lep, var_pt_b,
-		var_eta_b, var_pt_vsum, var_pt_t, var_pt_tt, var_x1,
+		/*
+			var_dphi, var_m_tt, var_eta_t, var_pt_lep, var_Ckk,
+			var_Crr, var_Cnn, var_pt_lep, var_eta_lep, var_pt_b,
+			var_eta_b, var_pt_vsum, var_pt_t, var_pt_tt, var_x1,
 
-		var_dphi, var_m_tt, var_eta_t, var_pt_lep, var_Ckk,
-		var_Crr, var_Cnn, var_pt_lep, var_eta_lep, var_pt_b,
-		var_eta_b, var_pt_vsum, var_pt_t, var_pt_tt, var_x1,
+			var_dphi, var_m_tt, var_eta_t, var_pt_lep, var_Ckk,
+			var_Crr, var_Cnn, var_pt_lep, var_eta_lep, var_pt_b,
+			var_eta_b, var_pt_vsum, var_pt_t, var_pt_tt, var_x1,
 
-		var_dphi, var_m_tt, var_eta_t, var_pt_lep, var_Ckk,
-		var_Crr, var_Cnn, var_pt_lep, var_eta_lep, var_pt_b,
-		var_eta_b, var_pt_vsum, var_pt_t, var_pt_tt, var_x1,
+			var_dphi, var_m_tt, var_eta_t, var_pt_lep, var_Ckk,
+			var_Crr, var_Cnn, var_pt_lep, var_eta_lep, var_pt_b,
+			var_eta_b, var_pt_vsum, var_pt_t, var_pt_tt, var_x1,
+
+			var_dphi, var_m_tt, var_eta_t, var_pt_lep, var_Ckk,
+			var_Crr, var_Cnn, var_pt_lep, var_eta_lep, var_pt_b,
+			var_eta_b, var_pt_vsum, var_pt_t, var_pt_tt, var_x1,
+		*/
 	}
 
 	// Protection for too high number of variables
@@ -152,7 +171,7 @@ func runTest(n10kEvtsPerSample, nVariables int, varFormula, noCutWeight bool) fl
 	if nVars > len(variables) {
 		panic(fmt.Errorf("Too much variables (max 60, got %v)", nVars))
 	}
-	
+
 	// Create analyzer object with options
 	analyzer := ana.New(samples, variables[:nVars],
 		ana.WithAutoStyle(true),
@@ -160,11 +179,11 @@ func runTest(n10kEvtsPerSample, nVariables int, varFormula, noCutWeight bool) fl
 		ana.WithHistoNorm(true),
 		ana.WithHistoStack(true),
 	)
-	
+
 	// Few handles for benchmarking
 	analyzer.WithVarsTreeFormula = varFormula
 	analyzer.NoTreeFormula = noCutWeight
-	
+
 	// Run the analyzer and produce all plots
 	if err := analyzer.FillHistos(); err != nil {
 		log.Fatal("Cannot fill histos:", err)
@@ -458,7 +477,7 @@ var (
 
 // Helper function to add many components (10k per components) to a sample
 func loadManyComponents(s *ana.Sample, n10kEvts int) {
-	for i:=0 ; i<n10kEvts ; i++ {
+	for i := 0; i < n10kEvts; i++ {
 		s.AddComponent(file2, tname)
 	}
 }
