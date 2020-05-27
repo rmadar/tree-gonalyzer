@@ -3,43 +3,124 @@ package main
 
 import (
 	"fmt"
-	"flag"
 	"math"
+	"log"
+
+	"gonum.org/v1/plot/vg"
+	"gonum.org/v1/plot/plotutil"
+	
+	"go-hep.org/x/hep/hbook"
+	"go-hep.org/x/hep/hplot"
 
 	"github.com/rmadar/tree-gonalyzer/ana"
+	"github.com/rmadar/hplot-style/style"
 )
 
-// Run the analyzer
+// Run all the tests
 func main() {
 
-	// Options passed by command lines.
-	var (
-		compileLatex = flag.Bool("latex", false, "On-the-fly LaTeX compilation of produced figure.")
-		varFormula   = flag.Bool("varFormula", false, "Use TreeFormula for variables.")
-		nVariables   = flag.Int("nVars", -1, "Number of variables to loop over.")
-		noCutWeight  = flag.Bool("noCutWeight", false, "Disable cuts and weights, avoiding TreeFormula.")
-	)
-	flag.Parse()
+	// Number of kEvents
+	n10kEvtsPerSample := 10
+	
+	// Scan the number of variables
+	nVars := []float64{1, 5, 10, 20, 30, 40, 50, 60}
 
+	// Containers
+	tVarOFFCutWeightOFF := make([]float64, len(nVars))
+	tVarOFFCutWeightON  := make([]float64, len(nVars))
+	tVarONCutWeightOFF  := make([]float64, len(nVars))
+	tVarONCutWeightON   := make([]float64, len(nVars))
+
+	// Run all test
+	for i, n := range nVars {
+		fmt.Println("Running for nVars =", n)
+		tVarOFFCutWeightOFF[i] = runTest(n10kEvtsPerSample, int(n), false, true)
+		tVarOFFCutWeightON[i]  = runTest(n10kEvtsPerSample, int(n), false, false)
+		tVarONCutWeightOFF[i]  = runTest(n10kEvtsPerSample, int(n), true , true)
+		tVarONCutWeightON[i]   = runTest(n10kEvtsPerSample, int(n), true, true)
+	}
+
+	// Plot benchmarks
+	p := plotBenchmarks(tVarOFFCutWeightOFF, tVarOFFCutWeightON,
+		tVarONCutWeightOFF, tVarONCutWeightON, nVars,
+	)
+	p.Title.Text = fmt.Sprintf("Benchmark with %v kEvts", n10kEvtsPerSample*50)
+	
+	f := hplot.Figure(p)
+	style.ApplyToFigure(f)
+	if err := hplot.Save(f, 10*vg.Inch, 4*vg.Inch, "perf.png"); err != nil {
+		log.Fatalf("error saving plot: %v\n", err)
+	}
+}
+
+func plotBenchmarks(s1, s2, s3, s4, n []float64) *hplot.Plot {
+
+	// Plot
+	p := hplot.New()
+	style.ApplyToPlot(p)
+	p.X.Label.Text = "Number of variables"
+	p.Y.Label.Text = "Running Time [ms / kEvts]"
+
+	// Graph
+	g1 := hplot.NewS2D(hbook.NewS2DFrom(n, s1))
+	g2 := hplot.NewS2D(hbook.NewS2DFrom(n, s2))
+	g3 := hplot.NewS2D(hbook.NewS2DFrom(n, s3))
+	g4 := hplot.NewS2D(hbook.NewS2DFrom(n, s4))
+
+	// Comsetics
+	applyStyle(g1, 0)
+	applyStyle(g2, 1)
+	applyStyle(g3, 2)
+	applyStyle(g4, 3)
+
+	// Add graph to the legend
+	p.Legend.Add(`No Formula`, g1)
+	p.Legend.Add(`Only weights/cuts Formula`, g2)
+	p.Legend.Add(`Only variables Formula`, g3)
+	p.Legend.Add(`All Formula`, g4)
+	p.Legend.Top = true
+	p.Legend.Left = true
+	p.Legend.XOffs = 12
+	p.Legend.YOffs = -8
+		
+	// Add graph to the plot
+	p.Add(g1)
+	p.Add(g2)
+	p.Add(g3)
+	p.Add(g4)
+
+	return p
+}
+
+// Helper to set S2D style
+func applyStyle(g *hplot.S2D, icolor int) {
+	g.LineStyle.Width = 2
+	g.GlyphStyle.Radius = 0
+	g.LineStyle.Color = plotutil.Color(icolor)
+}
+
+// Run one test and returns the time in ms/kEvts
+func runTest(n10kEvtsPerSample, nVariables int, varFormula, noCutWeight bool) float64 {
+	
 	// Data
 	splData := ana.NewSample("data", "data", `Pseudo-data`)
-	loadManyComponents(splData)
+	loadManyComponents(splData, n10kEvtsPerSample)
 
 	// Background 1
 	splBkg1 := ana.NewSample("bkg1", "bkg", `Proc 1`, ana.WithWeight(w1), ana.WithCut(isGG))
-	loadManyComponents(splBkg1)
+	loadManyComponents(splBkg1, n10kEvtsPerSample)
 
 	// Background 2
 	splBkg2 := ana.NewSample("bkg2", "bkg", `Proc 2`, ana.WithWeight(w2), ana.WithCut(isQQ))
-	loadManyComponents(splBkg2)
+	loadManyComponents(splBkg2, n10kEvtsPerSample)
 
 	// Background 3
-	splBkg3 := ana.NewSample("bkg3", "bkg", `Proc 3`)
-	loadManyComponents(splBkg3)
+	splBkg3 := ana.NewSample("bkg3", "bkg", `Proc 3`, ana.WithWeight(w1), ana.WithCut(isGG))
+	loadManyComponents(splBkg3, n10kEvtsPerSample)
 
 	// Background 4
-	splBkg4 := ana.NewSample("bkg3", "bkg", `Proc 3`)
-	loadManyComponents(splBkg4)
+	splBkg4 := ana.NewSample("bkg4", "bkg", `Proc 4`, ana.WithWeight(w2), ana.WithCut(isQQ))
+	loadManyComponents(splBkg4, n10kEvtsPerSample)
 
 	// Group samples together
 	samples := []*ana.Sample{splData, splBkg1, splBkg2, splBkg3, splBkg4}
@@ -65,8 +146,8 @@ func main() {
 
 	// Protection for too high number of variables
 	nVars := len(variables)
-	if *nVariables > -1 {
-		nVars = *nVariables
+	if nVariables > -1 {
+		nVars = nVariables
 	}
 	if nVars > len(variables) {
 		panic(fmt.Errorf("Too much variables (max 60, got %v)", nVars))
@@ -75,20 +156,24 @@ func main() {
 	// Create analyzer object with options
 	analyzer := ana.New(samples, variables[:nVars],
 		ana.WithAutoStyle(true),
-		ana.WithPlotTitle(`GOnalyzer Performance Test`),
-		ana.WithCompileLatex(*compileLatex),
+		ana.WithCompileLatex(false),
 		ana.WithHistoNorm(true),
 		ana.WithHistoStack(true),
 	)
-
+	
 	// Few handles for benchmarking
-	analyzer.WithVarsTreeFormula = *varFormula
-	analyzer.NoTreeFormula = *noCutWeight
-
+	analyzer.WithVarsTreeFormula = varFormula
+	analyzer.NoTreeFormula = noCutWeight
+	
 	// Run the analyzer and produce all plots
-	if err := analyzer.Run(); err != nil {
-		panic(err)
+	if err := analyzer.FillHistos(); err != nil {
+		log.Fatal("Cannot fill histos:", err)
 	}
+	if err := analyzer.PlotHistos(); err != nil {
+		log.Fatal("Cannot plot histos:", err)
+	}
+
+	return analyzer.RunTimePerKEvts()
 }
 
 // Define all samples and variables of the analysis
@@ -371,24 +456,9 @@ var (
 	}
 )
 
-// Helper function to add many components to a sample
-func loadManyComponents(s *ana.Sample) {
-	s.AddComponent(file1, tname)
-	s.AddComponent(file2, tname)
-	s.AddComponent(file3, tname)
-	s.AddComponent(file1, tname)
-	s.AddComponent(file2, tname)
-	s.AddComponent(file3, tname)
-	s.AddComponent(file1, tname)
-	s.AddComponent(file2, tname)
-	s.AddComponent(file3, tname)
-	s.AddComponent(file1, tname)
-	s.AddComponent(file2, tname)
-	s.AddComponent(file3, tname)
-	s.AddComponent(file1, tname)
-	s.AddComponent(file2, tname)
-	s.AddComponent(file3, tname)
-	s.AddComponent(file1, tname)
-	s.AddComponent(file2, tname)
-	s.AddComponent(file3, tname)
+// Helper function to add many components (10k per components) to a sample
+func loadManyComponents(s *ana.Sample, n10kEvts int) {
+	for i:=0 ; i<n10kEvts ; i++ {
+		s.AddComponent(file2, tname)
+	}
 }
