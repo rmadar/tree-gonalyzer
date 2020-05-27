@@ -5,22 +5,22 @@
 
 ## How to run each setup?
 
-**1.** Use explicit loading for variables and `rtree.Formula` for weight and cuts:
-```
-go run ./main.go
-```
-
-**2.** Use explicit loading for variables but disable `rtree.Formula` of weights and cuts (not applied):
-```
-go run ./main.go -noCutWeight
+**1.** Use explicit loading for variables and `rtree.Formula` for weight:
+```go
+t := runTest(n10kEvtsPerSample, nVars, false, false)
 ```
 
-**3.** Use `rtree.Formula` for variables and disable `rtree.Formula` of weights and cuts (not applied):
-```
-go run ./main.go -varFormula -noCutWeight
+**2.** Use explicit loading for variables but disable `rtree.Formula` of weights (*i.e.* not applied):
+```go
+t := runTest(n10kEvtsPerSample, nVars, false, true)
 ```
 
-**4.** Use `rtree.Formula` for variables and `rtree.Formula` for weights and cuts:
+**3.** Use `rtree.Formula` for variables and disable `rtree.Formula` of weights (*i.e.* not applied):
+```go
+t := runTest(n10kEvtsPerSample, nVars, true, true)
 ```
-go run ./main.go -varFormula
+
+**4.** Use `rtree.Formula` for variables and `rtree.Formula` for weights:
+```go
+t := runTest(n10kEvtsPerSample, nVars, true, false)
 ```

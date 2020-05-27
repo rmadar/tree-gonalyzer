@@ -75,7 +75,7 @@ func plotBenchmarks(s1, s2, s3, s4, n []float64) *hplot.Plot {
 
 	// Add graph to the legend
 	p.Legend.Add(`No Formula`, g1)
-	p.Legend.Add(`Only weights/cuts Formula`, g2)
+	p.Legend.Add(`Only weights Formula`, g2)
 	p.Legend.Add(`Only variables Formula`, g3)
 	p.Legend.Add(`All Formula`, g4)
 	p.Legend.Top = true
@@ -107,19 +107,19 @@ func runTest(n10kEvtsPerSample, nVariables int, varFormula, noCutWeight bool) fl
 	loadManyComponents(splData, n10kEvtsPerSample)
 
 	// Background 1
-	splBkg1 := ana.NewSample("bkg1", "bkg", `Proc 1`, ana.WithWeight(w1), ana.WithCut(isGG))
+	splBkg1 := ana.NewSample("bkg1", "bkg", `Proc 1`, ana.WithWeight(w1))
 	loadManyComponents(splBkg1, n10kEvtsPerSample)
 
 	// Background 2
-	splBkg2 := ana.NewSample("bkg2", "bkg", `Proc 2`, ana.WithWeight(w2), ana.WithCut(isQQ))
+	splBkg2 := ana.NewSample("bkg2", "bkg", `Proc 2`, ana.WithWeight(w2))
 	loadManyComponents(splBkg2, n10kEvtsPerSample)
 
 	// Background 3
-	splBkg3 := ana.NewSample("bkg3", "bkg", `Proc 3`, ana.WithWeight(w1), ana.WithCut(isGG))
+	splBkg3 := ana.NewSample("bkg3", "bkg", `Proc 3`, ana.WithWeight(w1))
 	loadManyComponents(splBkg3, n10kEvtsPerSample)
 
 	// Background 4
-	splBkg4 := ana.NewSample("bkg4", "bkg", `Proc 4`, ana.WithWeight(w2), ana.WithCut(isQQ))
+	splBkg4 := ana.NewSample("bkg4", "bkg", `Proc 4`, ana.WithWeight(w2))
 	loadManyComponents(splBkg4, n10kEvtsPerSample)
 
 	// Group samples together
