@@ -51,7 +51,7 @@ type Maker struct {
 	// Histograms for {variables x samples x selection}
 	HbookHistos [][][]*hbook.H1D
 	HplotHistos [][][]*hplot.H1D
-
+	
 	// Fields for benchmarking (TEMP)
 	WithVarsTreeFormula bool
 	NoTreeFormula       bool
@@ -258,7 +258,11 @@ func (ana *Maker) FillHistos() error {
 				})
 				
 				// Keep track of the number of processed events
-				ana.nEvents += t.Entries()
+				if ana.Nevts == -1 {
+					ana.nEvents += t.Entries()
+				} else {
+					ana.nEvents += ana.Nevts
+				}
 				
 				return nil
 			}(iComp)
@@ -546,12 +550,12 @@ func (ana Maker) PrintReport() {
 	if ncuts > 0 {
 		nhist *= ncuts
 	}
-	nkevt := float64(ana.nEvents) / 1e3
 	
-	// Timing info
+	// Time computation
+	nkevt := float64(ana.nEvents) / 1e3
 	dtLoop := float64(ana.timeLoop) / float64(time.Millisecond)
 	dtPlot := float64(ana.timePlot) / float64(time.Millisecond)
-
+	
 	// Formating
 	str_template := "\n Processing report:\n"
 	str_template += "    - %v histograms filled over %.0f kEvts (%v files, %v variables, %v selections)\n"
@@ -563,6 +567,14 @@ func (ana Maker) PrintReport() {
 		(dtLoop+dtPlot)/nkevt, fmtDuration(ana.timeLoop+ana.timePlot), nkevt,
 		dtLoop/(dtLoop+dtPlot)*100., dtPlot/(dtLoop+dtPlot)*100.,
 	)
+}
+
+// RunTimePerKEvts returns the running time in millisecond per kEvents.
+func (ana *Maker) RunTimePerKEvts() float64 {	
+	nkevt := float64(ana.nEvents) / 1e3
+	dtLoop := float64(ana.timeLoop) / float64(time.Millisecond)
+	dtPlot := float64(ana.timePlot) / float64(time.Millisecond)
+	return (dtLoop+dtPlot) / nkevt
 }
 
 // Run performs the three steps in one function: fill histos, plot histos
