@@ -75,7 +75,7 @@ func NewValF64(v float64) TreeFunc {
 
 // FormulaFuncFromReader returns the rtree.FormulaFunc function associated
 // to the TreeFunc f, from a give rtree.Reader r.
-func (f *TreeFunc) FormulaFuncFromReader(r *rtree.Reader) rfunc.Formula {
+func (f *TreeFunc) FormulaFrom(r *rtree.Reader) rfunc.Formula {
 	ff, err := r.FormulaFunc(f.VarsName, f.Fct)
 	if err != nil {
 		log.Fatalf("could not create formulaFunc: %+v", err)
@@ -86,11 +86,11 @@ func (f *TreeFunc) FormulaFuncFromReader(r *rtree.Reader) rfunc.Formula {
 // GetFuncF64 returns a function to be called in the event loop to get
 // the float64 value computed in f.Fct function.
 func (f *TreeFunc) GetFuncF64(r *rtree.Reader) func() float64 {
-	return f.FormulaFuncFromReader(r).Func().(func() float64)
+	return f.FormulaFrom(r).Func().(func() float64)
 }
 
 // GetFuncBool returns the function to be called in the event loop to get
 // the boolean value computed in f.Fct function.
 func (f *TreeFunc) GetFuncBool(r *rtree.Reader) func() bool {
-	return f.FormulaFuncFromReader(r).Func().(func() bool)
+	return f.FormulaFrom(r).Func().(func() bool)
 }

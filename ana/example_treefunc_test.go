@@ -26,8 +26,8 @@ func ExampleTreeFunc_general() {
 		},
 	}
 
-	// rtree.FormulaFunc object
-	formFunc := treeFunc.FormulaFuncFromReader(r)
+	// rtree.Formula object
+	formFunc := treeFunc.FormulaFrom(r)
 
 	// Go function to be called in the event loop
 	getValue := formFunc.Func().(func() float64)
@@ -60,8 +60,8 @@ func ExampleNewTreeFuncVarBool() {
 	// TreeFunc object
 	treeFunc := ana.NewVarBool(varName)
 
-	// rtree.FormulaFunc object
-	formFunc := treeFunc.FormulaFuncFromReader(r)
+	// rtree.Formula object
+	formFunc := treeFunc.FormulaFrom(r)
 
 	// Go function to be called in the event loop
 	getValue := treeFunc.GetFuncBool(r)
@@ -96,8 +96,8 @@ func ExampleNewTreeFuncVarF64() {
 	// TreeFunc object
 	treeFunc := ana.NewVarF64(varName)
 
-	// rtree.FormulaFunc object
-	formFunc := treeFunc.FormulaFuncFromReader(r)
+	// rtree.Formula object
+	formFunc := treeFunc.FormulaFrom(r)
 
 	// Go function to be called in the event loop
 	getValue := treeFunc.GetFuncF64(r)
