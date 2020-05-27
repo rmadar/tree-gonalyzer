@@ -18,7 +18,7 @@ type TreeFunc struct {
 	Fct      interface{}
 }
 
-// NewTreeFuncVarBool returns a TreeFunc to get
+// NewVarBool returns a TreeFunc to get
 // a single boolean branch-based variable.
 // The output value is a boolean.
 func NewVarBool(v string) TreeFunc {
@@ -28,7 +28,7 @@ func NewVarBool(v string) TreeFunc {
 	}
 }
 
-// NewTreeFuncVarF64 returns a TreeFunc to get a single
+// NewVarF64 returns a TreeFunc to get a single
 // float64 branch-based variable. The output value is a float64.
 func NewVarF64(v string) TreeFunc {
 	return TreeFunc{
@@ -37,7 +37,7 @@ func NewVarF64(v string) TreeFunc {
 	}
 }
 
-// NewTreeFuncVarF32 returns a TreeFunc to get a single
+// NewVarF32 returns a TreeFunc to get a single
 // float32 branch-based variable. The output  value is a float64.
 func NewVarF32(v string) TreeFunc {
 	return TreeFunc{
@@ -46,7 +46,7 @@ func NewVarF32(v string) TreeFunc {
 	}
 }
 
-// NewTreeFuncVarI64 returns a TreeFunc to get a single
+// NewVarI64 returns a TreeFunc to get a single
 // int64 branch-based variable. The output value is a float64.
 func NewVarI64(v string) TreeFunc {
 	return TreeFunc{
@@ -55,7 +55,7 @@ func NewVarI64(v string) TreeFunc {
 	}
 }
 
-// NewTreeFuncVarI32 returns a TreeFunc to get a single
+// NewVarI32 returns a TreeFunc to get a single
 // int32 branch-based variable. The output value is a float64.
 func NewVarI32(v string) TreeFunc {
 	return TreeFunc{
@@ -64,7 +64,7 @@ func NewVarI32(v string) TreeFunc {
 	}
 }
 
-// NewTreeFuncValF64 returns a TreeFunc to get float value,
+// NewValF64 returns a TreeFunc to get float value,
 // ie not a branch-based variable.
 func NewValF64(v float64) TreeFunc {
 	return TreeFunc{
@@ -73,7 +73,7 @@ func NewValF64(v float64) TreeFunc {
 	}
 }
 
-// FormulaFuncFromReader returns the rtree.FormulaFunc function associated
+// FormulaFrom returns the rtree.FormulaFunc function associated
 // to the TreeFunc f, from a give rtree.Reader r.
 func (f *TreeFunc) FormulaFrom(r *rtree.Reader) rfunc.Formula {
 	ff, err := r.FormulaFunc(f.VarsName, f.Fct)
