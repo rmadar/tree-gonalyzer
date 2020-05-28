@@ -10,7 +10,6 @@ import (
 	"github.com/rmadar/tree-gonalyzer/ana"
 )
 
-// Example showing how a general TreeFunc object works.
 func ExampleTreeFunc_general() {
 	// Get a reader for the example
 	f, r := getReader(5)
@@ -46,9 +45,7 @@ func ExampleTreeFunc_general() {
 	// pt=77.47, eta=2.93, pt*eta=226.79
 }
 
-// Example showing how NewVarBool() works and compares
-// to the rtree.Formula.
-func ExampleNewVarBool() {
+func ExampleTreeFunc_withBranchBool() {
 	// Get a reader for the example
 	f, r := getReader(5)
 	defer f.Close()
@@ -79,9 +76,7 @@ func ExampleNewVarBool() {
 	// 4 false false
 }
 
-// Example showing how NewVarF64() works and compares
-// to the rtree.Formula.
-func ExampleNewVarF64() {
+func ExampleTreeFunc_withBranchF64() {
 	// Get a reader for the example
 	f, r := getReader(5)
 	defer f.Close()
@@ -112,9 +107,7 @@ func ExampleNewVarF64() {
 	// 4 2.35 2.35
 }
 
-// Example showing how NewVarF32s() works and compares
-// to the rtree.Formula.
-func ExampleNewVarF32s() {
+func ExampleTreeFunc_withBranchF32s() {
 	// Get a reader for the example
 	f, r := getReaderWithSlices(5)
 	defer f.Close()
@@ -145,11 +138,11 @@ func ExampleNewVarF32s() {
 	// 4 2.35 2.35
 }
 
-// Example showing how NewValF64() works.
+// Example showing how to load a numerical value in a TreeFunc.
 // The reason why this approach exists is to be able
 // to pass a simple constant to a sample, using the
 // same API  ana.With.Weight(f TreeFunc).
-func ExampleNewValF64() {
+func ExampleTreeFunc_withNumericalValue() {
 	// Get a reader for the example
 	f, r := getReader(5)
 	defer f.Close()
