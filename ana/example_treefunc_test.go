@@ -46,9 +46,9 @@ func ExampleTreeFunc_general() {
 	// pt=77.47, eta=2.93, pt*eta=226.79
 }
 
-// Example showing how NewTreeFuncVarBool() works and compares
+// Example showing how NewVarBool() works and compares
 // to the rtree.FormulaFunc.
-func ExampleNewTreeFuncVarBool() {
+func ExampleNewVarBool() {
 	// Get a reader for the example
 	f, r := getReader(5)
 	defer f.Close()
@@ -82,9 +82,9 @@ func ExampleNewTreeFuncVarBool() {
 	// 4 false false
 }
 
-// Example showing how NewTreeFuncVarF64() works and compares
+// Example showing how NewVarF64() works and compares
 // to the rtree.FormulaFunc.
-func ExampleNewTreeFuncVarF64() {
+func ExampleNewVarF64() {
 	// Get a reader for the example
 	f, r := getReader(5)
 	defer f.Close()
@@ -118,11 +118,11 @@ func ExampleNewTreeFuncVarF64() {
 	// 4 2.35 2.35
 }
 
-// Example showing how NewTreeFuncValF64() works.
+// Example showing how NewValF64() works.
 // The reason why this approach exists is to be able
 // to pass a simple constant to a sample, using the
 // same API  ana.With.Weight(f TreeFunc).
-func ExampleNewTreeFuncValF64() {
+func ExampleNewValF64() {
 	// Get a reader for the example
 	f, r := getReader(5)
 	defer f.Close()
