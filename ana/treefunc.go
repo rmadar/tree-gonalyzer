@@ -44,7 +44,12 @@ func NewCutBool(v string) TreeFunc {
 func NewVarBool(v string) TreeFunc {
 	return TreeFunc{
 		VarsName: []string{v},
-		Fct:      func(x bool) float64 { return map[bool]float64{false: 0, true: 1}[x] },
+		Fct:      func(x bool) float64 {
+			if x {
+				return 1
+			}
+			return 0
+		},
 	}
 }
 
