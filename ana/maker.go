@@ -253,7 +253,6 @@ func (ana *Maker) FillHistos() error {
 						// Otherwise, loop over variables.
 						for iv, v := range ana.Variables {
 							if v.isSlice {
-								fmt.Println(ctx.Entry, getVars[iv]())
 								for _, x := range getVars[iv]() {
 									ana.HbookHistos[iv][ic][iSamp].Fill(x, w)
 								}
@@ -262,7 +261,7 @@ func (ana *Maker) FillHistos() error {
 							}
 						}
 					}
-
+					
 					return nil
 				})
 
