@@ -288,7 +288,7 @@ func Example_withSliceVariables() {
 	// Few definitions
 	fName, tName := "../testdata/fileSlices.root", "modules"
 	hitTimes := ana.NewVarF32s("hits_time_mc")
-	
+
 	// Samples
 	samples := []*ana.Sample{
 		ana.CreateSample("HGTD", "bkg", `w/o calib.`, fName, tName),

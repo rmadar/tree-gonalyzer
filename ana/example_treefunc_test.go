@@ -87,7 +87,7 @@ func ExampleTreeFunc_withBranchBoolForCut() {
 
 	// Go function to be called in the event loop
 	getValue := treeFunc.GetFuncBool(r)
-	
+
 	// rtree.Formula object
 	formula := treeFunc.FormulaFrom(r)
 
@@ -149,7 +149,7 @@ func ExampleTreeFunc_withBranchF32s() {
 
 	// Go function to be called in the event loop
 	getValue := treeFunc.GetFuncF64s(r)
-	
+
 	// rtree.Formula object
 	formula := treeFunc.FormulaFrom(r)
 
@@ -178,13 +178,13 @@ func ExampleTreeFunc_withNumericalValue() {
 	f, r := getReader(5)
 	defer f.Close()
 	defer r.Close()
-	
+
 	// TreeFunc object from a float64
 	treeFunc := ana.NewValF64(0.33)
 
 	// Go function to be called in the event loop
 	getValue := treeFunc.GetFuncF64(r)
-	
+
 	// Event loop
 	r.Read(func(ctx rtree.RCtx) error {
 		vTreeFunc := getValue()

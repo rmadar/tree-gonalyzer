@@ -51,7 +51,7 @@ type Maker struct {
 	// Histograms for {variables x samples x selection}
 	HbookHistos [][][]*hbook.H1D
 	HplotHistos [][][]*hplot.H1D
-	
+
 	// Internal fields
 	cutIdx      map[string]int // Linking cut name and cut index
 	samIdx      map[string]int // Linking sample name and sample index
@@ -168,7 +168,7 @@ func (ana *Maker) FillHistos() error {
 				defer r.Close()
 
 				// Prepare variables
-				getVar  := make([]func() float64, len(ana.Variables))
+				getVar := make([]func() float64, len(ana.Variables))
 				getVars := make([]func() []float64, len(ana.Variables))
 				for iv, v := range ana.Variables {
 					idx := iv
@@ -184,7 +184,7 @@ func (ana *Maker) FillHistos() error {
 				if samp.WeightFunc.Fct != nil {
 					getWeightSamp = samp.WeightFunc.GetFuncF64(r)
 				}
-				
+
 				// Prepare the additional weight of the component
 				getWeightComp := func() float64 { return float64(1.0) }
 				if comp.WeightFunc.Fct != nil {
@@ -196,13 +196,13 @@ func (ana *Maker) FillHistos() error {
 				if samp.CutFunc.Fct != nil {
 					passCutSamp = samp.CutFunc.GetFuncBool(r)
 				}
-				
+
 				// Prepare the component additional cut
 				passCutComp := func() bool { return true }
 				if comp.CutFunc.Fct != nil {
 					passCutComp = comp.CutFunc.GetFuncBool(r)
 				}
-				
+
 				// Prepare the cut string for kinematics
 				passKinemCut := make([]func() bool, len(ana.KinemCuts))
 				for ic, cut := range ana.KinemCuts {
@@ -217,10 +217,10 @@ func (ana *Maker) FillHistos() error {
 					if !(passCutSamp() && passCutComp()) {
 						return nil
 					}
-					
+
 					// Get the event weight
 					w := getWeightSamp() * getWeightComp()
-					
+
 					// Loop over selection and variables
 					for ic := range ana.KinemCuts {
 
@@ -241,28 +241,28 @@ func (ana *Maker) FillHistos() error {
 							}
 						}
 					}
-					
+
 					return nil
 				})
-				
+
 				// Keep track of the number of processed events.
 				if ana.Nevts == -1 {
 					ana.nEvents += t.Entries()
 				} else {
 					ana.nEvents += ana.Nevts
 				}
-				
+
 				return nil
 			}(iComp)
 		}
 	}
-	
+
 	// Histograms are now filled.
 	ana.histoFilled = true
 
 	// End timing.
 	ana.timeLoop = time.Now().Sub(start)
-	
+
 	return nil
 }
 
@@ -539,12 +539,12 @@ func (ana Maker) PrintReport() {
 	if ncuts > 0 {
 		nhist *= ncuts
 	}
-	
+
 	// Time computation
 	nkevt := float64(ana.nEvents) / 1e3
 	dtLoop := float64(ana.timeLoop) / float64(time.Millisecond)
 	dtPlot := float64(ana.timePlot) / float64(time.Millisecond)
-	
+
 	// Formating
 	str_template := "\n Processing report:\n"
 	str_template += "    - %v histograms filled over %.0f kEvts (%v files, %v variables, %v selections)\n"
@@ -559,11 +559,11 @@ func (ana Maker) PrintReport() {
 }
 
 // RunTimePerKEvts returns the running time in millisecond per kEvents.
-func (ana *Maker) RunTimePerKEvts() float64 {	
+func (ana *Maker) RunTimePerKEvts() float64 {
 	nkevt := float64(ana.nEvents) / 1e3
 	dtLoop := float64(ana.timeLoop) / float64(time.Millisecond)
 	dtPlot := float64(ana.timePlot) / float64(time.Millisecond)
-	return (dtLoop+dtPlot) / nkevt
+	return (dtLoop + dtPlot) / nkevt
 }
 
 // Run performs the three steps in one function: fill histos, plot histos

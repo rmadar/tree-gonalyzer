@@ -5,17 +5,17 @@ import (
 )
 
 type Variable struct {
-	Name       string      // Variable name.
-	TreeFunc   TreeFunc    // Variable definition from branches & functions.
-	Nbins      int         // Number of bins of final histograms.
-	Xmin, Xmax float64     // Mininum and maximum values of the histogram.
-	SaveName string   // Name of the plot to be saved default (default 'Name').
-	XLabel, YLabel           string  // Axis labels (default: 'Variable', 'Events').
-	XTickFormat, YTickFormat string  // Axis tick formatting (default: hplot default).
-	RangeXmin, RangeXmax     float64 // X-axis range (default: hplot default).
-	RangeYmin, RangeYmax     float64 // Y-axis range (default: hplot default).
-	RatioYmin, RatioYmax     float64 // Ratio Y-axis range (default: hplot default).
-	LegPosTop, LegPosLeft bool // Legend position (default: true, false)
+	Name                     string   // Variable name.
+	TreeFunc                 TreeFunc // Variable definition from branches & functions.
+	Nbins                    int      // Number of bins of final histograms.
+	Xmin, Xmax               float64  // Mininum and maximum values of the histogram.
+	SaveName                 string   // Name of the plot to be saved default (default 'Name').
+	XLabel, YLabel           string   // Axis labels (default: 'Variable', 'Events').
+	XTickFormat, YTickFormat string   // Axis tick formatting (default: hplot default).
+	RangeXmin, RangeXmax     float64  // X-axis range (default: hplot default).
+	RangeYmin, RangeYmax     float64  // Y-axis range (default: hplot default).
+	RatioYmin, RatioYmax     float64  // Ratio Y-axis range (default: hplot default).
+	LegPosTop, LegPosLeft    bool     // Legend position (default: true, false)
 
 	isSlice bool
 }
@@ -35,18 +35,18 @@ func NewVariable(name string, tFunc TreeFunc, nBins int, xMin, xMax float64, opt
 
 	// Set the slice label
 	switch tFunc.Fct.(type) {
-	case (func ([]float64) []float64):
+	case (func([]float64) []float64):
 		v.isSlice = true
-	case (func ([]float32) []float64):
+	case (func([]float32) []float64):
 		v.isSlice = true
-	case (func ([]int64) []float64):
+	case (func([]int64) []float64):
 		v.isSlice = true
-	case (func ([]int32) []float64):
+	case (func([]int32) []float64):
 		v.isSlice = true
 	default:
 		v.isSlice = false
 	}
-	
+
 	// Configuration with default values for all optional fields
 	cfg := newConfig(
 		WithSaveName(v.Name),

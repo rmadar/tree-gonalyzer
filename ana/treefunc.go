@@ -11,12 +11,12 @@ import (
 // TreeFunc is a wrapper to use rtree.Formula in an easy way.
 // It provides a set of functions to ease the simple cases
 // of boolean, float32 and float64 branches.
-// 
+//
 // Once the slice of variable (branch) names and the function
 // are given, one can either access the rtree.Formula or
 // directly the GO function to be called in the event loop
 // for boolean, float32 and float64.
-// 
+//
 // Except `NewCutBool()`, all `NewXXX()` functions lead to a treeFunc.Fct
 // returning a float64 a or []float64 in order to be accpeted
 // by hplot.h1d.Fill(v, w) method. Instead `NewCutBool()` lead to
@@ -45,7 +45,7 @@ func NewVarBool(v string) TreeFunc {
 	return TreeFunc{
 		VarsName: []string{v},
 		Fct:      func(x bool) float64 { return map[bool]float64{false: 0, true: 1}[x] },
-		}
+	}
 }
 
 // NewVarF64 returns a TreeFunc to get a single
@@ -98,7 +98,7 @@ func NewValF64(v float64) TreeFunc {
 func NewVarF64s(v string) TreeFunc {
 	return TreeFunc{
 		VarsName: []string{v},
-		Fct: func(xs []float64) []float64 { return xs },
+		Fct:      func(xs []float64) []float64 { return xs },
 	}
 }
 

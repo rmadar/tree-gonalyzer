@@ -44,7 +44,7 @@ func main() {
 
 	// Variables
 	variables := []*ana.Variable{
-		ana.NewVariable("dPhi", dPhiFunc,  15, 0, 3.14),
+		ana.NewVariable("dPhi", dPhiFunc, 15, 0, 3.14),
 		ana.NewVariable("m_tt", MttbarFunc, 25, 300, 1000),
 		ana.NewVariable("isGG", isGGFunc, 2, 0, 1),
 	}
@@ -80,10 +80,10 @@ var (
 	// TreeFunc: variables, weights and cuts
 	dPhiFunc   = ana.NewVarF64("truth_dphi_ll")
 	MttbarFunc = ana.NewVarF32("ttbar_m")
-	isGGFunc = ana.NewVarBool("init_gg")
-	
-	w1 = ana.NewValF64(0.5)
-	w2 = ana.NewValF64(0.25)
+	isGGFunc   = ana.NewVarBool("init_gg")
+
+	w1     = ana.NewValF64(0.5)
+	w2     = ana.NewValF64(0.25)
 	wptPos = ana.TreeFunc{
 		VarsName: []string{"t_pt"},
 		Fct:      func(pt float32) float64 { return 1.0 + float64(pt)/200. },
