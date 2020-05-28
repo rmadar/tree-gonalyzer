@@ -47,21 +47,18 @@ func ExampleTreeFunc_general() {
 }
 
 // Example showing how NewVarBool() works and compares
-// to the rtree.FormulaFunc.
+// to the rtree.Formula.
 func ExampleNewVarBool() {
 	// Get a reader for the example
 	f, r := getReader(5)
 	defer f.Close()
 	defer r.Close()
 
-	// branch name of a boolean variable in the TTree
-	varName := "init_qq"
-
-	// TreeFunc object
-	treeFunc := ana.NewVarBool(varName)
+	// TreeFunc object from a boolean branch name in the TTree
+	treeFunc := ana.NewVarBool("init_qq")
 
 	// rtree.Formula object
-	formFunc := treeFunc.FormulaFrom(r)
+	formula := treeFunc.FormulaFrom(r)
 
 	// Go function to be called in the event loop
 	getValue := treeFunc.GetFuncBool(r)
@@ -69,8 +66,8 @@ func ExampleNewVarBool() {
 	// Event loop
 	r.Read(func(ctx rtree.RCtx) error {
 		vTreeFunc := getValue()
-		vormFunc := formFunc.Func().(func() bool)()
-		fmt.Printf("%v %v %v\n", ctx.Entry, vTreeFunc, vormFunc)
+		vFormula := formula.Func().(func() bool)()
+		fmt.Printf("%v %v %v\n", ctx.Entry, vTreeFunc, vFormula)
 		return nil
 	})
 
@@ -83,21 +80,18 @@ func ExampleNewVarBool() {
 }
 
 // Example showing how NewVarF64() works and compares
-// to the rtree.FormulaFunc.
+// to the rtree.Formula.
 func ExampleNewVarF64() {
 	// Get a reader for the example
 	f, r := getReader(5)
 	defer f.Close()
 	defer r.Close()
 
-	// branch name of a float64 variable in the TTree
-	varName := "truth_dphi_ll"
-
-	// TreeFunc object
-	treeFunc := ana.NewVarF64(varName)
+	// TreeFunc object from a float64 branch name in the TTree
+	treeFunc := ana.NewVarF64("truth_dphi_ll")
 
 	// rtree.Formula object
-	formFunc := treeFunc.FormulaFrom(r)
+	formula := treeFunc.FormulaFrom(r)
 
 	// Go function to be called in the event loop
 	getValue := treeFunc.GetFuncF64(r)
@@ -105,8 +99,8 @@ func ExampleNewVarF64() {
 	// Event loop
 	r.Read(func(ctx rtree.RCtx) error {
 		vTreeFunc := getValue()
-		vormFunc := formFunc.Func().(func() float64)()
-		fmt.Printf("%v %.2f %.2f\n", ctx.Entry, vTreeFunc, vormFunc)
+		vFormula := formula.Func().(func() float64)()
+		fmt.Printf("%v %.2f %.2f\n", ctx.Entry, vTreeFunc, vFormula)
 		return nil
 	})
 
@@ -128,7 +122,7 @@ func ExampleNewValF64() {
 	defer f.Close()
 	defer r.Close()
 
-	// TreeFunc object
+	// TreeFunc object from a float64
 	treeFunc := ana.NewValF64(0.33)
 
 	// Go function to be called in the event loop
