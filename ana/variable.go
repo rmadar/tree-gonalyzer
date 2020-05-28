@@ -34,14 +34,14 @@ func NewVariable(name string, tFunc TreeFunc, nBins int, xMin, xMax float64, opt
 	}
 
 	// Set the slice label
+	// FIX-ME (rmadar) : will not work for arbirary signature.
+	//                   consider adding an option ana.IsSlice()?
 	switch tFunc.Fct.(type) {
-	case (func([]float64) []float64):
-		v.isSlice = true
-	case (func([]float32) []float64):
-		v.isSlice = true
-	case (func([]int64) []float64):
-		v.isSlice = true
-	case (func([]int32) []float64):
+	case (func([]bool) []float64),
+		(func([]int32) []float64),
+		(func([]int64) []float64),
+		(func([]float32) []float64),
+		(func([]float64) []float64):
 		v.isSlice = true
 	default:
 		v.isSlice = false

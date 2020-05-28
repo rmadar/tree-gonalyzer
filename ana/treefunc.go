@@ -166,7 +166,14 @@ func (f *TreeFunc) FormulaFrom(r *rtree.Reader) rfunc.Formula {
 // GetFuncF64 returns a function to be called in the event loop to get
 // the float64 value computed in f.Fct function.
 func (f *TreeFunc) GetFuncF64(r *rtree.Reader) func() float64 {
-	return f.FormulaFrom(r).Func().(func() float64)
+	switch f.Fct.(type) {
+	case (func(bool) bool):
+		panic("TreeFunc::GetFunc64() You try to get a bool while a F64 is needed.\n"+
+			"                      It is possible that you use NewCutBool() instead\n"+
+			"                      of NewVarBool().")
+	default:
+		return f.FormulaFrom(r).Func().(func() float64)
+	}
 }
 
 // GetFuncF64s returns a function to be called in the event loop to get
@@ -178,5 +185,13 @@ func (f *TreeFunc) GetFuncF64s(r *rtree.Reader) func() []float64 {
 // GetFuncBool returns the function to be called in the event loop to get
 // the boolean value computed in f.Fct function.
 func (f *TreeFunc) GetFuncBool(r *rtree.Reader) func() bool {
-	return f.FormulaFrom(r).Func().(func() bool)
+	switch f.Fct.(type) {
+	case (func(bool) float64):
+		panic("TreeFunc::GetFuncBool() You try to get a F64 while a bool is needed.\n"+
+			"                      It is possible that you use NewCutBool() instead\n"+
+			"                      of NewVarBool().")	
+	default:
+		return f.FormulaFrom(r).Func().(func() bool)
+		
+	}
 }
