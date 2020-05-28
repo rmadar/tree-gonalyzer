@@ -168,9 +168,9 @@ func (f *TreeFunc) FormulaFrom(r *rtree.Reader) rfunc.Formula {
 func (f *TreeFunc) GetFuncF64(r *rtree.Reader) func() float64 {
 	switch f.Fct.(type) {
 	case (func(bool) bool):
-		panic("TreeFunc::GetFunc64() You try to get a bool while a F64 is needed.\n"+
-			"                      It is possible that you use NewCutBool() instead\n"+
-			"                      of NewVarBool().")
+		panic("ana.TreeFunc: you try to get a bool while a F64 is needed.\n"+
+			"              It is possible that you use NewCutBool() while\n"+
+			"              NewVarBool() should be used.")
 	default:
 		return f.FormulaFrom(r).Func().(func() float64)
 	}
@@ -187,9 +187,9 @@ func (f *TreeFunc) GetFuncF64s(r *rtree.Reader) func() []float64 {
 func (f *TreeFunc) GetFuncBool(r *rtree.Reader) func() bool {
 	switch f.Fct.(type) {
 	case (func(bool) float64):
-		panic("TreeFunc::GetFuncBool() You try to get a F64 while a bool is needed.\n"+
-			"                      It is possible that you use NewCutBool() instead\n"+
-			"                      of NewVarBool().")	
+		panic("ana.TreeFunc: you try to get a F64 while a bool is needed.\n"+
+			"              It is possible that you use NewVarBool() while\n"+
+			"              NewCutBool() should be used.")	
 	default:
 		return f.FormulaFrom(r).Func().(func() bool)
 		
