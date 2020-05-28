@@ -10,23 +10,42 @@ import (
 
 // TreeFunc is a wrapper to use rtree.Formula in an easy way.
 // It provides a set of functions to ease the simple cases
-// of boolean, float32 and float64 branches. Once the slice of variable
-// (branch) names and the function are given, one can either access
-// the rtree.Formula or directly the GO function to be called
-// in the event loop for boolean, float32 and float64.
+// of boolean, float32 and float64 branches.
+
+// Once the slice of variable (branch) names and the function
+// are given, one can either access the rtree.Formula or
+// directly the GO function to be called in the event loop
+// for boolean, float32 and float64.
+// 
+// Except `NewCutBool()`, all `NewXXX()` functions lead to a treeFunc.Fct
+// returning a float64 a or []float64 in order to be accpeted
+// by hplot.h1d.Fill(v, w) method. Instead `NewCutBool()` lead to
+// a treeFunc.Fct returning a bool, specifically for cuts.
 type TreeFunc struct {
 	VarsName []string
 	Fct      interface{}
 }
 
-// NewVarBool returns a TreeFunc to get
-// a single boolean branch-based variable.
-// The output value is a boolean.
-func NewVarBool(v string) TreeFunc {
+// NewCutBool returns a TreeFunc to get
+// a single boolean branch-based variable for cuts.
+// The output value is a boolean and cannot be used
+// to be plotted. To plot a boolean, use NewVarBool(v).
+func NewCutBool(v string) TreeFunc {
 	return TreeFunc{
 		VarsName: []string{v},
 		Fct:      func(x bool) bool { return x },
 	}
+}
+
+// NewVarBool returns a TreeFunc to get
+// a single boolean branch-based variable to plot.
+// The output value is a float64 and cannot be
+// used for selection. For cuts, use NewCutBool(v).
+func NewVarBool(v string) TreeFunc {
+	return TreeFunc{
+		VarsName: []string{v},
+		Fct:      func(x bool) float64 { return map[bool]float64{false: 0, true: 1}[x] },
+		}
 }
 
 // NewVarF64 returns a TreeFunc to get a single

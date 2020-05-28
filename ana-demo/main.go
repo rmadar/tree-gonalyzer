@@ -3,7 +3,6 @@ package main
 
 import (
 	"flag"
-	"math"
 
 	"github.com/rmadar/tree-gonalyzer/ana"
 )
@@ -37,7 +36,7 @@ func main() {
 
 	// Background 3
 	sBkg3 := ana.NewSample("bkg3", "bkg", `Proc5+Proc6`, ana.WithWeight(w2))
-	sBkg3.AddComponent(file2, tname)
+	sBkg3.AddComponent(file2, tname, ana.WithCut(ana.NewCutBool("init_qq")))
 	sBkg3.AddComponent(file3, tname)
 
 	// Putting samples together
@@ -45,8 +44,9 @@ func main() {
 
 	// Variables
 	variables := []*ana.Variable{
-		ana.NewVariable("dPhi", dPhiFunc,  15, 0, math.Pi),
+		ana.NewVariable("dPhi", dPhiFunc,  15, 0, 3.14),
 		ana.NewVariable("m_tt", MttbarFunc, 25, 300, 1000),
+		ana.NewVariable("isGG", isGGFunc, 2, 0, 1),
 	}
 
 	// Selections
@@ -80,6 +80,8 @@ var (
 	// TreeFunc: variables, weights and cuts
 	dPhiFunc   = ana.NewVarF64("truth_dphi_ll")
 	MttbarFunc = ana.NewVarF32("ttbar_m")
+	isGGFunc = ana.NewVarBool("init_gg")
+	
 	w1 = ana.NewValF64(0.5)
 	w2 = ana.NewValF64(0.25)
 	wptPos = ana.TreeFunc{
