@@ -45,7 +45,7 @@ func ExampleTreeFunc_general() {
 	// pt=77.47, eta=2.93, pt*eta=226.79
 }
 
-func ExampleTreeFunc_withBranchBool() {
+func ExampleTreeFunc_withBranchBoolForPlot() {
 	// Get a reader for the example
 	f, r := getReader(5)
 	defer f.Close()
@@ -54,11 +54,42 @@ func ExampleTreeFunc_withBranchBool() {
 	// TreeFunc object from a boolean branch name in the TTree
 	treeFunc := ana.NewVarBool("init_qq")
 
+	// Go function to be called in the event loop
+	getValue := treeFunc.GetFuncF64(r)
+
 	// rtree.Formula object
 	formula := treeFunc.FormulaFrom(r)
 
+	// Event loop
+	r.Read(func(ctx rtree.RCtx) error {
+		vTreeFunc := getValue()
+		vFormula := formula.Func().(func() float64)()
+		fmt.Printf("%v %v %v\n", ctx.Entry, vTreeFunc, vFormula)
+		return nil
+	})
+
+	// Output:
+	// 0 0 0
+	// 1 0 0
+	// 2 1 1
+	// 3 0 0
+	// 4 0 0
+}
+
+func ExampleTreeFunc_withBranchBoolForCut() {
+	// Get a reader for the example
+	f, r := getReader(5)
+	defer f.Close()
+	defer r.Close()
+
+	// TreeFunc object from a boolean branch name in the TTree
+	treeFunc := ana.NewCutBool("init_qq")
+
 	// Go function to be called in the event loop
 	getValue := treeFunc.GetFuncBool(r)
+	
+	// rtree.Formula object
+	formula := treeFunc.FormulaFrom(r)
 
 	// Event loop
 	r.Read(func(ctx rtree.RCtx) error {
@@ -69,7 +100,7 @@ func ExampleTreeFunc_withBranchBool() {
 	})
 
 	// Output:
-	// 0 false false
+	// false false
 	// 1 false false
 	// 2 true true
 	// 3 false false
@@ -85,11 +116,11 @@ func ExampleTreeFunc_withBranchF64() {
 	// TreeFunc object from a float64 branch name in the TTree
 	treeFunc := ana.NewVarF64("truth_dphi_ll")
 
-	// rtree.Formula object
-	formula := treeFunc.FormulaFrom(r)
-
 	// Go function to be called in the event loop
 	getValue := treeFunc.GetFuncF64(r)
+
+	// rtree.Formula object
+	formula := treeFunc.FormulaFrom(r)
 
 	// Event loop
 	r.Read(func(ctx rtree.RCtx) error {
@@ -116,11 +147,11 @@ func ExampleTreeFunc_withBranchF32s() {
 	// TreeFunc object from a float64 branch name in the TTree
 	treeFunc := ana.NewVarF32s("hits_time_mc")
 
-	// rtree.Formula object
-	formula := treeFunc.FormulaFrom(r)
-
 	// Go function to be called in the event loop
 	getValue := treeFunc.GetFuncF64s(r)
+	
+	// rtree.Formula object
+	formula := treeFunc.FormulaFrom(r)
 
 	// Event loop
 	r.Read(func(ctx rtree.RCtx) error {
@@ -147,13 +178,13 @@ func ExampleTreeFunc_withNumericalValue() {
 	f, r := getReader(5)
 	defer f.Close()
 	defer r.Close()
-
+	
 	// TreeFunc object from a float64
 	treeFunc := ana.NewValF64(0.33)
 
 	// Go function to be called in the event loop
 	getValue := treeFunc.GetFuncF64(r)
-
+	
 	// Event loop
 	r.Read(func(ctx rtree.RCtx) error {
 		vTreeFunc := getValue()
