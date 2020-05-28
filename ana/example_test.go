@@ -58,10 +58,10 @@ func Example_aSimpleUseCase() {
 
 	// Define variables
 	variables := []*ana.Variable{
-		ana.NewVariable("Mttbar", mttFunc, 25, 350, 1000,
+		ana.NewVariable("Mttbar", ana.NewVarF32("ttbar_m"), 25, 350, 1000,
 			ana.WithAxisLabels("M(t,t) [GeV]", "Events Yields"),
 		),
-		ana.NewVariable("DphiLL", dphiFunc, 10, 0, math.Pi,
+		ana.NewVariable("DphiLL", ana.NewVarF64("truth_dphi_ll"), 10, 0, math.Pi,
 			ana.WithAxisLabels("dPhi(l,l)", "Events Yields"),
 			ana.WithLegLeft(true)),
 	}
@@ -108,8 +108,8 @@ func Example_multiComponentSamples() {
 
 	// Define variables
 	variables := []*ana.Variable{
-		ana.NewVariable("Mttbar", mttFunc, 25, 350, 1000),
-		ana.NewVariable("DphiLL", dphiFunc, 10, 0, math.Pi),
+		ana.NewVariable("Mttbar", ana.NewVarF32("ttbar_m"), 25, 350, 1000),
+		ana.NewVariable("DphiLL", ana.NewVarF64("truth_dphi_ll"), 10, 0, math.Pi),
 	}
 
 	// Create analyzer object with normalized histograms.
@@ -146,8 +146,8 @@ func Example_shapeComparison() {
 
 	// Define variables
 	variables := []*ana.Variable{
-		ana.NewVariable("TopPt", topPtFunc, 10, 0, 500),
-		ana.NewVariable("DphiLL", dphiFunc, 10, 0, math.Pi,
+		ana.NewVariable("TopPt", ana.NewVarF32("t_pt"), 10, 0, 500),
+		ana.NewVariable("DphiLL", ana.NewVarF64("truth_dphi_ll"), 10, 0, math.Pi,
 			ana.WithLegLeft(true)),
 	}
 
@@ -192,9 +192,9 @@ func Example_systematicVariations() {
 
 	// Define variables
 	variables := []*ana.Variable{
-		ana.NewVariable("Mttbar", mttFunc, 25, 350, 1500,
+		ana.NewVariable("Mttbar", ana.NewVarF32("ttbar_m"), 25, 350, 1500,
 			ana.WithRatioYRange(0.7, 1.3)),
-		ana.NewVariable("DphiLL", dphiFunc, 10, 0, math.Pi,
+		ana.NewVariable("DphiLL", ana.NewVarF64("truth_dphi_ll"), 10, 0, math.Pi,
 			ana.WithRatioYRange(0.7, 1.3),
 			ana.WithYRange(0, 0.2),
 			ana.WithLegLeft(true),
@@ -255,10 +255,10 @@ func Example_shapeDistortion() {
 
 	// Define variables
 	variables := []*ana.Variable{
-		ana.NewVariable("Mttbar", mttFunc, 25, 350, 1500,
+		ana.NewVariable("Mttbar", ana.NewVarF32("ttbar_m"), 25, 350, 1500,
 			ana.WithAxisLabels("M(t,t) [GeV]", "PDF"),
 		),
-		ana.NewVariable("DphiLL", dphiFunc, 10, 0, math.Pi,
+		ana.NewVariable("DphiLL", ana.NewVarF64("truth_dphi_ll"), 10, 0, math.Pi,
 			ana.WithLegLeft(true),
 			ana.WithAxisLabels("dPhi(l,l)", "PDF"),
 			ana.WithYRange(0, 0.3),
@@ -320,10 +320,7 @@ var (
 	fBkg2 = "../testdata/file3.root"
 	tName = "truth"
 
-	// Some variable, weights and cutw TreeFunc's
-	topPtFunc = ana.NewVarF32("t_pt")
-	mttFunc = ana.NewVarF32("ttbar_m")
-	dphiFunc = ana.NewVarF64("truth_dphi_ll")
+	// Some weights and cutw TreeFunc's
 	w1 = ana.NewValF64(1.0)
 	w2 = ana.NewValF64(0.5)
 	w3 = ana.TreeFunc{
