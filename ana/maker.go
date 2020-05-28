@@ -173,19 +173,16 @@ func (ana *Maker) FillHistos() error {
 				getVars := make([]func() []float64, len(ana.Variables))
 				for iv, v := range ana.Variables {
 					idx := iv
-					if v.isSlice {
+					v.isSlice = false
+					if getVar[idx], ok = v.TreeFunc.GetFuncF64(r); !ok {
+						v.isSlice = true
 						if getVars[idx], ok = v.TreeFunc.GetFuncF64s(r); !ok {
-							err := "Type assertion failed for variable \"%v\": expect []float64."
-							log.Fatal(fmt.Sprintf(err, v.Name))
-						}
-					} else {
-						if getVar[idx], ok = v.TreeFunc.GetFuncF64(r); !ok {
-							err := "Type assertion failed for variable \"%v\": expect float64."
+							err := "Type assertion failed for variable \"%v\": expect float64 or []float64."
 							log.Fatal(fmt.Sprintf(err, v.Name))
 						}
 					}
 				}
-				
+
 				// Prepare the sample global weight
 				getWeightSamp := func() float64 { return float64(1.0) }
 				if samp.WeightFunc.Fct != nil {
@@ -201,7 +198,7 @@ func (ana *Maker) FillHistos() error {
 					if getWeightComp, ok = comp.WeightFunc.GetFuncF64(r); !ok {
 						err := "Type assertion failed for weight[%v, %v]: expect float64."
 						log.Fatal(fmt.Sprintf(err, samp.Name, comp.FileName))
-					}					
+					}
 				}
 
 				// Prepare the sample global cut
@@ -236,7 +233,7 @@ func (ana *Maker) FillHistos() error {
 
 				// Read the tree (event loop)
 				err = r.Read(func(ctx rtree.RCtx) error {
-					
+
 					// Sample-level and component-level cut
 					if !(passCutSamp() && passCutComp()) {
 						return nil

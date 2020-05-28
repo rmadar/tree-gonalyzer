@@ -21,7 +21,8 @@ type Variable struct {
 }
 
 // NewVariable creates a new variable value with
-// default settings.
+// default settings. The TreeFunc object should returns either
+// a float64 or a []float64. Any other returned type will panic.
 func NewVariable(name string, tFunc TreeFunc, nBins int, xMin, xMax float64, opts ...VariableOptions) *Variable {
 
 	// Create the object
@@ -31,20 +32,6 @@ func NewVariable(name string, tFunc TreeFunc, nBins int, xMin, xMax float64, opt
 		Nbins:    nBins,
 		Xmin:     xMin,
 		Xmax:     xMax,
-	}
-
-	// Set the slice label
-	// FIX-ME (rmadar) : will not work for arbirary signature.
-	//                   consider adding an option ana.IsSlice()?
-	switch tFunc.Fct.(type) {
-	case (func([]bool) []float64),
-		(func([]int32) []float64),
-		(func([]int64) []float64),
-		(func([]float32) []float64),
-		(func([]float64) []float64):
-		v.isSlice = true
-	default:
-		v.isSlice = false
 	}
 
 	// Configuration with default values for all optional fields

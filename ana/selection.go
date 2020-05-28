@@ -1,5 +1,7 @@
 package ana
 
+// The returned type of TreeFunc must be a boolean.
+// It will panic otherwise.
 type Selection struct {
 	Name     string
 	TreeFunc TreeFunc

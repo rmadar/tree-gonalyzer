@@ -160,7 +160,8 @@ func WithErrBandColor(c color.NRGBA) Options {
 }
 
 // WithWeight sets the weight to be used for this sample,
-// as defined by the TreeFunc f.
+// as defined by the TreeFunc f, which must return a float64.
+// Maker.FillHisto() will panic otherwise.
 func WithWeight(f TreeFunc) SampleOptions {
 	return func(cfg *config) {
 		cfg.WeightFunc = f
@@ -168,7 +169,8 @@ func WithWeight(f TreeFunc) SampleOptions {
 }
 
 // WithCut sets the cut to be applied to the sample, as
-// defined by the TreeFunc f.
+// defined by the TreeFunc f, which must return a bool.
+// Maker.FillHisto() will panic otherwise.
 func WithCut(f TreeFunc) SampleOptions {
 	return func(cfg *config) {
 		cfg.CutFunc = f
