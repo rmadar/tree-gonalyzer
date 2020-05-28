@@ -26,10 +26,10 @@ func ExampleTreeFunc_general() {
 	}
 
 	// rtree.Formula object
-	formFunc := treeFunc.FormulaFrom(r)
+	formula := treeFunc.FormulaFrom(r)
 
 	// Go function to be called in the event loop
-	getValue := formFunc.Func().(func() float64)
+	getValue := formula.Func().(func() float64)
 
 	// Event loop
 	r.Read(func(ctx rtree.RCtx) error {
