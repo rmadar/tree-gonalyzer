@@ -112,6 +112,39 @@ func ExampleNewVarF64() {
 	// 4 2.35 2.35
 }
 
+// Example showing how NewVarF32s() works and compares
+// to the rtree.Formula.
+func ExampleNewVarF32s() {
+	// Get a reader for the example
+	f, r := getReaderWithSlices(5)
+	defer f.Close()
+	defer r.Close()
+
+	// TreeFunc object from a float64 branch name in the TTree
+	treeFunc := ana.NewVarF32s("hits_time_mc")
+
+	// rtree.Formula object
+	formula := treeFunc.FormulaFrom(r)
+
+	// Go function to be called in the event loop
+	getValue := treeFunc.GetFuncF64s(r)
+
+	// Event loop
+	r.Read(func(ctx rtree.RCtx) error {
+		vTreeFunc := getValue()
+		vFormula := formula.Func().(func() []float64)()
+		fmt.Printf("%v %.2f %.2f\n", ctx.Entry, vTreeFunc, vFormula)
+		return nil
+	})
+
+	// Output:
+	// 0 2.99 2.99
+	// 1 1.07 1.07
+	// 2 3.03 3.03
+	// 3 0.07 0.07
+	// 4 2.35 2.35
+}
+
 // Example showing how NewValF64() works.
 // The reason why this approach exists is to be able
 // to pass a simple constant to a sample, using the
@@ -143,17 +176,27 @@ func ExampleNewValF64() {
 	// 4 0.33
 }
 
-// Helper function get a reader for the examples
+// Helper function get a reader (w/o slices) for the examples
 func getReader(nmax int64) (*groot.File, *rtree.Reader) {
+	return getReaderFile("../testdata/file1.root", "truth", nmax)
+}
+
+// Helper function get a reader with slices for the examples
+func getReaderWithSlices(nmax int64) (*groot.File, *rtree.Reader) {
+	return getReaderFile("../testdata/fileSlices.root", "modules", nmax)
+}
+
+// Helper function to get a tree tname from a file fname.
+func getReaderFile(fname, tname string, nmax int64) (*groot.File, *rtree.Reader) {
 
 	// Get the file
-	f, err := groot.Open("../testdata/file1.root")
+	f, err := groot.Open(fname)
 	if err != nil {
-		log.Fatal("example_treefunc_test.go: could not open ../testdata/file1.root: %w", err)
+		log.Fatal("example_treefunc_test.go: could not open "+fname+": %w", err)
 	}
 
 	// Get the tree
-	obj, err := f.Get("truth")
+	obj, err := f.Get(tname)
 	if err != nil {
 		log.Fatal("could not retrieve object: %w", err)
 	}
