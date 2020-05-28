@@ -11,7 +11,7 @@ import (
 // TreeFunc is a wrapper to use rtree.Formula in an easy way.
 // It provides a set of functions to ease the simple cases
 // of boolean, float32 and float64 branches.
-
+// 
 // Once the slice of variable (branch) names and the function
 // are given, one can either access the rtree.Formula or
 // directly the GO function to be called in the event loop
