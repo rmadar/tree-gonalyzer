@@ -168,51 +168,75 @@ func (ana *Maker) FillHistos() error {
 				defer r.Close()
 
 				// Prepare variables
+				ok := false
 				getVar := make([]func() float64, len(ana.Variables))
 				getVars := make([]func() []float64, len(ana.Variables))
 				for iv, v := range ana.Variables {
 					idx := iv
 					if v.isSlice {
-						getVars[idx] = v.TreeFunc.GetFuncF64s(r)
+						if getVars[idx], ok = v.TreeFunc.GetFuncF64s(r); !ok {
+							err := "Type assertion failed for variable \"%v\": expect []float64."
+							log.Fatal(fmt.Sprintf(err, v.Name))
+						}
 					} else {
-						getVar[idx] = v.TreeFunc.GetFuncF64(r)
+						if getVar[idx], ok = v.TreeFunc.GetFuncF64(r); !ok {
+							err := "Type assertion failed for variable \"%v\": expect float64."
+							log.Fatal(fmt.Sprintf(err, v.Name))
+						}
 					}
 				}
-
+				
 				// Prepare the sample global weight
 				getWeightSamp := func() float64 { return float64(1.0) }
 				if samp.WeightFunc.Fct != nil {
-					getWeightSamp = samp.WeightFunc.GetFuncF64(r)
+					if getWeightSamp, ok = samp.WeightFunc.GetFuncF64(r); !ok {
+						err := "Type assertion failed for weight[%v]: expect float64."
+						log.Fatal(fmt.Sprintf(err, samp.Name))
+					}
 				}
 
 				// Prepare the additional weight of the component
 				getWeightComp := func() float64 { return float64(1.0) }
 				if comp.WeightFunc.Fct != nil {
-					getWeightComp = comp.WeightFunc.GetFuncF64(r)
+					if getWeightComp, ok = comp.WeightFunc.GetFuncF64(r); !ok {
+						err := "Type assertion failed for weight[%v, %v]: expect float64."
+						log.Fatal(fmt.Sprintf(err, samp.Name, comp.FileName))
+					}					
 				}
 
 				// Prepare the sample global cut
 				passCutSamp := func() bool { return true }
 				if samp.CutFunc.Fct != nil {
-					passCutSamp = samp.CutFunc.GetFuncBool(r)
+					if passCutSamp, ok = samp.CutFunc.GetFuncBool(r); !ok {
+						err := "Type assertion failed for Cut[%v]: expect bool."
+						log.Fatal(fmt.Sprintf(err, samp.Name))
+					}
 				}
 
 				// Prepare the component additional cut
 				passCutComp := func() bool { return true }
 				if comp.CutFunc.Fct != nil {
-					passCutComp = comp.CutFunc.GetFuncBool(r)
+					if passCutComp, ok = comp.CutFunc.GetFuncBool(r); !ok {
+						err := "Type assertion failed for Cut[%v, %v]: expect bool.\n"
+						err += "\t -> Make sure to use NewCutBool(), not NewVarBool()."
+						log.Fatal(fmt.Sprintf(err, samp.Name, comp.FileName))
+					}
 				}
 
 				// Prepare the cut string for kinematics
 				passKinemCut := make([]func() bool, len(ana.KinemCuts))
 				for ic, cut := range ana.KinemCuts {
 					idx := ic
-					passKinemCut[idx] = cut.TreeFunc.GetFuncBool(r)
+					if passKinemCut[idx], ok = cut.TreeFunc.GetFuncBool(r); !ok {
+						err := "Type assertion failed for selection \"%v\": expect bool.\n"
+						err += "\t -> Make sure to use NewCutBool(), not NewVarBool()."
+						log.Fatal(fmt.Sprintf(err, cut.Name))
+					}
 				}
 
 				// Read the tree (event loop)
 				err = r.Read(func(ctx rtree.RCtx) error {
-
+					
 					// Sample-level and component-level cut
 					if !(passCutSamp() && passCutComp()) {
 						return nil
