@@ -10,7 +10,7 @@ This tool is built on top of [go-hep.org](https://go-hep.org).
 ```go
 // Define samples
 samples := []*ana.Sample{
-	ana.CreateSample("data", "data", `Data 2020`, "data.root", "mytree"),
+	ana.CreateSample("data", "data", `Data`, "data.root", "mytree"),
 	ana.CreateSample("bkg1", "bkg", `Proc 1`, "proc1.root", "mytree"),
 	ana.CreateSample("bkg2", "bkg", `Proc 2`, "proc2.root", "mytree"),
 	ana.CreateSample("bkg3", "bkg", `Proc 3`, "proc3.root", "mytree"),
@@ -18,8 +18,8 @@ samples := []*ana.Sample{
 
 // Define variables
 variables := []*ana.Variable{
-	ana.NewVariable("plot1", "branch1", new(float32), 25, 0, 1000),
-	ana.NewVariable("plot2", "branch2", new(float64), 50, 0, 1000),
+	ana.NewVariable("plot1", ana.NewVarF32("branchF32"), 25, 0, 1000),
+	ana.NewVariable("plot2", ana.NewVarF32("branchF64"), 50, 0, 1000),
 }
 
 // Create analyzer object with some options
