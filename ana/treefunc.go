@@ -1,7 +1,6 @@
 package ana
 
 import (
-	"fmt"
 	"log"
 
 	"go-hep.org/x/hep/groot/rtree"
@@ -115,7 +114,6 @@ func NewVarF32s(v string) TreeFunc {
 		Fct: func(xs []float32) []float64 {
 			res := make([]float64, len(xs))
 			for i, x := range xs {
-				fmt.Println(i, x)
 				res[i] = float64(x)
 			}
 			return res

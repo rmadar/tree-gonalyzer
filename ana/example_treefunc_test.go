@@ -56,18 +56,19 @@ func ExampleTreeFunc_withBranchBoolForPlot() {
 
 	// Go function to be called in the event loop
 	// The return type is float64, since it's for plotting.
-	getValue, ok := treeFunc.GetFuncF64(r)
+	getTreeFuncVal, ok := treeFunc.GetFuncF64(r)
 	if !ok {
 		log.Fatal("type assertion failed: expect float64")
 	}
 
 	// rtree.Formula object
 	formula := treeFunc.FormulaFrom(r)
-
+	getFormulaVal := formula.Func().(func() float64)
+	
 	// Event loop
 	r.Read(func(ctx rtree.RCtx) error {
-		vTreeFunc := getValue()
-		vFormula := formula.Func().(func() float64)()
+		vTreeFunc := getTreeFuncVal()
+		vFormula := getFormulaVal()
 		fmt.Printf("%v %v %v\n", ctx.Entry, vTreeFunc, vFormula)
 		return nil
 	})
@@ -91,18 +92,19 @@ func ExampleTreeFunc_withBranchBoolForCut() {
 	treeFunc := ana.NewCutBool("init_qq")
 
 	// Go function to be called in the event loop
-	getValue, ok := treeFunc.GetFuncBool(r)
+	getTreeFuncVal, ok := treeFunc.GetFuncBool(r)
 	if !ok {
 		log.Fatal("type assertion failed: expect bool")
 	}
 
 	// rtree.Formula object
 	formula := treeFunc.FormulaFrom(r)
-
+	getFormulaVal := formula.Func().(func() bool)
+		
 	// Event loop
 	r.Read(func(ctx rtree.RCtx) error {
-		vTreeFunc := getValue()
-		vFormula := formula.Func().(func() bool)()
+		vTreeFunc := getTreeFuncVal()
+		vFormula := getFormulaVal()
 		fmt.Printf("%v %v %v\n", ctx.Entry, vTreeFunc, vFormula)
 		return nil
 	})
@@ -126,18 +128,19 @@ func ExampleTreeFunc_withBranchF64() {
 	treeFunc := ana.NewVarF64("truth_dphi_ll")
 
 	// Go function to be called in the event loop
-	getValue, ok := treeFunc.GetFuncF64(r)
+	getTreeFuncVal, ok := treeFunc.GetFuncF64(r)
 	if !ok {
 		log.Fatal("type assertion failed: expect float64")
 	}
 
 	// rtree.Formula object
 	formula := treeFunc.FormulaFrom(r)
+	getFormulaVal := formula.Func().(func() float64)
 
 	// Event loop
 	r.Read(func(ctx rtree.RCtx) error {
-		vTreeFunc := getValue()
-		vFormula := formula.Func().(func() float64)()
+		vTreeFunc := getTreeFuncVal()
+		vFormula := getFormulaVal()
 		fmt.Printf("%v %.2f %.2f\n", ctx.Entry, vTreeFunc, vFormula)
 		return nil
 	})
@@ -161,77 +164,43 @@ func ExampleTreeFunc_withBranchF32s() {
 	treeFunc := ana.NewVarF32s("hits_time_mc")
 
 	// Go function to be called in the event loop
-	getVal, ok := treeFunc.GetFuncF64s(r)
+	getTreeFuncVal, ok := treeFunc.GetFuncF64s(r)
 	if !ok {
 		log.Fatal("type assertion failed: expect []float64")
 	}
 
 	// rtree.Formula object
 	formula := treeFunc.FormulaFrom(r)
-	getValForm := formula.Func().(func() []float64)
+	getFormulaVal := formula.Func().(func() []float64)
 
 	// Event loop
 	r.Read(func(ctx rtree.RCtx) error {
-		vTreeFunc := getVal()
-		vFormula := getValForm()
-		fmt.Printf("Evt[%v] %v %v\n", ctx.Entry, vTreeFunc, vFormula)
+		vTreeFunc := getTreeFuncVal()
+		vFormula := getFormulaVal()
+		fmt.Printf("Evt[%v]\n -> %v\n -> %v\n\n", ctx.Entry, vTreeFunc[:5], vFormula[:5])
 		return nil
 	})
-
+	
 	// Output:
-	// 0 2.99 2.99
-	// 1 1.07 1.07
-	// 2 3.03 3.03
-	// 3 0.07 0.07
-	// 4 2.35 2.35
-}
-
-func ExampleTreeFunc_debugSlices() {
-
-	f, err := groot.Open("../testdata/fileSlices.root")
-	if err != nil {
-		panic(err)
-	}
-	defer f.Close()
-
-	o, err := f.Get("modules")
-	if err != nil {
-		panic(err)
-	}
-	t := o.(rtree.Tree)
-
-	r, err := rtree.NewReader(t, []rtree.ReadVar{}, rtree.WithRange(0, 5))
-	if err != nil {
-		panic(err)
-	}
-	defer r.Close()
-
-	form, err := r.FormulaFunc(
-		[]string{"hits_time_mc"},
-		func(xs []float32) []float64 {
-			o := make([]float64, len(xs))
-			for i, v := range xs {
-				o[i] = float64(2 * v)
-			}
-			return o
-		},
-	)
-	if err != nil {
-		panic(err)
-	}
-
-	fct := form.Func().(func() []float64)
-
-	err = r.Read(func(ctx rtree.RCtx) error {
-		fmt.Printf("evt[%d]: %v\n", ctx.Entry, fct())
-		return nil
-	})
-	if err != nil {
-		panic(err)
-	}
-
-	// Output:
-	// blabla
+	// Evt[0]
+	//  -> [12.206398963928223 11.711121559143066 11.734919548034668 12.457039833068848 11.558056831359863]
+	//  -> [12.206398963928223 11.711121559143066 11.734919548034668 12.457039833068848 11.558056831359863]
+	//
+	// Evt[1]
+	//  -> [11.718018531799316 12.985346794128418 12.231209754943848 11.825081825256348 12.405976295471191]
+	//  -> [11.718018531799316 12.985346794128418 12.231209754943848 11.825081825256348 12.405976295471191]
+	//
+	// Evt[2]
+	//  -> [12.231328964233398 12.214682579040527 12.194867134094238 12.246091842651367 11.859249114990234]
+	//  -> [12.231328964233398 12.214682579040527 12.194867134094238 12.246091842651367 11.859249114990234]
+	//
+	// Evt[3]
+	//  -> [11.33843994140625 11.725604057312012 12.774130821228027 12.108593940734863 12.192085266113281]
+	//  -> [11.33843994140625 11.725604057312012 12.774130821228027 12.108593940734863 12.192085266113281]
+	//
+	// Evt[4]
+	//  -> [12.156414031982422 12.641215324401855 11.678815841674805 12.329707145690918 11.578168869018555]
+	//  -> [12.156414031982422 12.641215324401855 11.678815841674805 12.329707145690918 11.578168869018555]
 }
 
 // Example showing how to load a numerical value in a TreeFunc.
@@ -248,14 +217,14 @@ func ExampleTreeFunc_withNumericalValue() {
 	treeFunc := ana.NewValF64(0.33)
 
 	// Go function to be called in the event loop
-	getValue, ok := treeFunc.GetFuncF64(r)
+	getTreeFuncVal, ok := treeFunc.GetFuncF64(r)
 	if !ok {
 		log.Fatal("type assertion failed: expect float64")
 	}
 
 	// Event loop
 	r.Read(func(ctx rtree.RCtx) error {
-		vTreeFunc := getValue()
+		vTreeFunc := getTreeFuncVal()
 		fmt.Printf("%v %.2f\n", ctx.Entry, vTreeFunc)
 		return nil
 	})
