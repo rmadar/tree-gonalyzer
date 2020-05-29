@@ -45,9 +45,9 @@ type Sample struct {
 	CircleSize        vg.Length   // Circle size (default: 0).
 	CircleColor       color.NRGBA // Circle color (default: transparent).
 	Band              bool        // Enable error band display.
-	YErrBars          bool        // Display y-error bars (default: false || DataStyle).
-	YErrBarsLineWidth vg.Length   // Width of y-error bars.
-	YErrBarsCapWidth  vg.Length   // Width of horizontal bars of the y-error bars.
+	YErrBars          bool        // Display error bars (default: false || DataStyle).
+	YErrBarsLineWidth vg.Length   // Width of error bars line.
+	YErrBarsCapWidth  vg.Length   // Width of horizontal bars of the error bars.
 }
 
 // SampleComponent contains the needed information
