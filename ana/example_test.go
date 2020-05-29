@@ -285,9 +285,8 @@ func Example_withKinemCuts() {
 }
 
 func Example_withSliceVariables() {
-	// Few definitions
+	// File and tree names
 	fName, tName := "../testdata/fileSlices.root", "modules"
-	hitTimes := ana.NewVarF32s("hits_time_mc")
 
 	// Samples
 	samples := []*ana.Sample{
@@ -296,11 +295,12 @@ func Example_withSliceVariables() {
 
 	// Variables
 	variables := []*ana.Variable{
-		ana.NewVariable("hitTimes", hitTimes, 50, 10, 20),
+		ana.NewVariable("hitTimes", ana.NewVarF32s("hits_time_mc"), 100, 10, 15),
 	}
 
 	// Analyzer
 	analyzer := ana.New(samples, variables,
+		ana.WithAutoStyle(true),
 		ana.WithHistoStack(false),
 		ana.WithRatioPlot(false),
 		ana.WithSaveFormat("png"),
@@ -334,9 +334,9 @@ var (
 
 	// Some colors
 	noColor    = color.NRGBA{}
-	softBlack  = color.NRGBA{R: 50, G: 30, B: 50, A: 200}
-	shadowBlue = color.NRGBA{R: 50, G: 20, B: 150, A: 20}
-	darkRed    = color.NRGBA{R: 180, G: 30, B: 50, A: 200}
-	darkGreen  = color.NRGBA{G: 180, R: 30, B: 50, A: 200}
-	darkBlue   = color.NRGBA{B: 180, G: 30, R: 50, A: 200}
+	softBlack  = color.NRGBA{R:  50, G: 30, B:  50, A: 200}
+	shadowBlue = color.NRGBA{R:  50, G: 20, B: 150, A:  20}
+	darkRed    = color.NRGBA{R: 180, G: 30, B:  50, A: 200}
+	darkGreen  = color.NRGBA{G: 180, R: 30, B:  50, A: 200}
+	darkBlue   = color.NRGBA{B: 180, G: 30, R:  50, A: 200}
 )
