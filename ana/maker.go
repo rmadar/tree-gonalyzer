@@ -172,8 +172,8 @@ func (ana *Maker) FillHistos() error {
 				getVar := make([]func() float64, len(ana.Variables))
 				getVars := make([]func() []float64, len(ana.Variables))
 				for iv, v := range ana.Variables {
-					idx := iv
 					v.isSlice = false
+					idx := iv
 					if getVar[idx], ok = v.TreeFunc.GetFuncF64(r); !ok {
 						v.isSlice = true
 						if getVars[idx], ok = v.TreeFunc.GetFuncF64s(r); !ok {
@@ -256,29 +256,33 @@ func (ana *Maker) FillHistos() error {
 						if !passKinemCut[ic]() {
 							continue
 						}
-
+						
 						// Otherwise, loop over variables.
 						for iv, v := range ana.Variables {
+
+							// slices
 							if v.isSlice {
 								for _, x := range getVars[iv]() {
 									ana.HbookHistos[iv][ic][iSamp].Fill(x, w)
 								}
-							} else {
-								ana.HbookHistos[iv][ic][iSamp].Fill(getVar[iv](), w)
+								continue
 							}
+							
+							// Float64
+							ana.HbookHistos[iv][ic][iSamp].Fill(getVar[iv](), w)
 						}
 					}
-
 					return nil
 				})
 
 				// Keep track of the number of processed events.
-				if ana.Nevts == -1 {
+				switch ana.Nevts {
+				case -1:
 					ana.nEvents += t.Entries()
-				} else {
+				default:
 					ana.nEvents += ana.Nevts
 				}
-
+				
 				return nil
 			}(iComp)
 		}
