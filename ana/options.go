@@ -32,6 +32,7 @@ type config struct {
 	RatioPlot    bool         // Enable ratio plot.
 	HistoStack   bool         // Disable histogram stacking (e.g. compare various processes).
 	HistoNorm    bool         // Normalize distributions to unit area (when stacked, the total is normalized).
+	SignalStack  bool         // Enable signal histogram stacking.
 	TotalBand    bool         // Enable total error band for stacks.
 	ErrBandColor color.NRGBA  // Color for the uncertainty band.
 
@@ -133,6 +134,14 @@ func WithRatioPlot(b bool) Options {
 func WithHistoStack(b bool) Options {
 	return func(cfg *config) {
 		cfg.HistoStack = b
+	}
+}
+
+// WithSignalStack enables histogram stacking for
+// bkg-typed samples.
+func WithSignalStack(b bool) Options {
+	return func(cfg *config) {
+		cfg.SignalStack = b
 	}
 }
 

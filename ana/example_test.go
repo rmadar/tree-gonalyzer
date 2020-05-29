@@ -45,6 +45,20 @@ func TestSliceVariables(t *testing.T) {
 	)
 }
 
+func TestWithSignals(t *testing.T) {
+	cmpimg.CheckPlot(Example_withSignals, t,
+		"Plots_withSignals/Mttbar.png",
+		"Plots_withSignals/DphiLL.png",
+	)
+}
+
+func TestWithStackedSignals(t *testing.T) {
+	cmpimg.CheckPlot(Example_withStackedSignals, t,
+		"Plots_withStackedSignals/Mttbar.png",
+		"Plots_withStackedSignals/DphiLL.png",
+	)
+}
+
 // Creation of the default analysis maker type with
 // single-component samples.
 func Example_aSimpleUseCase() {
@@ -71,6 +85,77 @@ func Example_aSimpleUseCase() {
 		ana.WithAutoStyle(true),
 		ana.WithSaveFormat("png"),
 		ana.WithSavePath("testdata/Plots_simpleUseCase"),
+	)
+
+	// Run the analyzer to produce all the plots
+	if err := analyzer.Run(); err != nil {
+		panic(err)
+	}
+}
+
+func Example_withSignals() {
+	// Define samples
+	samples := []*ana.Sample{
+		ana.CreateSample("data", "data", `Data`, fData, tName),
+		ana.CreateSample("bkg1", "bkg", `Proc 1`, fBkg1, tName, ana.WithWeight(w1)),
+		ana.CreateSample("bkg2", "bkg", `Proc 2`, fBkg2, tName, ana.WithWeight(w2)),
+		ana.CreateSample("bkg3", "bkg", `Proc 3`, fBkg1, tName, ana.WithWeight(w2)),
+		ana.CreateSample("sig1", "sig", `Sig 1`, fBkg2, tName, ana.WithWeight(wSigM(500, 0.04))),
+		ana.CreateSample("sig2", "sig", `Sig 2`, fBkg2, tName, ana.WithWeight(wSigM(650, 0.02))),
+		ana.CreateSample("sig3", "sig", `Sig 2`, fBkg2, tName, ana.WithWeight(wSigM(800, 0.01))),
+	}
+
+	// Define variables
+	variables := []*ana.Variable{
+		ana.NewVariable("Mttbar", ana.NewVarF32("ttbar_m"), 100, 350, 1000,
+			ana.WithAxisLabels("M(t,t) [GeV]", "Events Yields"),
+		),
+		ana.NewVariable("DphiLL", ana.NewVarF64("truth_dphi_ll"), 10, 0, math.Pi,
+			ana.WithAxisLabels("dPhi(l,l)", "Events Yields"),
+			ana.WithLegLeft(true)),
+	}
+
+	// Create analyzer object
+	analyzer := ana.New(samples, variables,
+		ana.WithAutoStyle(true),
+		ana.WithSaveFormat("png"),
+		ana.WithSavePath("testdata/Plots_withSignals"),
+	)
+
+	// Run the analyzer to produce all the plots
+	if err := analyzer.Run(); err != nil {
+		panic(err)
+	}
+}
+
+func Example_withStackedSignals() {
+	// Define samples
+	samples := []*ana.Sample{
+		ana.CreateSample("data", "data", `Data`, fData, tName),
+		ana.CreateSample("bkg1", "bkg", `Proc 1`, fBkg1, tName, ana.WithWeight(w1)),
+		ana.CreateSample("bkg2", "bkg", `Proc 2`, fBkg2, tName, ana.WithWeight(w2)),
+		ana.CreateSample("bkg3", "bkg", `Proc 3`, fBkg1, tName, ana.WithWeight(w2)),
+		ana.CreateSample("sig1", "sig", `Sig 1`, fBkg2, tName, ana.WithWeight(wSigM(500, 0.04))),
+		ana.CreateSample("sig2", "sig", `Sig 2`, fBkg2, tName, ana.WithWeight(wSigM(650, 0.02))),
+		ana.CreateSample("sig3", "sig", `Sig 2`, fBkg2, tName, ana.WithWeight(wSigM(800, 0.01))),
+	}
+
+	// Define variables
+	variables := []*ana.Variable{
+		ana.NewVariable("Mttbar", ana.NewVarF32("ttbar_m"), 100, 350, 1000,
+			ana.WithAxisLabels("M(t,t) [GeV]", "Events Yields"),
+		),
+		ana.NewVariable("DphiLL", ana.NewVarF64("truth_dphi_ll"), 10, 0, math.Pi,
+			ana.WithAxisLabels("dPhi(l,l)", "Events Yields"),
+			ana.WithLegLeft(true)),
+	}
+
+	// Create analyzer object
+	analyzer := ana.New(samples, variables,
+		ana.WithAutoStyle(true),
+		ana.WithSaveFormat("png"),
+		ana.WithSignalStack(true),
+		ana.WithSavePath("testdata/Plots_withStackedSignals"),
 	)
 
 	// Run the analyzer to produce all the plots
@@ -330,6 +415,16 @@ var (
 	w4 = ana.TreeFunc{
 		VarsName: []string{"t_pt"},
 		Fct:      func(pt float32) float64 { return 1.0 - float64(pt)/250. },
+	}
+	wSigM = func (mass, relWidth float32) ana.TreeFunc {
+		return ana.TreeFunc{
+			VarsName: []string{"ttbar_m"},
+			Fct: func(m float32) float64 {
+				dM2 := float64( (m-mass)*(m-mass))
+				sigma2 := float64(mass*relWidth * mass*relWidth)
+				return 50 * 1/float64(mass*relWidth) * math.Exp(-dM2/sigma2 )
+			},
+		}
 	}
 
 	// Some colors

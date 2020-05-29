@@ -44,7 +44,7 @@ type Maker struct {
 	PlotTitle    string      // General plot title (default: 'TTree GOnalyzer').
 	RatioPlot    bool        // Enable ratio plot (default: true).
 	HistoStack   bool        // Enable histogram stacking (default: true).
-	SigStack     bool        // Enable signal stack (default: false).
+	SignalStack  bool        // Enable signal stack (default: false).
 	HistoNorm    bool        // Normalize distributions to unit area (default: false).
 	TotalBand    bool        // Enable total error band in stack mode (default: true).
 	ErrBandColor color.NRGBA // Color for the uncertainty band (default: gray).
@@ -82,7 +82,6 @@ func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 		WithPlotTitle(`TTree GOnalyzer`),
 		WithCompileLatex(true),
 		WithHistoStack(true),
-		WithHistoNorm(false),
 		WithRatioPlot(true),
 		WithTotalBand(true),
 		WithErrBandColor(color.NRGBA{A: 100}),
@@ -104,6 +103,7 @@ func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 	a.CompileLatex = cfg.CompileLatex
 	a.RatioPlot = cfg.RatioPlot
 	a.HistoStack = cfg.HistoStack
+	a.SignalStack = cfg.SignalStack
 	a.HistoNorm = cfg.HistoNorm
 	a.TotalBand = cfg.TotalBand
 	a.ErrBandColor = cfg.ErrBandColor
@@ -170,14 +170,14 @@ func (ana *Maker) FillHistos() error {
 
 				// Prepare variables
 				ok := false
-				getVar := make([]func() float64, len(ana.Variables))
-				getVars := make([]func() []float64, len(ana.Variables))
+				getF64 := make([]func() float64, len(ana.Variables))
+				getF64s := make([]func() []float64, len(ana.Variables))
 				for iv, v := range ana.Variables {
 					v.isSlice = false
 					idx := iv
-					if getVar[idx], ok = v.TreeFunc.GetFuncF64(r); !ok {
+					if getF64[idx], ok = v.TreeFunc.GetFuncF64(r); !ok {
 						v.isSlice = true
-						if getVars[idx], ok = v.TreeFunc.GetFuncF64s(r); !ok {
+						if getF64s[idx], ok = v.TreeFunc.GetFuncF64s(r); !ok {
 							err := `Type assertion failed [variable "%v"]:`
 							err += ` TreeFunc.Fct must return a float64 or a []float64.`
 							log.Fatalf(err, v.Name)
@@ -261,16 +261,16 @@ func (ana *Maker) FillHistos() error {
 						// Otherwise, loop over variables.
 						for iv, v := range ana.Variables {
 
-							// slices
+							// Fill histo with full slices...
 							if v.isSlice {
-								for _, x := range getVars[iv]() {
+								for _, x := range getF64s[iv]() {
 									ana.HbookHistos[iv][ic][iSamp].Fill(x, w)
 								}
 								continue
 							}
-							
-							// Float64
-							ana.HbookHistos[iv][ic][iSamp].Fill(getVar[iv](), w)
+						
+							// ... or the single variable value.
+							ana.HbookHistos[iv][ic][iSamp].Fill(getF64[iv](), w)
 						}
 					}
 					return nil
@@ -312,7 +312,9 @@ func (ana *Maker) PlotHistos() error {
 
 	// Return an error if HbookHistos is empty
 	if !ana.histoFilled {
-		log.Fatalf("There is no histograms. Please make sure that 'FillHistos()' is called before 'PlotHistos()'")
+		err := "There is no histograms. Please make sure that"
+		err += "'FillHistos()' is called before 'PlotHistos()'"
+		log.Fatalf(err)
 	}
 
 	// Preparing the final figure
@@ -366,7 +368,7 @@ func (ana *Maker) PlotHistos() error {
 				}
 				
 				// Add signals if stacked
-				if ana.SigStack {
+				if ana.SignalStack {
 					normTot += n
 				}
 				
@@ -413,6 +415,7 @@ func (ana *Maker) PlotHistos() error {
 					bhBkgs_postnorm = append(bhBkgs_postnorm, h)
 					bhBkgTot = hbook.AddH1D(h, bhBkgTot)
 
+				// 
 				case sig:
 					phSigs = append(phSigs, ana.HplotHistos[iv][isel][is])
 					bhSigs_postnorm = append(bhSigs_postnorm, h)
@@ -421,17 +424,27 @@ func (ana *Maker) PlotHistos() error {
 			}
 
 			// Manage background stack plotting
-			if len(phBkgs) > 0 {
-
+			if len(phBkgs)+len(phSigs) > 0 {
+				
+				// Put all backgrounds in the stack
+				phStack := make([]*hplot.H1D, len(phBkgs))
+				copy(phStack, phBkgs)
+				
 				// Reverse the order so that legend and plot order matches
-				phBkgsLeg := make([]*hplot.H1D, len(phBkgs))
-				copy(phBkgsLeg, phBkgs)
-				for i, j := 0, len(phBkgsLeg)-1; i < j; i, j = i+1, j-1 {
-					phBkgsLeg[i], phBkgsLeg[j] = phBkgsLeg[j], phBkgsLeg[i]
+				for i, j := 0, len(phStack)-1; i < j; i, j = i+1, j-1 {
+					phStack[i], phStack[j] = phStack[j], phStack[i]
 				}
 
+				// Add signals if asked (after the order reversering to have
+				// signals on top of the bkg).
+				if ana.SignalStack {
+					for _, hs := range phSigs {
+						phStack = append(phStack, hs)
+					}
+				}
+				
 				// Stacking the background histo
-				stack := hplot.NewHStack(phBkgsLeg, hplot.WithBand(ana.TotalBand))
+				stack := hplot.NewHStack(phStack, hplot.WithBand(ana.TotalBand))
 				stack.Band.FillColor = ana.ErrBandColor
 				if ana.HistoStack && ana.TotalBand {
 					hBand := hplot.NewH1D(hbook.NewH1D(1, 0, 1), hplot.WithBand(true))
@@ -444,7 +457,6 @@ func (ana *Maker) PlotHistos() error {
 
 				// Add the stack to the plot
 				p.Add(stack)
-
 			}
 
 			// Adding hplot.H1D data to the plot, set the drawer to the current plot
@@ -452,6 +464,13 @@ func (ana *Maker) PlotHistos() error {
 				p.Add(phData)
 			}
 
+			// Add individual signals (if not stacked) after the data
+			if !ana.SignalStack {
+				for _, hs := range phSigs {
+					p.Add(hs)
+				}
+			}
+			
 			// Apply common and user-defined style for this variable
 			// FIX-ME (rmadar): the v.setPlotStyle(v) command doesn't update
 			//                  y-axis scale if it is put before the samples
@@ -671,13 +690,23 @@ func (ana *Maker) setAutoStyle() {
 		r, g, b, a := plotutil.Color(ic).RGBA()
 		c := color.NRGBA{R: uint8(r), G: uint8(g), B: uint8(b), A: uint8(a)}
 
-		// Apply data style automatically
-		if s.IsData() {
+		switch s.sType {
+		case data:
 			s.DataStyle = true
-		} else {
-
+		case bkg:
 			// Fill for stacked histo, lines otherwise
 			if ana.HistoStack {
+				s.FillColor = c
+				s.LineWidth = 0.
+			} else {
+				s.FillColor = color.NRGBA{}
+				s.LineColor = c
+				s.LineWidth = 2.
+			}
+			ic += 1
+		case sig:
+			// Fill for stacked histo, lines otherwise
+			if ana.SignalStack {
 				s.FillColor = c
 				s.LineWidth = 0.
 			} else {
