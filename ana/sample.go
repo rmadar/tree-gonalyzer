@@ -1,6 +1,8 @@
 package ana
 
 import (
+	"fmt"
+	"log"
 	"strings"
 
 	"image/color"
@@ -15,6 +17,15 @@ import (
 
 // Default color
 var colorNil = color.NRGBA{R: 0, G: 0, B: 0, A: 0}
+
+// Sample type
+type sampleType int
+
+const (
+	data sampleType = iota
+	bkg
+	sig
+)
 
 // Sample contains all the information defining a single histogram
 // of the final plot. A sample is made of (potentially) several
@@ -48,6 +59,9 @@ type Sample struct {
 	YErrBars          bool        // Display error bars (default: false || DataStyle).
 	YErrBarsLineWidth vg.Length   // Width of error bars line.
 	YErrBarsCapWidth  vg.Length   // Width of horizontal bars of the error bars.
+
+	// Internal
+	sType sampleType
 }
 
 // SampleComponent contains the needed information
@@ -66,12 +80,27 @@ type SampleComponent struct {
 // s.AddComponent(...) function.
 func NewSample(sname, stype, sleg string, opts ...SampleOptions) *Sample {
 
+	// Check/set sample type
+	var sType sampleType
+	switch strings.ToLower(stype) {
+	case "data":
+		sType = data
+	case "background", "bkg", "bg":
+		sType = bkg
+	case "signal", "sig", "sg":
+		sType = sig
+	default:
+		err := "Sample type not %v supported [%v]"
+		log.Fatal(fmt.Sprint(err, stype, sname))
+	}
+
 	// Empty basic sample
 	s := &Sample{
 		Name:       sname,
 		Type:       stype,
 		LegLabel:   sleg,
 		Components: []*SampleComponent{},
+		sType:      sType,
 	}
 
 	// Configuration with defaults values for all optional fields
@@ -229,18 +258,15 @@ func (s Sample) setBandStyle(b *hplot.Band) {
 
 // IsData returns true it the sample Type is 'data'.
 func (s *Sample) IsData() bool {
-	return strings.ToLower(s.Type) == "data"
+	return s.sType == data
 }
 
 // IsData returns true it the sample Type is 'background'.
 func (s *Sample) IsBkg() bool {
-	return strings.ToLower(s.Type) == "bkg" ||
-		strings.ToLower(s.Type) == "bg" ||
-		strings.ToLower(s.Type) == "background"
+	return s.sType == bkg
 }
 
 // IsData returns true it the sample Type is 'signal'.
 func (s *Sample) IsSig() bool {
-	return strings.ToLower(s.Type) == "sig" ||
-		strings.ToLower(s.Type) == "signal"
+	return s.sType == sig
 }
