@@ -90,8 +90,8 @@ func NewSample(sname, stype, sleg string, opts ...SampleOptions) *Sample {
 	case "signal", "sig", "sg":
 		sType = sig
 	default:
-		err := "Sample type not %v supported [%v]"
-		log.Fatal(fmt.Sprint(err, stype, sname))
+		err := "sample type \"%v\" not supported [sample %v]"
+		log.Fatal(fmt.Sprintf(err, stype, sname))
 	}
 
 	// Empty basic sample
