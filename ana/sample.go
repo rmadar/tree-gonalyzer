@@ -261,12 +261,12 @@ func (s *Sample) IsData() bool {
 	return s.sType == data
 }
 
-// IsData returns true it the sample Type is 'background'.
+// IsBkg returns true it the sample Type is 'background'.
 func (s *Sample) IsBkg() bool {
 	return s.sType == bkg
 }
 
-// IsData returns true it the sample Type is 'signal'.
+// IsSig returns true it the sample Type is 'signal'.
 func (s *Sample) IsSig() bool {
 	return s.sType == sig
 }

@@ -44,6 +44,7 @@ type Maker struct {
 	PlotTitle    string      // General plot title (default: 'TTree GOnalyzer').
 	RatioPlot    bool        // Enable ratio plot (default: true).
 	HistoStack   bool        // Enable histogram stacking (default: true).
+	SigStack     bool        // Enable signal stack (default: false).
 	HistoNorm    bool        // Normalize distributions to unit area (default: false).
 	TotalBand    bool        // Enable total error band in stack mode (default: true).
 	ErrBandColor color.NRGBA // Color for the uncertainty band (default: gray).
@@ -335,12 +336,15 @@ func (ana *Maker) PlotHistos() error {
 
 			var (
 				p               = hplot.New()
-				bhBkgTot        = hbook.NewH1D(v.Nbins, v.Xmin, v.Xmax)
 				bhData          = hbook.NewH1D(v.Nbins, v.Xmin, v.Xmax)
+				bhBkgTot        = hbook.NewH1D(v.Nbins, v.Xmin, v.Xmax)
+				bhSigTot        = hbook.NewH1D(v.Nbins, v.Xmin, v.Xmax)
 				norm_histos     = make([]float64, 0, len(hsamples))
-				norm_bkgtot     = 0.0
+				normTot         = 0.0
 				bhBkgs_postnorm []*hbook.H1D
 				phBkgs          []*hplot.H1D
+				bhSigs_postnorm []*hbook.H1D
+				phSigs          []*hplot.H1D
 				phData          *hplot.H1D
 			)
 
@@ -358,28 +362,31 @@ func (ana *Maker) PlotHistos() error {
 
 				// For background only
 				if ana.Samples[is].IsBkg() {
-					norm_bkgtot += n
+					normTot += n
 				}
-
+				
+				// Add signals if stacked
+				if ana.SigStack {
+					normTot += n
+				}
+				
 				// Keep data apart
 				if ana.Samples[is].IsData() {
 					bhData = h
-				}
-
+				}				
 			}
 
 			// Second sample loop: normalize bh, prepare background stack
 			for is, h := range hsamples {
 
 				// Deal with normalization
-				// FIX-ME (rmadar): use 'switch' and enum
 				if ana.HistoNorm {
-					if ana.Samples[is].IsData() {
+					switch ana.Samples[is].sType {
+					case data:
 						h.Scale(1 / norm_histos[is])
-					}
-					if ana.Samples[is].IsBkg() {
+					case bkg, sig:
 						if ana.HistoStack {
-							h.Scale(1. / norm_bkgtot)
+							h.Scale(1. / normTot)
 						} else {
 							h.Scale(1. / norm_histos[is])
 						}
@@ -390,19 +397,26 @@ func (ana *Maker) PlotHistos() error {
 				ana.HplotHistos[iv][isel][is] = ana.Samples[is].CreateHisto(h)
 				p.Legend.Add(ana.Samples[is].LegLabel, ana.HplotHistos[iv][isel][is])
 
-				// Keep data appart from backgrounds
-				if ana.Samples[is].IsData() {
+				// Keep track of different histo given their type
+				switch ana.Samples[is].sType {
+
+				// Keep data appart from backgrounds, style it.
+				case data: 
 					phData = ana.HplotHistos[iv][isel][is]
 					if ana.Samples[is].DataStyle {
 						style.ApplyToDataHist(phData)
 					}
-				}
 
 				// Sum-up normalized bkg and store all bkgs in a slice for the stack
-				if ana.Samples[is].IsBkg() {
+				case bkg: 
 					phBkgs = append(phBkgs, ana.HplotHistos[iv][isel][is])
 					bhBkgs_postnorm = append(bhBkgs_postnorm, h)
 					bhBkgTot = hbook.AddH1D(h, bhBkgTot)
+
+				case sig:
+					phSigs = append(phSigs, ana.HplotHistos[iv][isel][is])
+					bhSigs_postnorm = append(bhSigs_postnorm, h)
+					bhSigTot = hbook.AddH1D(h, bhSigTot)
 				}
 			}
 
