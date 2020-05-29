@@ -60,7 +60,7 @@ func ExampleSample_withCut() {
 
 func ExampleSample_multiComponents() {
 	// Declare weights and cuts
-	wGlobal := ana.NewVarF64("evtWeight")   // evtWeight is float64 branch
+	wGlobal := ana.NewVarF64("evtWeight") // evtWeight is float64 branch
 	wBljets := ana.NewValF64(0.30)
 	cIsHadr := ana.NewCutBool("isHadronic") // isHadronic is boolean branch
 

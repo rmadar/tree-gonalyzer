@@ -56,7 +56,7 @@ func ExampleTreeFunc_withBranchBoolForPlot() {
 
 	// Go function to be called in the event loop
 	// The return type is float64, since it's for plotting.
-	getValue, ok := treeFunc.GetFuncF64(r);
+	getValue, ok := treeFunc.GetFuncF64(r)
 	if !ok {
 		log.Fatal("type assertion failed: expect float64")
 	}
@@ -95,7 +95,7 @@ func ExampleTreeFunc_withBranchBoolForCut() {
 	if !ok {
 		log.Fatal("type assertion failed: expect bool")
 	}
-	
+
 	// rtree.Formula object
 	formula := treeFunc.FormulaFrom(r)
 
@@ -165,11 +165,11 @@ func ExampleTreeFunc_withBranchF32s() {
 	if !ok {
 		log.Fatal("type assertion failed: expect []float64")
 	}
-	
+
 	// rtree.Formula object
 	formula := treeFunc.FormulaFrom(r)
 	getValForm := formula.Func().(func() []float64)
-	
+
 	// Event loop
 	r.Read(func(ctx rtree.RCtx) error {
 		vTreeFunc := getVal()
@@ -187,7 +187,7 @@ func ExampleTreeFunc_withBranchF32s() {
 }
 
 func ExampleTreeFunc_debugSlices() {
-	
+
 	f, err := groot.Open("../testdata/fileSlices.root")
 	if err != nil {
 		panic(err)
@@ -233,7 +233,6 @@ func ExampleTreeFunc_debugSlices() {
 	// Output:
 	// blabla
 }
-
 
 // Example showing how to load a numerical value in a TreeFunc.
 // The reason why this approach exists is to be able

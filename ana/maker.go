@@ -177,7 +177,8 @@ func (ana *Maker) FillHistos() error {
 					if getVar[idx], ok = v.TreeFunc.GetFuncF64(r); !ok {
 						v.isSlice = true
 						if getVars[idx], ok = v.TreeFunc.GetFuncF64s(r); !ok {
-							err := "Type assertion failed for variable \"%v\": expect float64 or []float64."
+							err := "Type assertion failed [variable \"%v\"]:"
+							err += " TreeFunc.Fct must return a float64 or a []float64."
 							log.Fatal(fmt.Sprintf(err, v.Name))
 						}
 					}
@@ -187,7 +188,8 @@ func (ana *Maker) FillHistos() error {
 				getWeightSamp := func() float64 { return float64(1.0) }
 				if samp.WeightFunc.Fct != nil {
 					if getWeightSamp, ok = samp.WeightFunc.GetFuncF64(r); !ok {
-						err := "Type assertion failed for weight[%v]: expect float64."
+						err := "Type assertion failed [weight of %v]:"
+						err += " TreeFunc.Fct must return a float64."
 						log.Fatal(fmt.Sprintf(err, samp.Name))
 					}
 				}
@@ -196,7 +198,8 @@ func (ana *Maker) FillHistos() error {
 				getWeightComp := func() float64 { return float64(1.0) }
 				if comp.WeightFunc.Fct != nil {
 					if getWeightComp, ok = comp.WeightFunc.GetFuncF64(r); !ok {
-						err := "Type assertion failed for weight[%v, %v]: expect float64."
+						err := "Type assertion failed [weight of (%v, %v)]:"
+						err += " TreeFunc.Fct must return a float64."
 						log.Fatal(fmt.Sprintf(err, samp.Name, comp.FileName))
 					}
 				}
@@ -205,7 +208,9 @@ func (ana *Maker) FillHistos() error {
 				passCutSamp := func() bool { return true }
 				if samp.CutFunc.Fct != nil {
 					if passCutSamp, ok = samp.CutFunc.GetFuncBool(r); !ok {
-						err := "Type assertion failed for Cut[%v]: expect bool."
+						err := "Type assertion failed [Cut of %v]:"
+						err += " TreeFunc.Fct must return a bool.\n"
+						err += "\t -> Make sure to use NewCutBool(), not NewVarBool()."
 						log.Fatal(fmt.Sprintf(err, samp.Name))
 					}
 				}
@@ -214,7 +219,8 @@ func (ana *Maker) FillHistos() error {
 				passCutComp := func() bool { return true }
 				if comp.CutFunc.Fct != nil {
 					if passCutComp, ok = comp.CutFunc.GetFuncBool(r); !ok {
-						err := "Type assertion failed for Cut[%v, %v]: expect bool.\n"
+						err := "Type assertion failed [Cut of (%v, %v)]:"
+						err += " TreeFunc.Fct must return a bool.\n"
 						err += "\t -> Make sure to use NewCutBool(), not NewVarBool()."
 						log.Fatal(fmt.Sprintf(err, samp.Name, comp.FileName))
 					}
@@ -225,7 +231,8 @@ func (ana *Maker) FillHistos() error {
 				for ic, cut := range ana.KinemCuts {
 					idx := ic
 					if passKinemCut[idx], ok = cut.TreeFunc.GetFuncBool(r); !ok {
-						err := "Type assertion failed for selection \"%v\": expect bool.\n"
+						err := "Type assertion failed [selection \"%v\"]:"
+						err += " TreeFunc.Fct must return a bool.\n"
 						err += "\t -> Make sure to use NewCutBool(), not NewVarBool()."
 						log.Fatal(fmt.Sprintf(err, cut.Name))
 					}
@@ -261,7 +268,7 @@ func (ana *Maker) FillHistos() error {
 							}
 						}
 					}
-					
+
 					return nil
 				})
 
