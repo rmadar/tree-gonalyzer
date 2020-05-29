@@ -45,7 +45,7 @@ type Maker struct {
 	RatioPlot    bool        // Enable ratio plot (default: true).
 	HistoStack   bool        // Enable histogram stacking (default: true).
 	HistoNorm    bool        // Normalize distributions to unit area (default: false).
-	TotalBand    bool        // Enable total error band for stacked histo (default: true).
+	TotalBand    bool        // Enable total error band in stack mode (default: true).
 	ErrBandColor color.NRGBA // Color for the uncertainty band (default: gray).
 
 	// Histograms for {variables x samples x selection}
