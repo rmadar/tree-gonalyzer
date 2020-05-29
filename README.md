@@ -44,8 +44,13 @@ analyzer.Run()
     <td><p align="center"><img src="ana/testdata/Plots_shapeComparison/TopPt_golden.png">
 	Shape comparison <a href="https://godoc.org/github.com/rmadar/tree-gonalyzer/ana#example-package--ShapeComparison">[code]</a></p>
     </td>
-  </tr>
-
+    <td><p align="center"><img src="ana/testdata/Plots_withSignals/Mttbar_golden.png">
+	Unstacked signals <a href="https://godoc.org/github.com/rmadar/tree-gonalyzer/ana#example-package--WithSignals">[code]</a></p>
+    </td>
+    <td><p align="center"><img src="ana/testdata/Plots_withStackedSignals/Mttbar_golden.png">
+	Stacked signals <a href="https://godoc.org/github.com/rmadar/tree-gonalyzer/ana#example-package--WithStackedSignals">[code]</a></p>
+    </td>
+</tr>
 
   <tr>
     <td><p align="center"><img src="ana/testdata/Plots_shapeDistortion/DphiLL_golden.png">
@@ -57,12 +62,7 @@ analyzer.Run()
   </tr>
 
   <tr>
-    <td><p align="center"><img src="ana/testdata/Plots_withSignals/Mttbar_golden.png">
-	Unstacked signals <a href="https://godoc.org/github.com/rmadar/tree-gonalyzer/ana#example-package--WithSignals">[code]</a></p>
-    </td>
-    <td><p align="center"><img src="ana/testdata/Plots_withStackedSignals/Mttbar_golden.png">
-	Stacked signals <a href="https://godoc.org/github.com/rmadar/tree-gonalyzer/ana#example-package--WithStackedSignals">[code]</a></p>
-    </td>
+
   </tr>
 
 
