@@ -9,7 +9,7 @@ type Variable struct {
 	TreeFunc                 TreeFunc // Variable definition from branches & functions.
 	Nbins                    int      // Number of bins of final histograms.
 	Xmin, Xmax               float64  // Mininum and maximum values of the histogram.
-	SaveName                 string   // Name of the plot to be saved default (default 'Name').
+	SaveName                 string   // Name of the plot to be saved (default 'Name').
 	XLabel, YLabel           string   // Axis labels (default: 'Variable', 'Events').
 	XTickFormat, YTickFormat string   // Axis tick formatting (default: hplot default).
 	RangeXmin, RangeXmax     float64  // X-axis range (default: hplot default).
