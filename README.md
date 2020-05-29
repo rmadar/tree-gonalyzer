@@ -56,6 +56,15 @@ analyzer.Run()
     </td>
   </tr>
 
+  <tr>
+    <td><p align="center"><img src="ana/testdata/Plots_withSignals/Mttbar_golden.png">
+	Unstacked signals <a href="https://godoc.org/github.com/rmadar/tree-gonalyzer/ana#example-package--WithSignals">[code]</a></p>
+    </td>
+    <td><p align="center"><img src="ana/testdata/Plots_withStackedSignals/Mttbar_golden.png">
+	Stacked signals <a href="https://godoc.org/github.com/rmadar/tree-gonalyzer/ana#example-package--WithStackedSignals">[code]</a></p>
+    </td>
+  </tr>
+
 
  </table>
 
