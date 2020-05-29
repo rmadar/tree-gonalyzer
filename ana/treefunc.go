@@ -1,6 +1,7 @@
 package ana
 
 import (
+	"fmt"
 	"log"
 
 	"go-hep.org/x/hep/groot/rtree"
@@ -154,10 +155,38 @@ func NewVarI32s(v string) TreeFunc {
 // FormulaFrom returns the rtree.FormulaFunc function associated
 // to the TreeFunc f, from a give rtree.Reader r.
 func (f *TreeFunc) FormulaFrom(r *rtree.Reader) rfunc.Formula {
-	ff, err := r.FormulaFunc(f.VarsName, f.Fct)
+	var ff rfunc.Formula
+	var err error
+
+	switch fct := f.Fct.(type) {
+	case func() bool:
+		ff = rfunc.NewFuncToBool(f.VarsName, fct)
+	case func() float64:
+		ff = rfunc.NewFuncToF64(f.VarsName, fct)
+	case func(float64) float64:
+		ff = rfunc.NewFuncF64ToF64(f.VarsName, fct)
+	case func(float32) float64:
+		ff = rfunc.NewFuncF32ToF64(f.VarsName, fct)
+	case func(float32, float32) float64:
+		ff = newUsrFuncF32F32ToF64(f.VarsName, fct)
+	case func(float32) bool:
+		ff = rfunc.NewFuncF32ToBool(f.VarsName, fct)
+	case func(float64) bool:
+		ff = rfunc.NewFuncF64ToBool(f.VarsName, fct)
+	case func(bool) float64:
+		ff = newUsrFuncBoolToF64(f.VarsName, fct)
+	default:
+		fmt.Printf("Warning: function of type '%T' is not optimized.\n", f.Fct)
+		ff, err = rfunc.NewGenericFormula(f.VarsName, f.Fct)
+		if err != nil {
+			log.Fatalf("could not create formula func: %+v", err)
+		}
+	}
+	ff, err = r.Formula(ff)
 	if err != nil {
 		log.Fatalf("could not create formulaFunc: %+v", err)
 	}
+
 	return ff
 }
 
@@ -180,4 +209,70 @@ func (f *TreeFunc) GetFuncF64s(r *rtree.Reader) (func() []float64, bool) {
 func (f *TreeFunc) GetFuncBool(r *rtree.Reader) (func() bool, bool) {
 	fct, ok := f.FormulaFrom(r).Func().(func() bool)
 	return fct, ok
+}
+
+func newUsrFuncBoolToF64(varsName []string, fct func(bool) float64) *userFuncBoolToF64 {
+	return &userFuncBoolToF64{
+		rvars: varsName,
+		fct:   fct,
+	}
+}
+
+type userFuncBoolToF64 struct {
+	rvars []string
+	v1    *bool
+	fct   func(bool) float64
+}
+
+func (usr *userFuncBoolToF64) RVars() []string { return usr.rvars }
+
+func (usr *userFuncBoolToF64) Bind(args []interface{}) error {
+	if got, want := len(args), 1; got != want {
+		return fmt.Errorf(
+			"rfunc: invalid number of bind arguments (got=%d, want=%d)",
+			got, want,
+		)
+	}
+	usr.v1 = args[0].(*bool)
+	return nil
+}
+
+func (usr *userFuncBoolToF64) Func() interface{} {
+	return func() float64 {
+		return usr.fct(*usr.v1)
+	}
+}
+
+func newUsrFuncF32F32ToF64(varsName []string, fct func(float32, float32) float64) *userFuncF32F32ToF64 {
+	return &userFuncF32F32ToF64{
+		rvars: varsName,
+		fct:   fct,
+	}
+}
+
+type userFuncF32F32ToF64 struct {
+	rvars []string
+	v1    *float32
+	v2    *float32
+	fct   func(float32, float32) float64
+}
+
+func (usr *userFuncF32F32ToF64) RVars() []string { return usr.rvars }
+
+func (usr *userFuncF32F32ToF64) Bind(args []interface{}) error {
+	if got, want := len(args), 2; got != want {
+		return fmt.Errorf(
+			"rfunc: invalid number of bind arguments (got=%d, want=%d)",
+			got, want,
+		)
+	}
+	usr.v1 = args[0].(*float32)
+	usr.v2 = args[0].(*float32)
+	return nil
+}
+
+func (usr *userFuncF32F32ToF64) Func() interface{} {
+	return func() float64 {
+		return usr.fct(*usr.v1, *usr.v2)
+	}
 }

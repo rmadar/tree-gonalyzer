@@ -257,7 +257,7 @@ func (ana *Maker) FillHistos() error {
 						if !passKinemCut[ic]() {
 							continue
 						}
-						
+
 						// Otherwise, loop over variables.
 						for iv, v := range ana.Variables {
 
@@ -268,7 +268,7 @@ func (ana *Maker) FillHistos() error {
 								}
 								continue
 							}
-						
+
 							// ... or the single variable value.
 							ana.HbookHistos[iv][ic][iSamp].Fill(getF64[iv](), w)
 						}
@@ -283,7 +283,7 @@ func (ana *Maker) FillHistos() error {
 				default:
 					ana.nEvents += ana.Nevts
 				}
-				
+
 				return nil
 			}(iComp)
 		}
@@ -366,16 +366,16 @@ func (ana *Maker) PlotHistos() error {
 				if ana.Samples[is].IsBkg() {
 					normTot += n
 				}
-				
+
 				// Add signals if stacked
 				if ana.SignalStack {
 					normTot += n
 				}
-				
+
 				// Keep data apart
 				if ana.Samples[is].IsData() {
 					bhData = h
-				}				
+				}
 			}
 
 			// Second sample loop: normalize bh, prepare background stack
@@ -403,19 +403,19 @@ func (ana *Maker) PlotHistos() error {
 				switch ana.Samples[is].sType {
 
 				// Keep data appart from backgrounds, style it.
-				case data: 
+				case data:
 					phData = ana.HplotHistos[iv][isel][is]
 					if ana.Samples[is].DataStyle {
 						style.ApplyToDataHist(phData)
 					}
 
 				// Sum-up normalized bkg and store all bkgs in a slice for the stack
-				case bkg: 
+				case bkg:
 					phBkgs = append(phBkgs, ana.HplotHistos[iv][isel][is])
 					bhBkgs_postnorm = append(bhBkgs_postnorm, h)
 					bhBkgTot = hbook.AddH1D(h, bhBkgTot)
 
-				// 
+				//
 				case sig:
 					phSigs = append(phSigs, ana.HplotHistos[iv][isel][is])
 					bhSigs_postnorm = append(bhSigs_postnorm, h)
@@ -425,11 +425,11 @@ func (ana *Maker) PlotHistos() error {
 
 			// Manage background stack plotting
 			if len(phBkgs)+len(phSigs) > 0 {
-				
+
 				// Put all backgrounds in the stack
 				phStack := make([]*hplot.H1D, len(phBkgs))
 				copy(phStack, phBkgs)
-				
+
 				// Reverse the order so that legend and plot order matches
 				for i, j := 0, len(phStack)-1; i < j; i, j = i+1, j-1 {
 					phStack[i], phStack[j] = phStack[j], phStack[i]
@@ -442,7 +442,7 @@ func (ana *Maker) PlotHistos() error {
 						phStack = append(phStack, hs)
 					}
 				}
-				
+
 				// Stacking the background histo
 				stack := hplot.NewHStack(phStack, hplot.WithBand(ana.TotalBand))
 				stack.Band.FillColor = ana.ErrBandColor
@@ -470,7 +470,7 @@ func (ana *Maker) PlotHistos() error {
 					p.Add(hs)
 				}
 			}
-			
+
 			// Apply common and user-defined style for this variable
 			// FIX-ME (rmadar): the v.setPlotStyle(v) command doesn't update
 			//                  y-axis scale if it is put before the samples

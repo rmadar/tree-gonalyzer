@@ -416,22 +416,22 @@ var (
 		VarsName: []string{"t_pt"},
 		Fct:      func(pt float32) float64 { return 1.0 - float64(pt)/250. },
 	}
-	wSigM = func (mass, relWidth float32) ana.TreeFunc {
+	wSigM = func(mass, relWidth float32) ana.TreeFunc {
 		return ana.TreeFunc{
 			VarsName: []string{"ttbar_m"},
 			Fct: func(m float32) float64 {
-				dM2 := float64( (m-mass)*(m-mass))
-				sigma2 := float64(mass*relWidth * mass*relWidth)
-				return 50 * 1/float64(mass*relWidth) * math.Exp(-dM2/sigma2 )
+				dM2 := float64((m - mass) * (m - mass))
+				sigma2 := float64(mass * relWidth * mass * relWidth)
+				return 50 * 1 / float64(mass*relWidth) * math.Exp(-dM2/sigma2)
 			},
 		}
 	}
 
 	// Some colors
 	noColor    = color.NRGBA{}
-	softBlack  = color.NRGBA{R:  50, G: 30, B:  50, A: 200}
-	shadowBlue = color.NRGBA{R:  50, G: 20, B: 150, A:  20}
-	darkRed    = color.NRGBA{R: 180, G: 30, B:  50, A: 200}
-	darkGreen  = color.NRGBA{G: 180, R: 30, B:  50, A: 200}
-	darkBlue   = color.NRGBA{B: 180, G: 30, R:  50, A: 200}
+	softBlack  = color.NRGBA{R: 50, G: 30, B: 50, A: 200}
+	shadowBlue = color.NRGBA{R: 50, G: 20, B: 150, A: 20}
+	darkRed    = color.NRGBA{R: 180, G: 30, B: 50, A: 200}
+	darkGreen  = color.NRGBA{G: 180, R: 30, B: 50, A: 200}
+	darkBlue   = color.NRGBA{B: 180, G: 30, R: 50, A: 200}
 )

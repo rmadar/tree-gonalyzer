@@ -64,7 +64,7 @@ func ExampleTreeFunc_withBranchBoolForPlot() {
 	// rtree.Formula object
 	formula := treeFunc.FormulaFrom(r)
 	getFormulaVal := formula.Func().(func() float64)
-	
+
 	// Event loop
 	r.Read(func(ctx rtree.RCtx) error {
 		vTreeFunc := getTreeFuncVal()
@@ -100,7 +100,7 @@ func ExampleTreeFunc_withBranchBoolForCut() {
 	// rtree.Formula object
 	formula := treeFunc.FormulaFrom(r)
 	getFormulaVal := formula.Func().(func() bool)
-		
+
 	// Event loop
 	r.Read(func(ctx rtree.RCtx) error {
 		vTreeFunc := getTreeFuncVal()
@@ -180,7 +180,7 @@ func ExampleTreeFunc_withBranchF32s() {
 		fmt.Printf("Evt[%v]\n -> %v\n -> %v\n\n", ctx.Entry, vTreeFunc[:5], vFormula[:5])
 		return nil
 	})
-	
+
 	// Output:
 	// Evt[0]
 	//  -> [12.206398963928223 11.711121559143066 11.734919548034668 12.457039833068848 11.558056831359863]
