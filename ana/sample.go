@@ -36,13 +36,11 @@ const (
 type Sample struct {
 
 	// General settings
-	Name       string             // Sample name.
-	Type       string             // Sample type: 'data', 'bkg' or 'sig'.
-	LegLabel   string             // Label used in the legend.
-	components []*sampleComponent // List of components included in the histogram.
+	Name     string // Sample name.
+	Type     string // Sample type: 'data', 'bkg' or 'sig'.
+	LegLabel string // Label used in the legend.
 
-	// Gobal weight and cut to be applied to
-	// all components.
+	// Gobal weight and cut (applied to all components).
 	CutFunc    TreeFunc
 	WeightFunc TreeFunc
 
@@ -61,7 +59,8 @@ type Sample struct {
 	YErrBarsCapWidth  vg.Length   // Width of horizontal bars of the error bars.
 
 	// Internal
-	sType sampleType
+	components []*sampleComponent
+	sType      sampleType
 }
 
 // SampleComponent contains the needed information
@@ -157,7 +156,7 @@ func CreateSample(sname, stype, sleg, fname, tname string, opts ...SampleOptions
 
 // AddComponent adds a new component (ie file and tree) to the sample.
 // A additional cut and weight can be applied to the added component only.
-// The component cut is combined with the global cut using a AND, 
+// The component cut is combined with the global cut using a AND,
 // while the component weight is multiplied with the global weight.
 func (s *Sample) AddComponent(fname, tname string, opts ...SampleOptions) {
 
