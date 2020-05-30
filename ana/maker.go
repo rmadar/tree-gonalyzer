@@ -152,7 +152,7 @@ func (ana *Maker) FillHistos() error {
 	for iSamp, samp := range ana.Samples {
 
 		// Loop over the sample components
-		for iComp, comp := range samp.Components {
+		for iComp, comp := range samp.components {
 
 			// Anonymous function to avoid memory-leaks due to 'defer'
 			func(j int) error {
@@ -594,7 +594,7 @@ func (ana Maker) PrintReport() {
 	// Event, histo info
 	nfiles := 0
 	for _, s := range ana.Samples {
-		for _ = range s.Components {
+		for _ = range s.components {
 			nfiles++
 		}
 	}

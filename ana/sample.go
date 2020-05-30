@@ -39,7 +39,7 @@ type Sample struct {
 	Name       string             // Sample name.
 	Type       string             // Sample type: 'data', 'bkg' or 'sig'.
 	LegLabel   string             // Label used in the legend.
-	Components []*sampleComponent // List of components included in the histogram.
+	components []*sampleComponent // List of components included in the histogram.
 
 	// Gobal weight and cut to be applied to
 	// all components.
@@ -99,7 +99,7 @@ func NewSample(sname, stype, sleg string, opts ...SampleOptions) *Sample {
 		Name:       sname,
 		Type:       stype,
 		LegLabel:   sleg,
-		Components: []*sampleComponent{},
+		components: []*sampleComponent{},
 		sType:      sType,
 	}
 
@@ -155,7 +155,10 @@ func CreateSample(sname, stype, sleg, fname, tname string, opts ...SampleOptions
 	return s
 }
 
-// AddComponent adds a new sample component to the sample.
+// AddComponent adds a new component (ie file and tree) to the sample.
+// A additional cut and weight can be applied to the added component only.
+// The component cut is combined with the global cut using a AND, 
+// while the component weight is multiplied with the global weight.
 func (s *Sample) AddComponent(fname, tname string, opts ...SampleOptions) {
 
 	// Manage default settings and passed options
@@ -176,7 +179,7 @@ func (s *Sample) AddComponent(fname, tname string, opts ...SampleOptions) {
 	}
 
 	// Append it to the pointer-receiver sample
-	s.Components = append(s.Components, c)
+	s.components = append(s.components, c)
 }
 
 // CreateHisto returns a hplot.H1D with the sample style.
