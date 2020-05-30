@@ -25,9 +25,9 @@ func ExampleTreeFunc_general() {
 		},
 	}
 
-	// rtree.Formula object
-	formula := treeFunc.FormulaFrom(r)
-
+	// Get the rtree.Formula object
+	formula := treeFunc.TreeFormulaFrom(r)
+	
 	// Go function to be called in the event loop
 	getValue := formula.Func().(func() float64)
 
@@ -62,7 +62,7 @@ func ExampleTreeFunc_withBranchBoolForPlot() {
 	}
 
 	// rtree.Formula object
-	formula := treeFunc.FormulaFrom(r)
+	formula := treeFunc.TreeFormulaFrom(r)
 	getFormulaVal := formula.Func().(func() float64)
 
 	// Event loop
@@ -98,7 +98,7 @@ func ExampleTreeFunc_withBranchBoolForCut() {
 	}
 
 	// rtree.Formula object
-	formula := treeFunc.FormulaFrom(r)
+	formula := treeFunc.TreeFormulaFrom(r)
 	getFormulaVal := formula.Func().(func() bool)
 
 	// Event loop
@@ -134,7 +134,7 @@ func ExampleTreeFunc_withBranchF64() {
 	}
 
 	// rtree.Formula object
-	formula := treeFunc.FormulaFrom(r)
+	formula := treeFunc.TreeFormulaFrom(r)
 	getFormulaVal := formula.Func().(func() float64)
 
 	// Event loop
@@ -170,7 +170,7 @@ func ExampleTreeFunc_withBranchF32s() {
 	}
 
 	// rtree.Formula object
-	formula := treeFunc.FormulaFrom(r)
+	formula := treeFunc.TreeFormulaFrom(r)
 	getFormulaVal := formula.Func().(func() []float64)
 
 	// Event loop

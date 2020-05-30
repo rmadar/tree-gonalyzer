@@ -153,9 +153,12 @@ func NewVarI32s(v string) TreeFunc {
 	}
 }
 
-// FormulaFrom returns the rtree.FormulaFunc function associated
-// to the TreeFunc f, from a give rtree.Reader r.
-func (f *TreeFunc) rfuncFormula() rfunc.Formula {
+// FuncFormula returns the rfunc.Formula function associated
+// to the TreeFunc f. If the type of f.Fct corresponds to
+// either a pre-defined function from rtree/rfunc, or to
+// a user-defined rfunc, it's loaded. A generic rtree function
+// is loaded otherwise (~5 times slower).
+func (f *TreeFunc) FuncFormula() rfunc.Formula {
 
 	if f.formula != nil {
 		return f.formula
@@ -191,8 +194,8 @@ func (f *TreeFunc) rfuncFormula() rfunc.Formula {
 	}
 }
 
-func (f *TreeFunc) treeFormulaFrom(r *rtree.Reader) rfunc.Formula {
-	tf, err := r.Formula(f.rfuncFormula())
+func (f *TreeFunc) TreeFormulaFrom(r *rtree.Reader) rfunc.Formula {
+	tf, err := r.Formula(f.FuncFormula())
 	if err != nil {
 		log.Fatalf("could not create formulaFunc: %+v", err)
 	}
@@ -202,21 +205,21 @@ func (f *TreeFunc) treeFormulaFrom(r *rtree.Reader) rfunc.Formula {
 // GetFuncF64 returns a function to be called in the event loop to get
 // the float64 value computed in f.Fct function.
 func (f *TreeFunc) GetFuncF64(r *rtree.Reader) (func() float64, bool) {
-	fct, ok := f.treeFormulaFrom(r).Func().(func() float64)
+	fct, ok := f.TreeFormulaFrom(r).Func().(func() float64)
 	return fct, ok
 }
 
 // GetFuncF64s returns a function to be called in the event loop to get
 // a slice []float64 values computed in f.Fct function.
 func (f *TreeFunc) GetFuncF64s(r *rtree.Reader) (func() []float64, bool) {
-	fct, ok := f.treeFormulaFrom(r).Func().(func() []float64)
+	fct, ok := f.TreeFormulaFrom(r).Func().(func() []float64)
 	return fct, ok
 }
 
 // GetFuncBool returns the function to be called in the event loop to get
 // the boolean value computed in f.Fct function.
 func (f *TreeFunc) GetFuncBool(r *rtree.Reader) (func() bool, bool) {
-	fct, ok := f.treeFormulaFrom(r).Func().(func() bool)
+	fct, ok := f.TreeFormulaFrom(r).Func().(func() bool)
 	return fct, ok
 }
 
@@ -276,7 +279,7 @@ func (usr *userFuncF32F32ToF64) Bind(args []interface{}) error {
 		)
 	}
 	usr.v1 = args[0].(*float32)
-	usr.v2 = args[0].(*float32)
+	usr.v2 = args[1].(*float32)
 	return nil
 }
 
