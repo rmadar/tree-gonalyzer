@@ -24,6 +24,7 @@ import (
 type TreeFunc struct {
 	VarsName []string
 	Fct      interface{}
+	formula  rfunc.Formula
 }
 
 // NewCutBool returns a TreeFunc to get
@@ -154,60 +155,68 @@ func NewVarI32s(v string) TreeFunc {
 
 // FormulaFrom returns the rtree.FormulaFunc function associated
 // to the TreeFunc f, from a give rtree.Reader r.
-func (f *TreeFunc) FormulaFrom(r *rtree.Reader) rfunc.Formula {
-	var ff rfunc.Formula
-	var err error
+func (f *TreeFunc) rfuncFormula() rfunc.Formula {
 
-	switch fct := f.Fct.(type) {
-	case func() bool:
-		ff = rfunc.NewFuncToBool(f.VarsName, fct)
-	case func() float64:
-		ff = rfunc.NewFuncToF64(f.VarsName, fct)
-	case func(float64) float64:
-		ff = rfunc.NewFuncF64ToF64(f.VarsName, fct)
-	case func(float32) float64:
-		ff = rfunc.NewFuncF32ToF64(f.VarsName, fct)
-	case func(float32, float32) float64:
-		ff = newUsrFuncF32F32ToF64(f.VarsName, fct)
-	case func(float32) bool:
-		ff = rfunc.NewFuncF32ToBool(f.VarsName, fct)
-	case func(float64) bool:
-		ff = rfunc.NewFuncF64ToBool(f.VarsName, fct)
-	case func(bool) float64:
-		ff = newUsrFuncBoolToF64(f.VarsName, fct)
-	default:
-		fmt.Printf("Warning: function of type '%T' is not optimized.\n", f.Fct)
-		ff, err = rfunc.NewGenericFormula(f.VarsName, f.Fct)
-		if err != nil {
-			log.Fatalf("could not create formula func: %+v", err)
+	if f.formula != nil {
+		return f.formula
+
+	} else {
+		var ff rfunc.Formula
+		var err error
+
+		switch fct := f.Fct.(type) {
+		case func() bool:
+			ff = rfunc.NewFuncToBool(f.VarsName, fct)
+		case func() float64:
+			ff = rfunc.NewFuncToF64(f.VarsName, fct)
+		case func(float64) float64:
+			ff = rfunc.NewFuncF64ToF64(f.VarsName, fct)
+		case func(float32) float64:
+			ff = rfunc.NewFuncF32ToF64(f.VarsName, fct)
+		case func(float32, float32) float64:
+			ff = newUsrFuncF32F32ToF64(f.VarsName, fct)
+		case func(float32) bool:
+			ff = rfunc.NewFuncF32ToBool(f.VarsName, fct)
+		case func(float64) bool:
+			ff = rfunc.NewFuncF64ToBool(f.VarsName, fct)
+		case func(bool) float64:
+			ff = newUsrFuncBoolToF64(f.VarsName, fct)
+		default:
+			ff, err = rfunc.NewGenericFormula(f.VarsName, f.Fct)
+			if err != nil {
+				log.Fatalf("could not create formula func: %+v", err)
+			}
 		}
+		return ff
 	}
-	ff, err = r.Formula(ff)
+}
+
+func (f *TreeFunc) treeFormulaFrom(r *rtree.Reader) rfunc.Formula {
+	tf, err := r.Formula(f.rfuncFormula())
 	if err != nil {
 		log.Fatalf("could not create formulaFunc: %+v", err)
 	}
-
-	return ff
+	return tf
 }
 
 // GetFuncF64 returns a function to be called in the event loop to get
 // the float64 value computed in f.Fct function.
 func (f *TreeFunc) GetFuncF64(r *rtree.Reader) (func() float64, bool) {
-	fct, ok := f.FormulaFrom(r).Func().(func() float64)
+	fct, ok := f.treeFormulaFrom(r).Func().(func() float64)
 	return fct, ok
 }
 
 // GetFuncF64s returns a function to be called in the event loop to get
 // a slice []float64 values computed in f.Fct function.
 func (f *TreeFunc) GetFuncF64s(r *rtree.Reader) (func() []float64, bool) {
-	fct, ok := f.FormulaFrom(r).Func().(func() []float64)
+	fct, ok := f.treeFormulaFrom(r).Func().(func() []float64)
 	return fct, ok
 }
 
 // GetFuncBool returns the function to be called in the event loop to get
 // the boolean value computed in f.Fct function.
 func (f *TreeFunc) GetFuncBool(r *rtree.Reader) (func() bool, bool) {
-	fct, ok := f.FormulaFrom(r).Func().(func() bool)
+	fct, ok := f.treeFormulaFrom(r).Func().(func() bool)
 	return fct, ok
 }
 

@@ -39,7 +39,7 @@ type Sample struct {
 	Name       string             // Sample name.
 	Type       string             // Sample type: 'data', 'bkg' or 'sig'.
 	LegLabel   string             // Label used in the legend.
-	Components []*SampleComponent // List of components included in the histogram.
+	Components []*sampleComponent // List of components included in the histogram.
 
 	// Gobal weight and cut to be applied to
 	// all components.
@@ -68,7 +68,7 @@ type Sample struct {
 // to fill the final histogram for a given component
 // (or sub-sample). This includes a file, a tree and
 // possibly a specific weight and cut.
-type SampleComponent struct {
+type sampleComponent struct {
 	FileName   string
 	TreeName   string
 	WeightFunc TreeFunc
@@ -99,7 +99,7 @@ func NewSample(sname, stype, sleg string, opts ...SampleOptions) *Sample {
 		Name:       sname,
 		Type:       stype,
 		LegLabel:   sleg,
-		Components: []*SampleComponent{},
+		Components: []*sampleComponent{},
 		sType:      sType,
 	}
 
@@ -168,7 +168,7 @@ func (s *Sample) AddComponent(fname, tname string, opts ...SampleOptions) {
 	}
 
 	// Create a component
-	c := &SampleComponent{
+	c := &sampleComponent{
 		FileName:   fname,
 		TreeName:   tname,
 		WeightFunc: cfg.WeightFunc,
