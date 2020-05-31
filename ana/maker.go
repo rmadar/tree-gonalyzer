@@ -40,7 +40,7 @@ type Maker struct {
 	CompileLatex bool   // On-the-fly latex compilation (default: true).
 
 	// Plots
-	AutoStyle    bool        // Enable automatic styling (default: false).
+	AutoStyle    bool        // Enable automatic styling (default: true).
 	PlotTitle    string      // General plot title (default: 'TTree GOnalyzer').
 	RatioPlot    bool        // Enable ratio plot (default: true).
 	HistoStack   bool        // Enable histogram stacking (default: true).
@@ -72,21 +72,21 @@ func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 	a := Maker{
 		Samples:   s,
 		Variables: v,
+		Nevts: -1,
+		AutoStyle: true,
+		SavePath: "plots",
+		SaveFormat: "tex",
+		PlotTitle: "TTree GOnalyzer",
+		CompileLatex: true,
+		HistoStack: true,
+		RatioPlot: true,
+		TotalBand: true,
+		ErrBandColor: color.NRGBA{A: 100},
+		KinemCuts: []*Selection{NewSelection()},
 	}
 
 	// Configuration with default values for all optional fields
-	cfg := newConfig(
-		WithNevts(-1),
-		WithSavePath("plots"),
-		WithSaveFormat("tex"),
-		WithPlotTitle(`TTree GOnalyzer`),
-		WithCompileLatex(true),
-		WithHistoStack(true),
-		WithRatioPlot(true),
-		WithTotalBand(true),
-		WithErrBandColor(color.NRGBA{A: 100}),
-		WithKinemCuts([]*Selection{NewSelection()}),
-	)
+	cfg := newConfig()
 
 	// Update the configuration looping over functional options
 	for _, opt := range opts {
@@ -94,19 +94,45 @@ func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 	}
 
 	// Set fields with updaded configuration
-	a.KinemCuts = cfg.KinemCuts
-	a.Nevts = cfg.Nevts
-	a.SavePath = cfg.SavePath
-	a.SaveFormat = cfg.SaveFormat
-	a.AutoStyle = cfg.AutoStyle
-	a.PlotTitle = cfg.PlotTitle
-	a.CompileLatex = cfg.CompileLatex
-	a.RatioPlot = cfg.RatioPlot
-	a.HistoStack = cfg.HistoStack
-	a.SignalStack = cfg.SignalStack
-	a.HistoNorm = cfg.HistoNorm
-	a.TotalBand = cfg.TotalBand
-	a.ErrBandColor = cfg.ErrBandColor
+	if cfg.KinemCuts.usr {
+		a.KinemCuts = cfg.KinemCuts.val
+	}
+	if cfg.Nevts.usr {
+		a.Nevts = cfg.Nevts.val
+	}
+	if cfg.SavePath.usr {
+		a.SavePath = cfg.SavePath.val
+	}
+	if cfg.SaveFormat.usr {
+		a.SaveFormat = cfg.SaveFormat.val
+	}
+	if cfg.AutoStyle.usr {
+		a.AutoStyle = cfg.AutoStyle.val
+	}
+	if cfg.PlotTitle.usr {
+		a.PlotTitle = cfg.PlotTitle.val
+	}
+	if cfg.CompileLatex.usr {
+		a.CompileLatex = cfg.CompileLatex.val
+	}
+	if cfg.RatioPlot.usr {
+		a.RatioPlot = cfg.RatioPlot.val
+	}
+	if cfg.HistoStack.usr {
+		a.HistoStack = cfg.HistoStack.val
+	}
+	if cfg.SignalStack.usr {
+		a.SignalStack = cfg.SignalStack.val
+	}
+	if cfg.HistoNorm.usr {
+		a.HistoNorm = cfg.HistoNorm.val
+	}
+	if cfg.TotalBand.usr {
+		a.TotalBand = cfg.TotalBand.val
+	}
+	if cfg.ErrBandColor.usr {
+		a.ErrBandColor = cfg.ErrBandColor.val
+	}
 
 	// Get mappings between slice indices and object names
 	a.samIdx = getIdxMap(a.Samples, &Sample{})
@@ -268,7 +294,7 @@ func (ana *Maker) FillHistos() error {
 								}
 								continue
 							}
-
+							
 							// ... or the single variable value.
 							ana.HbookHistos[iv][ic][iSamp].Fill(getF64[iv](), w)
 						}
@@ -407,6 +433,15 @@ func (ana *Maker) PlotHistos() error {
 					phData = ana.HplotHistos[iv][isel][is]
 					if ana.Samples[is].DataStyle {
 						style.ApplyToDataHist(phData)
+						if ana.Samples[is].CircleSize > 0 {
+							phData.GlyphStyle.Radius = ana.Samples[is].CircleSize
+						}
+						if ana.Samples[is].YErrBarsLineWidth > 0 {
+							phData.YErrs.LineStyle.Width = ana.Samples[is].YErrBarsLineWidth
+						}
+						if ana.Samples[is].YErrBarsCapWidth > 0 {
+							phData.YErrs.CapWidth = ana.Samples[is].YErrBarsCapWidth
+						}
 					}
 
 				// Sum-up normalized bkg and store all bkgs in a slice for the stack
@@ -445,8 +480,8 @@ func (ana *Maker) PlotHistos() error {
 
 				// Stacking the background histo
 				stack := hplot.NewHStack(phStack, hplot.WithBand(ana.TotalBand))
-				stack.Band.FillColor = ana.ErrBandColor
 				if ana.HistoStack && ana.TotalBand {
+					stack.Band.FillColor = ana.ErrBandColor
 					hBand := hplot.NewH1D(hbook.NewH1D(1, 0, 1), hplot.WithBand(true))
 					hBand.Band = stack.Band
 					hBand.LineStyle.Width = 0
@@ -716,6 +751,9 @@ func (ana *Maker) setAutoStyle() {
 			}
 			ic += 1
 		}
+
+		// Apply user-defined setting on top of default ones.
+		s.applyConfig()
 	}
 }
 

@@ -100,9 +100,21 @@ func Example_withSignals() {
 		ana.CreateSample("bkg1", "bkg", `Proc 1`, fBkg1, tName, ana.WithWeight(w1)),
 		ana.CreateSample("bkg2", "bkg", `Proc 2`, fBkg2, tName, ana.WithWeight(w2)),
 		ana.CreateSample("bkg3", "bkg", `Proc 3`, fBkg1, tName, ana.WithWeight(w2)),
-		ana.CreateSample("sig1", "sig", `Sig 1`, fBkg2, tName, ana.WithWeight(wSigM(500, 0.04))),
-		ana.CreateSample("sig2", "sig", `Sig 2`, fBkg2, tName, ana.WithWeight(wSigM(650, 0.02))),
-		ana.CreateSample("sig3", "sig", `Sig 2`, fBkg2, tName, ana.WithWeight(wSigM(800, 0.01))),
+		ana.CreateSample("sig1", "sig", `Sig 1`, fBkg2, tName, ana.WithWeight(wSigM(500, 0.04)),
+			ana.WithLineColor(darkRed),
+			ana.WithLineDashes([]vg.Length{2, 3, 2}),
+			ana.WithLineWidth(3),
+		),
+		ana.CreateSample("sig2", "sig", `Sig 2`, fBkg2, tName, ana.WithWeight(wSigM(650, 0.02)),
+			ana.WithLineColor(darkGreen),
+			ana.WithLineDashes([]vg.Length{1, 1, 1}),
+			ana.WithLineWidth(3),
+		),
+		ana.CreateSample("sig3", "sig", `Sig 2`, fBkg2, tName, ana.WithWeight(wSigM(800, 0.01)),
+			ana.WithLineColor(darkBlue),
+			ana.WithLineDashes([]vg.Length{3, 3, 3}),
+			ana.WithLineWidth(3),
+		),
 	}
 
 	// Define variables
@@ -117,7 +129,7 @@ func Example_withSignals() {
 
 	// Create analyzer object
 	analyzer := ana.New(samples, variables,
-		ana.WithAutoStyle(true),
+		//ana.WithAutoStyle(false),
 		ana.WithSaveFormat("png"),
 		ana.WithSavePath("testdata/Plots_withSignals"),
 	)
@@ -131,7 +143,10 @@ func Example_withSignals() {
 func Example_withStackedSignals() {
 	// Define samples
 	samples := []*ana.Sample{
-		ana.CreateSample("data", "data", `Data`, fData, tName),
+		ana.CreateSample("data", "data", `Data`, fData, tName,
+			ana.WithCircleSize(2.8),
+			ana.WithYErrBarsCapWidth(0.01),
+		),
 		ana.CreateSample("bkg1", "bkg", `Proc 1`, fBkg1, tName, ana.WithWeight(w1)),
 		ana.CreateSample("bkg2", "bkg", `Proc 2`, fBkg2, tName, ana.WithWeight(w2)),
 		ana.CreateSample("bkg3", "bkg", `Proc 3`, fBkg1, tName, ana.WithWeight(w2)),
@@ -152,7 +167,6 @@ func Example_withStackedSignals() {
 
 	// Create analyzer object
 	analyzer := ana.New(samples, variables,
-		ana.WithAutoStyle(true),
 		ana.WithSaveFormat("png"),
 		ana.WithSignalStack(true),
 		ana.WithSavePath("testdata/Plots_withStackedSignals"),

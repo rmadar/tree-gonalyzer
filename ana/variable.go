@@ -32,35 +32,60 @@ func NewVariable(name string, tFunc TreeFunc, nBins int, xMin, xMax float64, opt
 		Nbins:    nBins,
 		Xmin:     xMin,
 		Xmax:     xMax,
+		SaveName: name,
+		XLabel: `Variable`,
+		YLabel: `Events`,
+		LegPosTop: true,
 	}
 
 	// Configuration with default values for all optional fields
-	cfg := newConfig(
-		WithSaveName(v.Name),
-		WithAxisLabels(`Variable`, `Events`),
-		WithLegTop(true),
-		WithLegLeft(false),
-	)
+	cfg := newConfig()
 
 	// Update the configuration looping over functional options
 	for _, opt := range opts {
 		opt(cfg)
 	}
-
+	
 	// Set fields with updaded configuration
-	v.SaveName = cfg.SaveName
-	v.XLabel = cfg.XLabel
-	v.YLabel = cfg.YLabel
-	v.XTickFormat = cfg.XTickFormat
-	v.YTickFormat = cfg.YTickFormat
-	v.RangeXmin = cfg.RangeXmin
-	v.RangeXmax = cfg.RangeXmax
-	v.RangeYmin = cfg.RangeYmin
-	v.RangeYmax = cfg.RangeYmax
-	v.RatioYmin = cfg.RatioYmin
-	v.RatioYmax = cfg.RatioYmax
-	v.LegPosTop = cfg.LegPosTop
-	v.LegPosLeft = cfg.LegPosLeft
+	if  cfg.SaveName.usr {
+		v.SaveName = cfg.SaveName.val
+	}
+	if cfg.XLabel.usr {
+		v.XLabel = cfg.XLabel.val
+	}
+	if cfg.YLabel.usr {
+		v.YLabel = cfg.YLabel.val
+	}
+	if cfg.XTickFormat.usr {
+		v.XTickFormat = cfg.XTickFormat.val
+	}
+	if cfg.YTickFormat.usr {
+		v.YTickFormat = cfg.YTickFormat.val
+	}
+	if cfg.RangeXmin.usr {
+		v.RangeXmin = cfg.RangeXmin.val
+	}
+	if cfg.RangeXmax.usr {
+		v.RangeXmax = cfg.RangeXmax.val
+	}
+	if cfg.RangeYmin.usr {
+		v.RangeYmin = cfg.RangeYmin.val
+	}
+	if cfg.RangeYmax.usr {
+		v.RangeYmax = cfg.RangeYmax.val
+	}
+	if cfg.RatioYmin.usr {
+		v.RatioYmin = cfg.RatioYmin.val
+	}
+	if cfg.RatioYmax.usr {
+		v.RatioYmax = cfg.RatioYmax.val
+	}
+	if cfg.LegPosTop.usr {
+		v.LegPosTop = cfg.LegPosTop.val
+	}
+	if cfg.LegPosLeft.usr {
+		v.LegPosLeft = cfg.LegPosLeft.val
+	}
 
 	return v
 }

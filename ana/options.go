@@ -22,60 +22,187 @@ type SampleOptions func(cfg *config)
 type config struct {
 
 	// Maker options
-	KinemCuts    []*Selection // List of cuts.
-	Nevts        int64        // Maximum of processed events.
-	SavePath     string       // Path to which plot will be saved.
-	SaveFormat   string       // Extension of saved figure 'tex', 'pdf', 'png'.
-	CompileLatex bool         // Enable on-the-fly latex compilation of plots.
-	AutoStyle    bool         // Enable auto style of the histogram.
-	PlotTitle    string       // General plot title.
-	RatioPlot    bool         // Enable ratio plot.
-	HistoStack   bool         // Disable histogram stacking (e.g. compare various processes).
-	HistoNorm    bool         // Normalize distributions to unit area (when stacked, the total is normalized).
-	SignalStack  bool         // Enable signal histogram stacking.
-	TotalBand    bool         // Enable total error band for stacks.
-	ErrBandColor color.NRGBA  // Color for the uncertainty band.
+	KinemCuts struct {
+		val []*Selection // List of cuts.
+		usr bool
+	}
+	Nevts struct {
+		val int64 // Maximum of processed events.
+		usr bool
+	}
+	SavePath struct {
+		val string // Path to which plot will be saved.
+		usr bool
+	}
+	SaveFormat struct {
+		val string // Extension of saved figure 'tex', 'pdf', 'png'.
+		usr bool
+	}
+	CompileLatex struct {
+		val bool // Enable on-the-fly latex compilation of plots.
+		usr bool
+	}
+	AutoStyle struct {
+		val bool // Enable auto style of the histogram.
+		usr bool
+	}
+	PlotTitle struct {
+		val string // General plot title.
+		usr bool
+	}
+	RatioPlot struct {
+		val bool // Enable ratio plot.
+		usr bool
+	}
+	HistoStack struct {
+		val bool // Disable histogram stacking (e.g. compare various processes).
+		usr bool
+	}
+	HistoNorm struct {
+		val bool // Normalize distributions to unit area (when stacked, the total is normalized).
+		usr bool
+	}
+	SignalStack struct {
+		val bool // Enable signal histogram stacking.
+		usr bool
+	}
+	TotalBand struct {
+		val bool // Enable total error band for stacks.
+		usr bool
+	}
+	ErrBandColor struct {
+		val color.NRGBA // Color for the uncertainty band.
+		usr bool
+	}
 
 	// Sample options
-	WeightFunc        TreeFunc    // Weight applied to the sample
-	CutFunc           TreeFunc    // Cut applied to the sample
-	LineColor         color.NRGBA // Line color of the sample histogram
-	LineWidth         vg.Length   // Line width of the sample histogram
-	LineDashes        []vg.Length // Line dashes format
-	FillColor         color.NRGBA // Fill color of the sample histogram
-	CircleMarkers     bool        // Use of circled marker
-	CircleSize        vg.Length   // Size of the markers
-	CircleColor       color.NRGBA // Color of the markers
-	Band              bool        // Enable error band display
-	YErrBars          bool        // Use of y error bars
-	YErrBarsLineWidth vg.Length   // Line width of the y error bar
-	YErrBarsCapWidth  vg.Length   // Width of the y error bar caps
-	DataStyle         bool        // Use default data style histogram
+	WeightFunc struct {
+		val TreeFunc // Weight applied to the sample
+		usr bool
+	}
+	CutFunc struct {
+		val TreeFunc // Cut applied to the sample
+		usr bool
+	}
+	LineColor struct { // Line color of the sample histogram
+		val color.NRGBA
+		usr bool
+	}
+	LineWidth struct {
+		val vg.Length // Line width of the sample histogram
+		usr bool
+	}
+	LineDashes struct {
+		val []vg.Length // Line dashes format
+		usr bool
+	}
+	FillColor struct {
+		val color.NRGBA // Fill color of the sample histogram
+		usr bool
+	}
+	CircleMarkers struct {
+		val bool // Use of circled marker
+		usr bool
+	}
+	CircleSize struct {
+		val vg.Length // Size of the markers
+		usr bool
+	}
+	CircleColor struct {
+		val color.NRGBA // Color of the markers
+		usr bool
+	}
+	Band struct {
+		val bool // Enable error band display
+		usr bool
+	}
+	YErrBars struct {
+		val bool // Use of y error bars
+		usr bool
+	}
+	YErrBarsLineWidth struct {
+		val vg.Length // Line width of the y error bar
+		usr bool
+	}
+	YErrBarsCapWidth struct {
+		val vg.Length // Width of the y error bar caps
+		usr bool
+	}
+	DataStyle struct {
+		val bool // Use default data style histogram
+		usr bool
+	}
 
 	// Variable options
-	SaveName                 string   // Filename for a variable plot
-	TreeVar                  TreeFunc // TreeFunc for a computed variable (ie not a single branch)
-	XLabel, YLabel           string   // Axis labels
-	XTickFormat, YTickFormat string   // Ticks formating
-	RangeXmin, RangeXmax     float64  // X-axis ranges
-	RangeYmin, RangeYmax     float64  // Y-axis ranges
-	RatioYmin, RatioYmax     float64  // Ratio Y-axis range
-	LegPosTop, LegPosLeft    bool     // Legend position
+	SaveName struct {
+		val string // Filename for a variable plot
+		usr bool
+	}
+	TreeVar struct {
+		val TreeFunc // TreeFunc for a computed variable (ie not a single branch)
+		usr bool
+	}
+	XLabel struct {
+		val string
+		usr bool
+	}
+	YLabel struct {
+		val string // Axis labels
+		usr bool
+	}
+	XTickFormat struct {
+		val string
+		usr bool
+	}
+	YTickFormat struct {
+		val string // Ticks formating
+		usr bool
+	}
+	RangeXmin struct {
+		val float64
+		usr bool
+	}
+	RangeXmax struct {
+		val float64 // X-axis ranges
+		usr bool
+	}
+	RangeYmin struct {
+		val float64 // X-axis ranges
+		usr bool
+	}
+	RangeYmax struct {
+		val float64 // X-axis ranges
+		usr bool
+	}
+	RatioYmax struct {
+		val float64 // Y-axis ranges
+		usr bool
+	}
+	RatioYmin struct {
+		val float64 // Y-axis ranges
+		usr bool
+	}
+	LegPosTop struct {
+		val bool
+		usr bool
+	}
+	LegPosLeft struct {
+		val bool // Legend position
+		usr bool
+	}
 }
 
 // newConfig returns a config type with a set of passed options.
-func newConfig(opts ...func(cfg *config)) *config {
+func newConfig() *config {
 	cfg := new(config)
-	for _, opt := range opts {
-		opt(cfg)
-	}
 	return cfg
 }
 
 // WithKinemCuts sets the list of kinematic cuts to run on.
 func WithKinemCuts(c []*Selection) Options {
 	return func(cfg *config) {
-		cfg.KinemCuts = c
+		cfg.KinemCuts.val = c
+		cfg.KinemCuts.usr = true
 	}
 }
 
@@ -83,49 +210,57 @@ func WithKinemCuts(c []*Selection) Options {
 // each sample component.
 func WithNevts(n int64) Options {
 	return func(cfg *config) {
-		cfg.Nevts = n
+		cfg.Nevts.val = n
+		cfg.Nevts.usr = true
+		
 	}
 }
 
 // WithSavePath sets the path to save plots.
 func WithSavePath(p string) Options {
 	return func(cfg *config) {
-		cfg.SavePath = p
+		cfg.SavePath.val = p
+		cfg.SavePath.usr = true
 	}
 }
 
 // WithSaveFormat sets the format for the plots.
 func WithSaveFormat(f string) Options {
 	return func(cfg *config) {
-		cfg.SaveFormat = f
+		cfg.SaveFormat.val = f
+		cfg.SaveFormat.usr = true
 	}
 }
 
 // WithCompileLatex enables automatic latex compilation.
 func WithCompileLatex(b bool) Options {
 	return func(cfg *config) {
-		cfg.CompileLatex = b
+		cfg.CompileLatex.val = b
+		cfg.CompileLatex.usr = true
 	}
 }
 
 // WithAutoStyle enables automatic styling of the histograms.
 func WithAutoStyle(b bool) Options {
 	return func(cfg *config) {
-		cfg.AutoStyle = b
+		cfg.AutoStyle.val = b
+		cfg.AutoStyle.usr = true
 	}
 }
 
 // WithPlotTitle sets the general plot title.
 func WithPlotTitle(t string) Options {
 	return func(cfg *config) {
-		cfg.PlotTitle = t
+		cfg.PlotTitle.val = t
+		cfg.PlotTitle.usr = true
 	}
 }
 
 // WithRatioPlot enables the ratio plot panel.
 func WithRatioPlot(b bool) Options {
 	return func(cfg *config) {
-		cfg.RatioPlot = b
+		cfg.RatioPlot.val = b
+		cfg.RatioPlot.usr = true
 	}
 }
 
@@ -133,7 +268,8 @@ func WithRatioPlot(b bool) Options {
 // bkg-typed samples.
 func WithHistoStack(b bool) Options {
 	return func(cfg *config) {
-		cfg.HistoStack = b
+		cfg.HistoStack.val = b
+		cfg.HistoStack.usr = true
 	}
 }
 
@@ -141,7 +277,8 @@ func WithHistoStack(b bool) Options {
 // bkg-typed samples.
 func WithSignalStack(b bool) Options {
 	return func(cfg *config) {
-		cfg.SignalStack = b
+		cfg.SignalStack.val = b
+		cfg.SignalStack.usr = true
 	}
 }
 
@@ -149,14 +286,16 @@ func WithSignalStack(b bool) Options {
 // bkg-typed samples.
 func WithTotalBand(b bool) Options {
 	return func(cfg *config) {
-		cfg.TotalBand = b
+		cfg.TotalBand.val = b
+		cfg.TotalBand.usr = true
 	}
 }
 
 // WithHistoNorm enables histogram normalization to unity.
 func WithHistoNorm(b bool) Options {
 	return func(cfg *config) {
-		cfg.HistoNorm = b
+		cfg.HistoNorm.val = b
+		cfg.HistoNorm.usr = true
 	}
 }
 
@@ -164,7 +303,8 @@ func WithHistoNorm(b bool) Options {
 // total histogram (and ratio).
 func WithErrBandColor(c color.NRGBA) Options {
 	return func(cfg *config) {
-		cfg.ErrBandColor = c
+		cfg.ErrBandColor.val = c
+		cfg.ErrBandColor.usr = true
 	}
 }
 
@@ -173,7 +313,8 @@ func WithErrBandColor(c color.NRGBA) Options {
 // Maker.FillHisto() will panic otherwise.
 func WithWeight(f TreeFunc) SampleOptions {
 	return func(cfg *config) {
-		cfg.WeightFunc = f
+		cfg.WeightFunc.val = f
+		cfg.WeightFunc.usr = true
 	}
 }
 
@@ -182,21 +323,24 @@ func WithWeight(f TreeFunc) SampleOptions {
 // Maker.FillHisto() will panic otherwise.
 func WithCut(f TreeFunc) SampleOptions {
 	return func(cfg *config) {
-		cfg.CutFunc = f
+		cfg.CutFunc.val = f
+		cfg.CutFunc.usr = true
 	}
 }
 
 // WithLineColor sets the line color of the histogram.
 func WithLineColor(c color.NRGBA) SampleOptions {
 	return func(cfg *config) {
-		cfg.LineColor = c
+		cfg.LineColor.val = c
+		cfg.LineColor.usr = true
 	}
 }
 
 // WithLineWidth sets line width of the sample histogram.
 func WithLineWidth(w vg.Length) SampleOptions {
 	return func(cfg *config) {
-		cfg.LineWidth = w
+		cfg.LineWidth.val = w
+		cfg.LineWidth.usr = true
 	}
 
 }
@@ -204,7 +348,8 @@ func WithLineWidth(w vg.Length) SampleOptions {
 // WithLineWidth sets line width of the sample histogram.
 func WithLineDashes(s []vg.Length) SampleOptions {
 	return func(cfg *config) {
-		cfg.LineDashes = s
+		cfg.LineDashes.val = s
+		cfg.LineDashes.usr = true
 	}
 
 }
@@ -212,70 +357,80 @@ func WithLineDashes(s []vg.Length) SampleOptions {
 // WithFillColor sets the color with which the histo will be filled.
 func WithFillColor(c color.NRGBA) SampleOptions {
 	return func(cfg *config) {
-		cfg.FillColor = c
+		cfg.FillColor.val = c
+		cfg.FillColor.usr = true
 	}
 }
 
 // WithCircleMarkers enables the use of circle markers (as for data histogram).
 func WithCircleMarkers(b bool) SampleOptions {
 	return func(cfg *config) {
-		cfg.CircleMarkers = b
+		cfg.CircleMarkers.val = b
+		cfg.CircleMarkers.usr = true
 	}
 }
 
 // WithCircleSize sets the size of circle markers.
 func WithCircleSize(s vg.Length) SampleOptions {
 	return func(cfg *config) {
-		cfg.CircleSize = s
+		cfg.CircleSize.val = s
+		cfg.CircleSize.usr = true
 	}
 }
 
 // WithCircleColor sets the color of circle markers.
 func WithCircleColor(c color.NRGBA) SampleOptions {
 	return func(cfg *config) {
-		cfg.CircleColor = c
+		cfg.CircleColor.val = c
+		cfg.CircleColor.usr = true
 	}
 }
 
 // WithBand enables y error band.
 func WithBand(b bool) SampleOptions {
 	return func(cfg *config) {
-		cfg.Band = b
+		cfg.Band.val = b
+		cfg.Band.usr = true
 	}
 }
 
 // WithYErrBars enables y error bars.
 func WithYErrBars(b bool) SampleOptions {
 	return func(cfg *config) {
-		cfg.YErrBars = b
+		cfg.YErrBars.val = b
+		cfg.YErrBars.usr = true
 	}
 }
 
 // WithYErrBarsLineWidth sets the width of the error bars line
 func WithYErrBarsLineWidth(w vg.Length) SampleOptions {
 	return func(cfg *config) {
-		cfg.YErrBarsLineWidth = w
+		cfg.YErrBarsLineWidth.val = w
+		cfg.YErrBarsLineWidth.usr = true
 	}
 }
 
 // WithYErrBarsCapsWidth sets the width of the y error bars caps.
 func WithYErrBarsCapWidth(w vg.Length) SampleOptions {
 	return func(cfg *config) {
-		cfg.YErrBarsCapWidth = w
+		cfg.YErrBarsCapWidth.val = w
+		cfg.YErrBarsCapWidth.usr = true
 	}
 }
 
 // WithDataStyle enables the default data histogram style.
 func WithDataStyle(b bool) SampleOptions {
 	return func(cfg *config) {
-		cfg.DataStyle = b
+		cfg.DataStyle.val = b
+		cfg.DataStyle.usr = true
 	}
 }
 
 // WithSaveName sets the file name of the plot.
 func WithSaveName(n string) VariableOptions {
 	return func(cfg *config) {
-		cfg.SaveName = n
+		cfg.SaveName.val = n
+		cfg.SaveName.usr = true
 	}
 }
 
@@ -283,60 +438,73 @@ func WithSaveName(n string) VariableOptions {
 // computed variable.
 func WithTreeVar(f TreeFunc) VariableOptions {
 	return func(cfg *config) {
-		cfg.TreeVar = f
+		cfg.TreeVar.val = f
+		cfg.TreeVar.usr = true
 	}
 }
 
 // WithAxisLabels sets the x- and y-axis label.
 func WithAxisLabels(xlab, ylab string) VariableOptions {
 	return func(cfg *config) {
-		cfg.XLabel = xlab
-		cfg.YLabel = ylab
+		cfg.XLabel.val = xlab
+		cfg.XLabel.usr = true
+		cfg.YLabel.val = ylab
+		cfg.YLabel.usr = true
 	}
 }
 
 // WithAxisLabels sets the x- and y-axis labels.
 func WithTickFormats(xticks, yticks string) VariableOptions {
 	return func(cfg *config) {
-		cfg.XTickFormat = xticks
-		cfg.YTickFormat = yticks
+		cfg.XTickFormat.val = xticks
+		cfg.XTickFormat.usr = true
+		cfg.YTickFormat.val = yticks
+		cfg.YTickFormat.usr = true
 	}
 }
 
 // WithXRange sets the x-axis min and max.
 func WithXRange(min, max float64) VariableOptions {
 	return func(cfg *config) {
-		cfg.RangeXmin = min
-		cfg.RangeXmax = max
+		cfg.RangeXmin.val = min
+		cfg.RangeXmin.usr = true
+		cfg.RangeXmax.val = max
+		cfg.RangeXmax.usr = true
 	}
 }
 
 // WithYRange sets the y-axis min and max.
 func WithYRange(min, max float64) VariableOptions {
 	return func(cfg *config) {
-		cfg.RangeYmin = min
-		cfg.RangeYmax = max
+		cfg.RangeYmin.val = min
+		cfg.RangeYmin.usr = true
+		cfg.RangeYmax.val = max
+		cfg.RangeYmax.usr = true
 	}
 }
 
 // WithRatioYRange sets the y-axis min and max for the ratio plot.
 func WithRatioYRange(min, max float64) VariableOptions {
 	return func(cfg *config) {
-		cfg.RatioYmin = min
-		cfg.RatioYmax = max
+		cfg.RatioYmin.val = min
+		cfg.RatioYmin.usr = true
+		cfg.RatioYmax.val = max
+		cfg.RatioYmax.usr = true
 	}
 }
 
 // WithLegLeft sets the legend left/right position on the plot.
 func WithLegLeft(left bool) VariableOptions {
 	return func(cfg *config) {
-		cfg.LegPosLeft = left
+		cfg.LegPosLeft.val = left
+		cfg.LegPosLeft.usr = true
 	}
 }
 
 // WithLegTop sets the legend top/bottom position on the plot.
 func WithLegTop(top bool) VariableOptions {
 	return func(cfg *config) {
-		cfg.LegPosTop = top
+		cfg.LegPosTop.val = top
+		cfg.LegPosTop.usr = true
 	}
 }

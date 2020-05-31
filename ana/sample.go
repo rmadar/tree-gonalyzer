@@ -61,6 +61,7 @@ type Sample struct {
 	// Internal
 	components []*sampleComponent
 	sType      sampleType
+	config     *config
 }
 
 // SampleComponent contains the needed information
@@ -79,7 +80,7 @@ type sampleComponent struct {
 // s.AddComponent(...) function.
 func NewSample(sname, stype, sleg string, opts ...SampleOptions) *Sample {
 
-	// Check/set sample type
+	// Check & set sample type
 	var sType sampleType
 	switch strings.ToLower(stype) {
 	case "data":
@@ -93,43 +94,80 @@ func NewSample(sname, stype, sleg string, opts ...SampleOptions) *Sample {
 		log.Fatal(fmt.Sprintf(err, stype, sname))
 	}
 
-	// Empty basic sample
+	// Empty basic sample with default setup
 	s := &Sample{
 		Name:       sname,
 		Type:       stype,
 		LegLabel:   sleg,
 		components: []*sampleComponent{},
+		LineColor:  color.NRGBA{R: 20, G: 20, B: 180, A: 255},
 		sType:      sType,
+		DataStyle:  sType == data,
+		YErrBars:   sType == data,
 	}
 
 	// Configuration with defaults values for all optional fields
-	cfg := newConfig(
-		WithLineColor(color.NRGBA{R: 20, G: 20, B: 180, A: 255}),
-		WithDataStyle(s.IsData()),
-	)
+	cfg := newConfig()
 
 	// Update the configuration looping over functional options
 	for _, opt := range opts {
 		opt(cfg)
 	}
 
-	// Set setting with the updated configuration
-	s.WeightFunc = cfg.WeightFunc
-	s.CutFunc = cfg.CutFunc
-	s.LineColor = cfg.LineColor
-	s.LineWidth = cfg.LineWidth
-	s.LineDashes = cfg.LineDashes
-	s.FillColor = cfg.FillColor
-	s.CircleMarkers = cfg.CircleMarkers
-	s.CircleSize = cfg.CircleSize
-	s.CircleColor = cfg.CircleColor
-	s.Band = cfg.Band
-	s.YErrBars = cfg.YErrBars || cfg.DataStyle
-	s.YErrBarsLineWidth = cfg.YErrBarsLineWidth
-	s.YErrBarsCapWidth = cfg.YErrBarsCapWidth
-	s.DataStyle = cfg.DataStyle
+	// Save the configuration in the object.
+	s.config = cfg
+
+	// Apply the configuration
+	s.applyConfig()
 
 	return s
+}
+
+func (s *Sample) applyConfig() {
+
+	// Set setting with the updated configuration	
+	if s.config.WeightFunc.usr {
+		s.WeightFunc = s.config.WeightFunc.val
+	}
+	if s.config.CutFunc.usr {
+		s.CutFunc = s.config.CutFunc.val
+	}
+	if s.config.LineColor.usr {
+		s.LineColor = s.config.LineColor.val
+	}
+	if s.config.LineWidth.usr {
+		s.LineWidth = s.config.LineWidth.val
+	}
+	if s.config.LineDashes.usr {
+		s.LineDashes = s.config.LineDashes.val
+	}
+	if s.config.FillColor.usr {
+		s.FillColor = s.config.FillColor.val
+	}
+	if s.config.CircleMarkers.usr {
+		s.CircleMarkers = s.config.CircleMarkers.val
+	}
+	if s.config.CircleSize.usr {
+		s.CircleSize = s.config.CircleSize.val
+	}
+	if s.config.CircleColor.usr {
+		s.CircleColor = s.config.CircleColor.val
+	}
+	if s.config.Band.usr {
+		s.Band = s.config.Band.val
+	}
+	if s.config.YErrBars.usr {
+		s.YErrBars = s.config.YErrBars.val
+	}
+	if s.config.YErrBarsLineWidth.usr {
+		s.YErrBarsLineWidth = s.config.YErrBarsLineWidth.val
+	}
+	if s.config.YErrBarsCapWidth.usr {
+		s.YErrBarsCapWidth = s.config.YErrBarsCapWidth.val
+	}
+	if s.config.DataStyle.usr {
+		s.DataStyle = s.config.DataStyle.val
+	}
 }
 
 // CreateSample creates a non-empty sample having the default settings,
@@ -141,12 +179,6 @@ func CreateSample(sname, stype, sleg, fname, tname string, opts ...SampleOptions
 
 	// New empty sample
 	s := NewSample(sname, stype, sleg, opts...)
-
-	// Configuration
-	cfg := newConfig()
-	for _, opt := range opts {
-		opt(cfg)
-	}
 
 	// Add it to component the sample
 	s.AddComponent(fname, tname)
@@ -173,8 +205,8 @@ func (s *Sample) AddComponent(fname, tname string, opts ...SampleOptions) {
 	c := &sampleComponent{
 		FileName:   fname,
 		TreeName:   tname,
-		WeightFunc: cfg.WeightFunc,
-		CutFunc:    cfg.CutFunc,
+		WeightFunc: cfg.WeightFunc.val,
+		CutFunc:    cfg.CutFunc.val,
 	}
 
 	// Append it to the pointer-receiver sample
@@ -243,7 +275,7 @@ func (s Sample) CreateHisto(hdata *hbook.H1D, opts ...hplot.Options) *hplot.H1D 
 	if h.Band != nil {
 		s.setBandStyle(h.Band)
 	}
-
+	
 	return h
 }
 
