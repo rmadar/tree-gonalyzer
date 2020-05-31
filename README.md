@@ -24,10 +24,7 @@ variables := []*ana.Variable{
 }
 
 // Create analyzer object with some options
-analyzer := ana.New(samples, variables,
-	      ana.WithAutoStyle(true),
-	      ana.WithHistoNorm(true),
-)
+analyzer := ana.New(samples, variables, ana.WithHistoNorm(true))
 
 // Produce plots
 analyzer.Run()
