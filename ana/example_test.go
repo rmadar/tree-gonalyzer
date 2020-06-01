@@ -82,6 +82,7 @@ func Example_aSimpleUseCase() {
 
 	// Create analyzer object
 	analyzer := ana.New(samples, variables,
+		ana.WithDumpTree(true),
 		ana.WithSaveFormat("png"),
 		ana.WithSavePath("testdata/Plots_simpleUseCase"),
 	)
@@ -397,6 +398,7 @@ func Example_withSliceVariables() {
 
 	// Analyzer
 	analyzer := ana.New(samples, variables,
+		ana.WithDumpTree(true),
 		ana.WithHistoStack(false),
 		ana.WithRatioPlot(false),
 		ana.WithSaveFormat("png"),

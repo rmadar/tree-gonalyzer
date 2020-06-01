@@ -42,6 +42,10 @@ type config struct {
 		val bool // Enable on-the-fly latex compilation of plots.
 		usr bool
 	}
+	DumpTree struct {
+		val bool // Enable Tree dumping
+		usr bool
+	}
 	AutoStyle struct {
 		val bool // Enable auto style of the histogram.
 		usr bool
@@ -237,6 +241,14 @@ func WithCompileLatex(b bool) Options {
 	return func(cfg *config) {
 		cfg.CompileLatex.val = b
 		cfg.CompileLatex.usr = true
+	}
+}
+
+// WithCompileLatex enables automatic latex compilation.
+func WithDumpTree(b bool) Options {
+	return func(cfg *config) {
+		cfg.DumpTree.val = b
+		cfg.DumpTree.usr = true
 	}
 }
 
