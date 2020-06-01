@@ -36,7 +36,7 @@ func main() {
 
 	// Background 3
 	sBkg3 := ana.NewSample("bkg3", "bkg", `Proc5+Proc6`, ana.WithWeight(w2))
-	sBkg3.AddComponent(file2, tname, ana.WithCut(ana.NewCutBool("init_qq")))
+	sBkg3.AddComponent(file2, tname, ana.WithCut(ana.TreeCutBool("init_qq")))
 	sBkg3.AddComponent(file3, tname)
 
 	// Putting samples together
@@ -44,9 +44,9 @@ func main() {
 
 	// Variables
 	variables := []*ana.Variable{
-		ana.NewVariable("dPhi", ana.NewVarF64("truth_dphi_ll"), 15, 0, 3.14),
-		ana.NewVariable("m_tt", ana.NewVarF32("ttbar_m"), 25, 300, 1000),
-		ana.NewVariable("isGG", ana.NewVarBool("init_gg"), 2, 0, 1),
+		ana.NewVariable("dPhi", ana.TreeVarF64("truth_dphi_ll"), 15, 0, 3.14),
+		ana.NewVariable("m_tt", ana.TreeVarF32("ttbar_m"), 25, 300, 1000),
+		ana.NewVariable("isGG", ana.TreeVarBool("init_gg"), 2, 0, 1),
 		ana.NewVariable("combVar", combFunc, 100, 0, 100),
 	}
 
@@ -86,8 +86,8 @@ var (
 		},
 	}
 
-	w1     = ana.NewValF64(0.5)
-	w2     = ana.NewValF64(0.25)
+	w1     = ana.TreeValF64(0.5)
+	w2     = ana.TreeValF64(0.25)
 	wptPos = ana.TreeFunc{
 		VarsName: []string{"t_pt"},
 		Fct:      func(pt float32) float64 { return 1.0 + float64(pt)/200. },
