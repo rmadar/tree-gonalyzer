@@ -18,9 +18,9 @@ samples := []*ana.Sample{
 
 // Define variables
 variables := []*ana.Variable{
-	ana.NewVariable("plot1", ana.NewVarBool("branchBool"), 2, 0, 2),
-	ana.NewVariable("plot2", ana.NewVarF32("branchF32"), 25, 0, 1000),
-	ana.NewVariable("plot3", ana.NewVarF64("branchF64"), 50, 0, 1000),
+	ana.NewVariable("plot1", ana.TreeVarBool("branchBool"), 2, 0, 2),
+	ana.NewVariable("plot2", ana.TreeVarF32("branchF32"), 25, 0, 1000),
+	ana.NewVariable("plot3", ana.TreeVarF64("branchF64"), 50, 0, 1000),
 }
 
 // Create analyzer object with some options

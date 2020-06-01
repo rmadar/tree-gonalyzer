@@ -34,7 +34,7 @@ func ExampleSample_withWeight() {
 
 	// Sample with single branch weight
 	ana.CreateSample("proc", "bkg", `leg`, "myfile.root", "mytree",
-		ana.WithWeight(ana.NewVarF64("evtWght")),
+		ana.WithWeight(ana.TreeVarF64("evtWght")),
 	)
 }
 
@@ -54,15 +54,15 @@ func ExampleSample_withCut() {
 
 	// Sample with single branch boolean
 	ana.CreateSample("proc", "bkg", `leg`, "myfile.root", "mytree",
-		ana.WithCut(ana.NewCutBool("passCriteria")),
+		ana.WithCut(ana.TreeCutBool("passCriteria")),
 	)
 }
 
 func ExampleSample_multiComponents() {
 	// Declare weights and cuts
-	wGlobal := ana.NewVarF64("evtWeight") // evtWeight is float64 branch
-	wBljets := ana.NewValF64(0.30)
-	cIsHadr := ana.NewCutBool("isHadronic") // isHadronic is boolean branch
+	wGlobal := ana.TreeVarF64("evtWeight") // evtWeight is float64 branch
+	wBljets := ana.TreeValF64(0.30)
+	cIsHadr := ana.TreeCutBool("isHadronic") // isHadronic is boolean branch
 
 	// ttbar background starting with an empty sample with a global weight
 	ttbarIncl := ana.NewSample("ttbar", "bkg", `Inclusive`, ana.WithWeight(wGlobal))

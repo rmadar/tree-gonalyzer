@@ -17,9 +17,9 @@ import (
 // directly the GO function to be called in the event loop
 // for boolean, float32 and float64.
 //
-// Except `NewCutBool()`, all `NewXXX()` functions lead to a treeFunc.Fct
+// Except `TreeCutBool()`, all `NewXXX()` functions lead to a treeFunc.Fct
 // returning a float64 a or []float64 in order to be accpeted
-// by hplot.h1d.Fill(v, w) method. Instead `NewCutBool()` lead to
+// by hplot.h1d.Fill(v, w) method. Instead `TreeCutBool()` lead to
 // a treeFunc.Fct returning a bool, specifically for cuts.
 type TreeFunc struct {
 	VarsName []string
@@ -27,22 +27,22 @@ type TreeFunc struct {
 	formula  rfunc.Formula
 }
 
-// NewCutBool returns a TreeFunc to get
+// TreeCutBool returns a TreeFunc to get
 // a single boolean branch-based variable for cuts.
 // The output value is a boolean and cannot be used
-// to be plotted. To plot a boolean, use NewVarBool(v).
-func NewCutBool(v string) TreeFunc {
+// to be plotted. To plot a boolean, use TreeVarBool(v).
+func TreeCutBool(v string) TreeFunc {
 	return TreeFunc{
 		VarsName: []string{v},
 		Fct:      func(x bool) bool { return x },
 	}
 }
 
-// NewVarBool returns a TreeFunc to get
+// TreeVarBool returns a TreeFunc to get
 // a single boolean branch-based variable to plot.
 // The output value is a float64 and cannot be
-// used for selection. For cuts, use NewCutBool(v).
-func NewVarBool(v string) TreeFunc {
+// used for selection. For cuts, use TreeCutBool(v).
+func TreeVarBool(v string) TreeFunc {
 	return TreeFunc{
 		VarsName: []string{v},
 		Fct: func(x bool) float64 {
@@ -54,63 +54,63 @@ func NewVarBool(v string) TreeFunc {
 	}
 }
 
-// NewVarF64 returns a TreeFunc to get a single
+// TreeVarF64 returns a TreeFunc to get a single
 // float64 branch-based variable. The output value is a float64.
-func NewVarF64(v string) TreeFunc {
+func TreeVarF64(v string) TreeFunc {
 	return TreeFunc{
 		VarsName: []string{v},
 		Fct:      func(x float64) float64 { return x },
 	}
 }
 
-// NewVarF32 returns a TreeFunc to get a single
+// TreeVarF32 returns a TreeFunc to get a single
 // float32 branch-based variable. The output  value is a float64.
-func NewVarF32(v string) TreeFunc {
+func TreeVarF32(v string) TreeFunc {
 	return TreeFunc{
 		VarsName: []string{v},
 		Fct:      func(x float32) float64 { return float64(x) },
 	}
 }
 
-// NewVarI64 returns a TreeFunc to get a single
+// TreeVarI64 returns a TreeFunc to get a single
 // int64 branch-based variable. The output value is a float64.
-func NewVarI64(v string) TreeFunc {
+func TreeVarI64(v string) TreeFunc {
 	return TreeFunc{
 		VarsName: []string{v},
 		Fct:      func(x int64) float64 { return float64(x) },
 	}
 }
 
-// NewVarI32 returns a TreeFunc to get a single
+// TreeVarI32 returns a TreeFunc to get a single
 // int32 branch-based variable. The output value is a float64.
-func NewVarI32(v string) TreeFunc {
+func TreeVarI32(v string) TreeFunc {
 	return TreeFunc{
 		VarsName: []string{v},
 		Fct:      func(x int32) float64 { return float64(x) },
 	}
 }
 
-// NewValF64 returns a TreeFunc to get float value,
+// TreeValF64 returns a TreeFunc to get float value,
 // ie not a branch-based variable.
-func NewValF64(v float64) TreeFunc {
+func TreeValF64(v float64) TreeFunc {
 	return TreeFunc{
 		VarsName: []string{},
 		Fct:      func() float64 { return v },
 	}
 }
 
-// NewVarF64s returns a TreeFunc to get a slice of
+// TreeVarF64s returns a TreeFunc to get a slice of
 // float64 branch-based variable. The output value is a float64.
-func NewVarF64s(v string) TreeFunc {
+func TreeVarF64s(v string) TreeFunc {
 	return TreeFunc{
 		VarsName: []string{v},
 		Fct:      func(xs []float64) []float64 { return xs },
 	}
 }
 
-// NewVarF32s returns a TreeFunc to get a slice of
+// TreeVarF32s returns a TreeFunc to get a slice of
 // float32 branch-based variable. The output  value is a float64.
-func NewVarF32s(v string) TreeFunc {
+func TreeVarF32s(v string) TreeFunc {
 	return TreeFunc{
 		VarsName: []string{v},
 		Fct: func(xs []float32) []float64 {
@@ -123,9 +123,9 @@ func NewVarF32s(v string) TreeFunc {
 	}
 }
 
-// NewVarI64s returns a TreeFunc to get a slice of
+// TreeVarI64s returns a TreeFunc to get a slice of
 // int64 branch-based variable. The output value is a float64.
-func NewVarI64s(v string) TreeFunc {
+func TreeVarI64s(v string) TreeFunc {
 	return TreeFunc{
 		VarsName: []string{v},
 		Fct: func(xs []int64) []float64 {
@@ -138,9 +138,9 @@ func NewVarI64s(v string) TreeFunc {
 	}
 }
 
-// NewVarI32s returns a TreeFunc to get a slice of
+// TreeVarI32s returns a TreeFunc to get a slice of
 // int32 branch-based variable. The output value is a float64.
-func NewVarI32s(v string) TreeFunc {
+func TreeVarI32s(v string) TreeFunc {
 	return TreeFunc{
 		VarsName: []string{v},
 		Fct: func(xs []int32) []float64 {

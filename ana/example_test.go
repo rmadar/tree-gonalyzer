@@ -72,17 +72,16 @@ func Example_aSimpleUseCase() {
 
 	// Define variables
 	variables := []*ana.Variable{
-		ana.NewVariable("Mttbar", ana.NewVarF32("ttbar_m"), 25, 350, 1000,
+		ana.NewVariable("Mttbar", ana.TreeVarF32("ttbar_m"), 25, 350, 1000,
 			ana.WithAxisLabels("M(t,t) [GeV]", "Events Yields"),
 		),
-		ana.NewVariable("DphiLL", ana.NewVarF64("truth_dphi_ll"), 10, 0, math.Pi,
+		ana.NewVariable("DphiLL", ana.TreeVarF64("truth_dphi_ll"), 10, 0, math.Pi,
 			ana.WithAxisLabels("dPhi(l,l)", "Events Yields"),
 			ana.WithLegLeft(true)),
 	}
 
 	// Create analyzer object
 	analyzer := ana.New(samples, variables,
-		ana.WithAutoStyle(true),
 		ana.WithSaveFormat("png"),
 		ana.WithSavePath("testdata/Plots_simpleUseCase"),
 	)
@@ -119,17 +118,16 @@ func Example_withSignals() {
 
 	// Define variables
 	variables := []*ana.Variable{
-		ana.NewVariable("Mttbar", ana.NewVarF32("ttbar_m"), 100, 350, 1000,
+		ana.NewVariable("Mttbar", ana.TreeVarF32("ttbar_m"), 100, 350, 1000,
 			ana.WithAxisLabels("M(t,t) [GeV]", "Events Yields"),
 		),
-		ana.NewVariable("DphiLL", ana.NewVarF64("truth_dphi_ll"), 10, 0, math.Pi,
+		ana.NewVariable("DphiLL", ana.TreeVarF64("truth_dphi_ll"), 10, 0, math.Pi,
 			ana.WithAxisLabels("dPhi(l,l)", "Events Yields"),
 			ana.WithLegLeft(true)),
 	}
 
 	// Create analyzer object
 	analyzer := ana.New(samples, variables,
-		//ana.WithAutoStyle(false),
 		ana.WithSaveFormat("png"),
 		ana.WithSavePath("testdata/Plots_withSignals"),
 	)
@@ -157,10 +155,10 @@ func Example_withStackedSignals() {
 
 	// Define variables
 	variables := []*ana.Variable{
-		ana.NewVariable("Mttbar", ana.NewVarF32("ttbar_m"), 100, 350, 1000,
+		ana.NewVariable("Mttbar", ana.TreeVarF32("ttbar_m"), 100, 350, 1000,
 			ana.WithAxisLabels("M(t,t) [GeV]", "Events Yields"),
 		),
-		ana.NewVariable("DphiLL", ana.NewVarF64("truth_dphi_ll"), 10, 0, math.Pi,
+		ana.NewVariable("DphiLL", ana.TreeVarF64("truth_dphi_ll"), 10, 0, math.Pi,
 			ana.WithAxisLabels("dPhi(l,l)", "Events Yields"),
 			ana.WithLegLeft(true)),
 	}
@@ -183,8 +181,8 @@ func Example_withStackedSignals() {
 // variables are dummy, they are here just for the example.
 func Example_multiComponentSamples() {
 	// Weights and cuts
-	w := ana.NewVarF32("weight")
-	isQQ := ana.NewVarBool("init_qq")
+	w := ana.TreeVarF32("weight")
+	isQQ := ana.TreeVarBool("init_qq")
 
 	// Data sample.
 	data := ana.NewSample("data", "data", `Data 18-20`)
@@ -207,13 +205,12 @@ func Example_multiComponentSamples() {
 
 	// Define variables
 	variables := []*ana.Variable{
-		ana.NewVariable("Mttbar", ana.NewVarF32("ttbar_m"), 25, 350, 1000),
-		ana.NewVariable("DphiLL", ana.NewVarF64("truth_dphi_ll"), 10, 0, math.Pi),
+		ana.NewVariable("Mttbar", ana.TreeVarF32("ttbar_m"), 25, 350, 1000),
+		ana.NewVariable("DphiLL", ana.TreeVarF64("truth_dphi_ll"), 10, 0, math.Pi),
 	}
 
 	// Create analyzer object with normalized histograms.
 	analyzer := ana.New(samples, variables,
-		ana.WithAutoStyle(true),
 		ana.WithHistoNorm(true),
 		ana.WithSaveFormat("png"),
 		ana.WithSavePath("testdata/Plots_multiComponents"),
@@ -245,8 +242,8 @@ func Example_shapeComparison() {
 
 	// Define variables
 	variables := []*ana.Variable{
-		ana.NewVariable("TopPt", ana.NewVarF32("t_pt"), 10, 0, 500),
-		ana.NewVariable("DphiLL", ana.NewVarF64("truth_dphi_ll"), 10, 0, math.Pi,
+		ana.NewVariable("TopPt", ana.TreeVarF32("t_pt"), 10, 0, 500),
+		ana.NewVariable("DphiLL", ana.TreeVarF64("truth_dphi_ll"), 10, 0, math.Pi,
 			ana.WithLegLeft(true)),
 	}
 
@@ -291,9 +288,9 @@ func Example_systematicVariations() {
 
 	// Define variables
 	variables := []*ana.Variable{
-		ana.NewVariable("Mttbar", ana.NewVarF32("ttbar_m"), 25, 350, 1500,
+		ana.NewVariable("Mttbar", ana.TreeVarF32("ttbar_m"), 25, 350, 1500,
 			ana.WithRatioYRange(0.7, 1.3)),
-		ana.NewVariable("DphiLL", ana.NewVarF64("truth_dphi_ll"), 10, 0, math.Pi,
+		ana.NewVariable("DphiLL", ana.TreeVarF64("truth_dphi_ll"), 10, 0, math.Pi,
 			ana.WithRatioYRange(0.7, 1.3),
 			ana.WithYRange(0, 0.2),
 			ana.WithLegLeft(true),
@@ -354,10 +351,10 @@ func Example_shapeDistortion() {
 
 	// Define variables
 	variables := []*ana.Variable{
-		ana.NewVariable("Mttbar", ana.NewVarF32("ttbar_m"), 25, 350, 1500,
+		ana.NewVariable("Mttbar", ana.TreeVarF32("ttbar_m"), 25, 350, 1500,
 			ana.WithAxisLabels("M(t,t) [GeV]", "PDF"),
 		),
-		ana.NewVariable("DphiLL", ana.NewVarF64("truth_dphi_ll"), 10, 0, math.Pi,
+		ana.NewVariable("DphiLL", ana.TreeVarF64("truth_dphi_ll"), 10, 0, math.Pi,
 			ana.WithLegLeft(true),
 			ana.WithAxisLabels("dPhi(l,l)", "PDF"),
 			ana.WithYRange(0, 0.3),
@@ -366,6 +363,7 @@ func Example_shapeDistortion() {
 
 	// Create analyzer object
 	analyzer := ana.New(samples, variables,
+		ana.WithAutoStyle(false),
 		ana.WithHistoStack(false),
 		ana.WithRatioPlot(false),
 		ana.WithHistoNorm(true),
@@ -394,12 +392,11 @@ func Example_withSliceVariables() {
 
 	// Variables
 	variables := []*ana.Variable{
-		ana.NewVariable("hitTimes", ana.NewVarF32s("hits_time_mc"), 100, 10, 15),
+		ana.NewVariable("hitTimes", ana.TreeVarF32s("hits_time_mc"), 100, 10, 15),
 	}
 
 	// Analyzer
 	analyzer := ana.New(samples, variables,
-		ana.WithAutoStyle(true),
 		ana.WithHistoStack(false),
 		ana.WithRatioPlot(false),
 		ana.WithSaveFormat("png"),
@@ -420,8 +417,8 @@ var (
 	tName = "truth"
 
 	// Some weights and cutw TreeFunc's
-	w1 = ana.NewValF64(1.0)
-	w2 = ana.NewValF64(0.5)
+	w1 = ana.TreeValF64(1.0)
+	w2 = ana.TreeValF64(0.5)
 	w3 = ana.TreeFunc{
 		VarsName: []string{"t_pt"},
 		Fct:      func(pt float32) float64 { return 1.0 + float64(pt)/50. },

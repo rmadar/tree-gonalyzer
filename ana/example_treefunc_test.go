@@ -52,7 +52,7 @@ func ExampleTreeFunc_withBranchBoolForPlot() {
 	defer r.Close()
 
 	// TreeFunc object from a boolean branch name in the TTree
-	treeFunc := ana.NewVarBool("init_qq")
+	treeFunc := ana.TreeVarBool("init_qq")
 
 	// Go function to be called in the event loop
 	// The return type is float64, since it's for plotting.
@@ -89,7 +89,7 @@ func ExampleTreeFunc_withBranchBoolForCut() {
 
 	// TreeFunc object from a boolean branch name in the TTree
 	// The return type is boolean, since it's for a cut.
-	treeFunc := ana.NewCutBool("init_qq")
+	treeFunc := ana.TreeCutBool("init_qq")
 
 	// Go function to be called in the event loop
 	getTreeFuncVal, ok := treeFunc.GetFuncBool(r)
@@ -125,7 +125,7 @@ func ExampleTreeFunc_withBranchF64() {
 
 	// TreeFunc object from a float64 branch name in the TTree.
 	// The return type is []float64.
-	treeFunc := ana.NewVarF64("truth_dphi_ll")
+	treeFunc := ana.TreeVarF64("truth_dphi_ll")
 
 	// Go function to be called in the event loop
 	getTreeFuncVal, ok := treeFunc.GetFuncF64(r)
@@ -161,7 +161,7 @@ func ExampleTreeFunc_withBranchF32s() {
 
 	// TreeFunc object from a []float32 branch name in the TTree.
 	// The return type is []float64.
-	treeFunc := ana.NewVarF32s("hits_time_mc")
+	treeFunc := ana.TreeVarF32s("hits_time_mc")
 
 	// Go function to be called in the event loop
 	getTreeFuncVal, ok := treeFunc.GetFuncF64s(r)
@@ -214,7 +214,7 @@ func ExampleTreeFunc_withNumericalValue() {
 	defer r.Close()
 
 	// TreeFunc object from a float64
-	treeFunc := ana.NewValF64(0.33)
+	treeFunc := ana.TreeValF64(0.33)
 
 	// Go function to be called in the event loop
 	getTreeFuncVal, ok := treeFunc.GetFuncF64(r)
