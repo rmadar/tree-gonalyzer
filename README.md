@@ -65,3 +65,16 @@ analyzer.Run()
 
  </table>
 
+## Performances
+
+![benchmarking](ana-perf/perf.png)
+
+For 2M events and 60 variables, a comparison with similar ROOT-based code
+(using `t->Draw()`) gives:
+ + `ROOT  -> 6.2 ms/kEvts`
+ + `GOHEP -> 2.0 ms/kEvts`
+ 
+Testing on only one variable to avoid event-loop repetition
+in case of `t->Draw()` (even if it's probably not like doing N times the loop):
+ + `ROOT  -> 0.39 ms/kEvts`
+ + `GOHEP -> 0.11 ms/kEvts`
