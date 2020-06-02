@@ -50,7 +50,7 @@ type Maker struct {
 	TotalBand    bool        // Enable total error band in stack mode (default: true).
 	ErrBandColor color.NRGBA // Color for the uncertainty band (default: gray).
 
-	// Histograms for {variables x samples x selection}
+	// Histograms for {samples x selections x variables}
 	HbookHistos [][][]*hbook.H1D
 	HplotHistos [][][]*hplot.H1D
 
@@ -196,175 +196,8 @@ func (ana *Maker) FillHistos() error {
 	start := time.Now()
 
 	// Loop over the samples
-	for iSamp, samp := range ana.Samples {
-
-		var fOut *groot.File
-		var tOut  rtree.Writer
-		if ana.DumpTree {
-			fOut, tOut = ana.getOutFileTree(samp.Name+".root", "GOtree")
-			defer fOut.Close()
-			defer tOut.Close()
-		}
-
-		// Loop over the sample components
-		for iComp, comp := range samp.components {
-
-			// Anonymous function to avoid memory-leaks due to 'defer'
-			func(j int) error {
-
-				// Get the file and tree
-				f, t := getTreeFromFile(comp.FileName, comp.TreeName)
-				defer f.Close()
-
-				// Get the tree reader
-				r, err := rtree.NewReader(t, []rtree.ReadVar{}, rtree.WithRange(0, ana.Nevts))
-				if err != nil {
-					log.Fatal("could not create tree reader: %w", err)
-				}
-				defer r.Close()
-
-				// Prepare variables
-				ok := false
-				getF64 := make([]func() float64, len(ana.Variables))
-				getF64s := make([]func() []float64, len(ana.Variables))
-				for iv, v := range ana.Variables {
-					v.isSlice = false
-					idx := iv
-					if getF64[idx], ok = v.TreeFunc.GetFuncF64(r); !ok {
-						v.isSlice = true
-						if getF64s[idx], ok = v.TreeFunc.GetFuncF64s(r); !ok {
-							err := `Type assertion failed [variable "%v"]:`
-							err += ` TreeFunc.Fct must return a float64 or a []float64.`
-							log.Fatalf(err, v.Name)
-						}
-					}
-				}
-
-				// Prepare the sample global weight
-				getWeightSamp := func() float64 { return float64(1.0) }
-				if samp.WeightFunc.Fct != nil {
-					if getWeightSamp, ok = samp.WeightFunc.GetFuncF64(r); !ok {
-						err := `Type assertion failed [weight of %v]:`
-						err += ` TreeFunc.Fct must return a float64.`
-						log.Fatalf(err, samp.Name)
-					}
-				}
-
-				// Prepare the additional weight of the component
-				getWeightComp := func() float64 { return float64(1.0) }
-				if comp.WeightFunc.Fct != nil {
-					if getWeightComp, ok = comp.WeightFunc.GetFuncF64(r); !ok {
-						err := `Type assertion failed [weight of (%v, %v)]:`
-						err += ` TreeFunc.Fct must return a float64.`
-						log.Fatalf(err, samp.Name, comp.FileName)
-					}
-				}
-
-				// Prepare the sample global cut
-				passCutSamp := func() bool { return true }
-				if samp.CutFunc.Fct != nil {
-					if passCutSamp, ok = samp.CutFunc.GetFuncBool(r); !ok {
-						err := `Type assertion failed [Cut of %v]:`
-						err += ` TreeFunc.Fct must return a bool.\n`
-						err += `\t -> Make sure to use NewCutBool(), not NewVarBool().`
-						log.Fatalf(err, samp.Name)
-					}
-				}
-
-				// Prepare the component additional cut
-				passCutComp := func() bool { return true }
-				if comp.CutFunc.Fct != nil {
-					if passCutComp, ok = comp.CutFunc.GetFuncBool(r); !ok {
-						err := `Type assertion failed [Cut of (%v, %v)]:`
-						err += ` TreeFunc.Fct must return a bool.\n`
-						err += `\t -> Make sure to use NewCutBool(), not NewVarBool().`
-						log.Fatalf(err, samp.Name, comp.FileName)
-					}
-				}
-
-				// Prepare the cut string for kinematics
-				passKinemCut := make([]func() bool, len(ana.KinemCuts))
-				for ic, cut := range ana.KinemCuts {
-					idx := ic
-					if passKinemCut[idx], ok = cut.TreeFunc.GetFuncBool(r); !ok {
-						err := "Type assertion failed [selection \"%v\"]:"
-						err += " TreeFunc.Fct must return a bool.\n"
-						err += "\t -> Make sure to use NewCutBool(), not NewVarBool()."
-						log.Fatal(fmt.Sprintf(err, cut.Name))
-					}
-				}
-
-				// Read the tree (event loop)
-				err = r.Read(func(ctx rtree.RCtx) error {
-
-					// Sample-level and component-level cut
-					if !( passCutSamp() && passCutComp() ) {
-						return nil
-					}
-
-					// Get the event weight
-					w := getWeightSamp() * getWeightComp()
-
-					// Loop over selection and variables
-					for ic := range ana.KinemCuts {
-
-						// Look at the next selection if the event is not selected.
-						if !passKinemCut[ic]() {
-							continue
-						}
-
-						// Keep track which selection is passed.
-						if ana.DumpTree {
-							ana.dumpedVar[ana.nVars+ic] = 1.0
-						}
-						
-						// Otherwise, loop over variables.
-						for iv, v := range ana.Variables {
-
-							// Fill histo (and fill tree) with full slices...
-							if v.isSlice {
-								xs := getF64s[iv]()								
-								for _, x := range xs {
-									ana.HbookHistos[iv][ic][iSamp].Fill(x, w)
-								}
-								if ana.DumpTree {
-									ana.dumpedVars[iv] = xs
-									ana.dumpedVarsN[iv] = int32(len(xs))
-								}
-				
-							} else {
-								// ... or the single variable value.
-								x := getF64[iv]()
-								ana.HbookHistos[iv][ic][iSamp].Fill(x, w)
-								if ana.DumpTree {
-									ana.dumpedVar[iv] = x
-								}
-							}
-						}
-
-					}
-					
-					if ana.DumpTree {
-						_, err = tOut.Write()
-						if err != nil {
-							log.Fatalf("could not write event in a tree: %+v", err)
-						}
-					}
-					
-					return nil
-				})
-
-				// Keep track of the number of processed events.
-				switch ana.Nevts {
-				case -1:
-					ana.nEvents += t.Entries()
-				default:
-					ana.nEvents += ana.Nevts
-				}
-
-				return nil
-			}(iComp)
-		}
+	for i := range ana.Samples {
+		ana.HbookHistos[i] = ana.fillSampleHistos(i)
 	}
 
 	// Histograms are now filled.
@@ -376,10 +209,195 @@ func (ana *Maker) FillHistos() error {
 	return nil
 }
 
+func (ana *Maker) fillSampleHistos(sampleIdx int) [][]*hbook.H1D {
+
+	// Current sample
+	samp := ana.Samples[sampleIdx]
+
+	// Initiate the structure of the histo container: h[iCut][iVar]
+	h := make([][]*hbook.H1D, len(ana.KinemCuts))
+	for iCut := range ana.KinemCuts {
+		h[iCut] = make([]*hbook.H1D, len(ana.Variables))
+		for iVar, v := range ana.Variables {
+			h[iCut][iVar] = hbook.NewH1D(v.Nbins, v.Xmin, v.Xmax)
+		}
+	}
+	
+	// Output in case of TTree dumping
+	var fOut *groot.File
+	var tOut  rtree.Writer
+	if ana.DumpTree {
+		fOut, tOut = ana.getOutFileTree(samp.Name+".root", "GOtree")
+		defer fOut.Close()
+		defer tOut.Close()
+	}
+	
+	// Loop over the sample components
+	for iComp, comp := range samp.components {
+		
+		// Anonymous function to avoid memory-leaks due to 'defer'
+		func(j int) error {
+			
+			// Get the file and tree
+			f, t := getTreeFromFile(comp.FileName, comp.TreeName)
+			defer f.Close()
+			
+			// Get the tree reader
+			r, err := rtree.NewReader(t, []rtree.ReadVar{}, rtree.WithRange(0, ana.Nevts))
+			if err != nil {
+				log.Fatal("could not create tree reader: %w", err)
+			}
+			defer r.Close()
+			
+			// Prepare variables
+			ok := false
+			getF64 := make([]func() float64, len(ana.Variables))
+			getF64s := make([]func() []float64, len(ana.Variables))
+			for iv, v := range ana.Variables {
+				v.isSlice = false
+				idx := iv
+				if getF64[idx], ok = v.TreeFunc.GetFuncF64(r); !ok {
+					v.isSlice = true
+					if getF64s[idx], ok = v.TreeFunc.GetFuncF64s(r); !ok {
+						err := `Type assertion failed [variable "%v"]:`
+						err += ` TreeFunc.Fct must return a float64 or a []float64.`
+						log.Fatalf(err, v.Name)
+					}
+				}
+			}
+			
+			// Prepare the sample global weight
+			getWeightSamp := func() float64 { return float64(1.0) }
+			if samp.WeightFunc.Fct != nil {
+				if getWeightSamp, ok = samp.WeightFunc.GetFuncF64(r); !ok {
+					err := `Type assertion failed [weight of %v]:`
+					err += ` TreeFunc.Fct must return a float64.`
+					log.Fatalf(err, samp.Name)
+				}
+			}
+			
+			// Prepare the additional weight of the component
+			getWeightComp := func() float64 { return float64(1.0) }
+			if comp.WeightFunc.Fct != nil {
+				if getWeightComp, ok = comp.WeightFunc.GetFuncF64(r); !ok {
+					err := `Type assertion failed [weight of (%v, %v)]:`
+					err += ` TreeFunc.Fct must return a float64.`
+					log.Fatalf(err, samp.Name, comp.FileName)
+				}
+			}
+			
+			// Prepare the sample global cut
+			passCutSamp := func() bool { return true }
+			if samp.CutFunc.Fct != nil {
+				if passCutSamp, ok = samp.CutFunc.GetFuncBool(r); !ok {
+					err := `Type assertion failed [Cut of %v]:`
+					err += ` TreeFunc.Fct must return a bool.\n`
+					err += `\t -> Make sure to use NewCutBool(), not NewVarBool().`
+					log.Fatalf(err, samp.Name)
+					}
+			}
+			
+			// Prepare the component additional cut
+			passCutComp := func() bool { return true }
+			if comp.CutFunc.Fct != nil {
+				if passCutComp, ok = comp.CutFunc.GetFuncBool(r); !ok {
+					err := `Type assertion failed [Cut of (%v, %v)]:`
+					err += ` TreeFunc.Fct must return a bool.\n`
+					err += `\t -> Make sure to use NewCutBool(), not NewVarBool().`
+					log.Fatalf(err, samp.Name, comp.FileName)
+				}
+			}
+			
+			// Prepare the cut string for kinematics
+			passKinemCut := make([]func() bool, len(ana.KinemCuts))
+			for ic, cut := range ana.KinemCuts {
+				idx := ic
+				if passKinemCut[idx], ok = cut.TreeFunc.GetFuncBool(r); !ok {
+					err := "Type assertion failed [selection \"%v\"]:"
+					err += " TreeFunc.Fct must return a bool.\n"
+					err += "\t -> Make sure to use NewCutBool(), not NewVarBool()."
+					log.Fatal(fmt.Sprintf(err, cut.Name))
+					}
+			}
+			
+			// Read the tree (event loop)
+			err = r.Read(func(ctx rtree.RCtx) error {
+				
+				// Sample-level and component-level cut
+				if !( passCutSamp() && passCutComp() ) {
+					return nil
+				}
+				
+				// Get the event weight
+				w := getWeightSamp() * getWeightComp()
+				
+				// Loop over selection and variables
+				for ic := range ana.KinemCuts {
+					
+					// Look at the next selection if the event is not selected.
+					if !passKinemCut[ic]() {
+						continue
+					}
+					
+					// Keep track which selection is passed.
+					if ana.DumpTree {
+						ana.dumpedVar[ana.nVars+ic] = 1.0
+					}
+					
+					// Otherwise, loop over variables.
+					for iv, v := range ana.Variables {
+						
+						// Fill histo (and fill tree) with full slices...
+						if v.isSlice {
+							xs := getF64s[iv]()								
+							for _, x := range xs {
+								h[ic][iv].Fill(x, w)
+							}
+							if ana.DumpTree {
+								ana.dumpedVars[iv] = xs
+								ana.dumpedVarsN[iv] = int32(len(xs))
+							}
+							
+						} else {
+							// ... or the single variable value.
+							x := getF64[iv]()
+							h[ic][iv].Fill(x, w)
+							if ana.DumpTree {
+								ana.dumpedVar[iv] = x
+							}
+						}
+					}
+					
+				}
+				
+				if ana.DumpTree {
+					_, err = tOut.Write()
+					if err != nil {
+						log.Fatalf("could not write event in a tree: %+v", err)
+					}
+				}
+				
+				return nil
+			})
+			
+			// Keep track of the number of processed events.
+			switch ana.Nevts {
+			case -1:
+				ana.nEvents += t.Entries()
+			default:
+				ana.nEvents += ana.Nevts
+			}
+			
+			return nil
+		}(iComp)
+	}
+	return h
+}
+
 // PlotHistos loops over all filled histograms and produce one plot
 // for each variable and selection, including all sample histograms.
 func (ana *Maker) PlotHistos() error {
-
+	
 	// Start timing
 	start := time.Now()
 
@@ -406,20 +424,20 @@ func (ana *Maker) PlotHistos() error {
 	}
 
 	// Loop over variables
-	for iv, h_sel_samples := range ana.HbookHistos {
-
+	for _, iVar := range ana.varIdx {
+		
 		// Current variable
-		v := ana.Variables[iv]
-
+		v := ana.Variables[iVar]
+		
 		// Loop over selections
-		for isel, hsamples := range h_sel_samples {
-
+		for _, iCut := range ana.cutIdx {
+			
 			var (
 				p               = hplot.New()
 				bhData          = hbook.NewH1D(v.Nbins, v.Xmin, v.Xmax)
 				bhBkgTot        = hbook.NewH1D(v.Nbins, v.Xmin, v.Xmax)
 				bhSigTot        = hbook.NewH1D(v.Nbins, v.Xmin, v.Xmax)
-				norm_histos     = make([]float64, 0, len(hsamples))
+				norm_histos     = make([]float64, 0, len(ana.Samples))
 				normTot         = 0.0
 				bhBkgs_postnorm []*hbook.H1D
 				phBkgs          []*hplot.H1D
@@ -432,8 +450,11 @@ func (ana *Maker) PlotHistos() error {
 			p.Title.Text = ana.PlotTitle
 
 			// First sample loop: compute normalisation, sum bkg bh, keep data bh
-			for is, h := range hsamples {
+			for iSample := range ana.Samples {
 
+				// Get the current histogram
+				h := ana.HbookHistos[iSample][iCut][iVar]
+				
 				// Compute the integral of the current histo
 				n := h.Integral()
 
@@ -441,7 +462,7 @@ func (ana *Maker) PlotHistos() error {
 				norm_histos = append(norm_histos, n)
 
 				// For background only
-				if ana.Samples[is].IsBkg() {
+				if ana.Samples[iSample].IsBkg() {
 					normTot += n
 				}
 
@@ -451,60 +472,63 @@ func (ana *Maker) PlotHistos() error {
 				}
 
 				// Keep data apart
-				if ana.Samples[is].IsData() {
+				if ana.Samples[iSample].IsData() {
 					bhData = h
 				}
 			}
 
 			// Second sample loop: normalize bh, prepare background stack
-			for is, h := range hsamples {
-
+			for iSample := range ana.Samples {
+				
+				// Get the current histogram
+				h := ana.HbookHistos[iSample][iCut][iVar]
+				
 				// Deal with normalization
 				if ana.HistoNorm {
-					switch ana.Samples[is].sType {
+					switch ana.Samples[iSample].sType {
 					case data:
-						h.Scale(1 / norm_histos[is])
+						h.Scale(1 / norm_histos[iSample])
 					case bkg, sig:
 						if ana.HistoStack {
 							h.Scale(1. / normTot)
 						} else {
-							h.Scale(1. / norm_histos[is])
+							h.Scale(1. / norm_histos[iSample])
 						}
 					}
 				}
-
+				
 				// Get plottable histogram and add it to the legend
-				ana.HplotHistos[iv][isel][is] = ana.Samples[is].CreateHisto(h)
-				p.Legend.Add(ana.Samples[is].LegLabel, ana.HplotHistos[iv][isel][is])
-
+				ana.HplotHistos[iSample][iCut][iVar] = ana.Samples[iSample].CreateHisto(h)
+				p.Legend.Add(ana.Samples[iSample].LegLabel, ana.HplotHistos[iSample][iCut][iVar])
+				
 				// Keep track of different histo given their type
-				switch ana.Samples[is].sType {
-
+				switch ana.Samples[iSample].sType {
+					
 				// Keep data appart from backgrounds, style it.
 				case data:
-					phData = ana.HplotHistos[iv][isel][is]
-					if ana.Samples[is].DataStyle {
+					phData = ana.HplotHistos[iSample][iCut][iVar]
+					if ana.Samples[iSample].DataStyle {
 						style.ApplyToDataHist(phData)
-						if ana.Samples[is].CircleSize > 0 {
-							phData.GlyphStyle.Radius = ana.Samples[is].CircleSize
+						if ana.Samples[iSample].CircleSize > 0 {
+							phData.GlyphStyle.Radius = ana.Samples[iSample].CircleSize
 						}
-						if ana.Samples[is].YErrBarsLineWidth > 0 {
-							phData.YErrs.LineStyle.Width = ana.Samples[is].YErrBarsLineWidth
+						if ana.Samples[iSample].YErrBarsLineWidth > 0 {
+							phData.YErrs.LineStyle.Width = ana.Samples[iSample].YErrBarsLineWidth
 						}
-						if ana.Samples[is].YErrBarsCapWidth > 0 {
-							phData.YErrs.CapWidth = ana.Samples[is].YErrBarsCapWidth
+						if ana.Samples[iSample].YErrBarsCapWidth > 0 {
+							phData.YErrs.CapWidth = ana.Samples[iSample].YErrBarsCapWidth
 						}
 					}
 
 				// Sum-up normalized bkg and store all bkgs in a slice for the stack
 				case bkg:
-					phBkgs = append(phBkgs, ana.HplotHistos[iv][isel][is])
+					phBkgs = append(phBkgs, ana.HplotHistos[iSample][iCut][iVar])
 					bhBkgs_postnorm = append(bhBkgs_postnorm, h)
 					bhBkgTot = hbook.AddH1D(h, bhBkgTot)
 
 				//
 				case sig:
-					phSigs = append(phSigs, ana.HplotHistos[iv][isel][is])
+					phSigs = append(phSigs, ana.HplotHistos[iSample][iCut][iVar])
 					bhSigs_postnorm = append(bhSigs_postnorm, h)
 					bhSigTot = hbook.AddH1D(h, bhSigTot)
 				}
@@ -650,7 +674,7 @@ func (ana *Maker) PlotHistos() error {
 			style.ApplyToFigure(f)
 			f.Latex = latex
 
-			path := ana.SavePath + "/" + ana.KinemCuts[isel].Name
+			path := ana.SavePath + "/" + ana.KinemCuts[iCut].Name
 			if _, err := os.Stat(path); os.IsNotExist(err) {
 				os.MkdirAll(path, 0755)
 			}
@@ -743,25 +767,16 @@ func (ana *Maker) Run() error {
 // Helper function to initialize histogram containers
 func (ana *Maker) initHistoContainers() {
 
-	// Initialize hbook H1D
-	ana.HbookHistos = make([][][]*hbook.H1D, len(ana.Variables))
-	for iv := range ana.HbookHistos {
-		ana.HbookHistos[iv] = make([][]*hbook.H1D, len(ana.KinemCuts))
-		for isel := range ana.KinemCuts {
-			ana.HbookHistos[iv][isel] = make([]*hbook.H1D, len(ana.Samples))
-			v := ana.Variables[iv]
-			for isample := range ana.HbookHistos[iv][isel] {
-				ana.HbookHistos[iv][isel][isample] = hbook.NewH1D(v.Nbins, v.Xmin, v.Xmax)
-			}
-		}
-	}
-
+	// Initialize hbook H1D as N[samples] 2D-slices.
+	// Cut x variable initialization is done in fillSampleHistos().
+	ana.HbookHistos = make([][][]*hbook.H1D, len(ana.Samples))
+	
 	// Inititialize hplot H1D
-	ana.HplotHistos = make([][][]*hplot.H1D, len(ana.Variables))
-	for iv := range ana.HplotHistos {
-		ana.HplotHistos[iv] = make([][]*hplot.H1D, len(ana.KinemCuts))
-		for isel := range ana.KinemCuts {
-			ana.HplotHistos[iv][isel] = make([]*hplot.H1D, len(ana.Samples))
+	ana.HplotHistos = make([][][]*hplot.H1D, len(ana.Samples))
+	for iSamp := range ana.Samples {
+		ana.HplotHistos[iSamp] = make([][]*hplot.H1D, len(ana.KinemCuts))
+		for iCut := range ana.KinemCuts {
+			ana.HplotHistos[iSamp][iCut] = make([]*hplot.H1D, len(ana.Variables))
 		}
 	}
 
@@ -810,8 +825,10 @@ func (ana *Maker) setAutoStyle() {
 }
 
 func (ana *Maker) assessVariableTypes() {
-	
-	f, t := getTreeFromFile(ana.Samples[0].components[0].FileName, ana.Samples[0].components[0].TreeName)
+
+	fName := ana.Samples[0].components[0].FileName
+	tName := ana.Samples[0].components[0].TreeName
+	f, t := getTreeFromFile(fName, tName)
 	defer f.Close()
 	r, err := rtree.NewReader(t, []rtree.ReadVar{})
 	if err != nil {
