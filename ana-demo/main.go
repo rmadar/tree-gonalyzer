@@ -81,11 +81,12 @@ var (
 	// TreeFunc: variables, weights and cuts
 	combFunc = ana.TreeFunc{
 		VarsName: []string{"t_pt", "truth_dphi_ll"},
+		//Fct: func(pt float32, dphi float64) float64 {
+		//	return float64(pt) / 10.
 		Fct: func(pt float32, dphi float64) []float64 {
 			return []float64{dphi, float64(pt) / 10.}
 		},
 	}
-
 	w1     = ana.TreeValF64(0.5)
 	w2     = ana.TreeValF64(0.25)
 	wptPos = ana.TreeFunc{

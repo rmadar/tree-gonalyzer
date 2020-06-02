@@ -30,6 +30,10 @@ type config struct {
 		val int64 // Maximum of processed events.
 		usr bool
 	}
+	SampleMT struct {
+		val bool // Enable concurency over samples.
+		usr bool
+	}
 	SavePath struct {
 		val string // Path to which plot will be saved.
 		usr bool
@@ -217,6 +221,14 @@ func WithNevts(n int64) Options {
 		cfg.Nevts.val = n
 		cfg.Nevts.usr = true
 
+	}
+}
+
+// WithSampleMT enables a concurent sample processing.
+func WithSampleMT(b bool) Options {
+	return func(cfg *config) {
+		cfg.SampleMT.val = b
+		cfg.SampleMT.usr = true
 	}
 }
 

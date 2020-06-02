@@ -33,8 +33,9 @@ type Maker struct {
 	Samples   []*Sample    // List of samples on which to run.
 	Variables []*Variable  // List of variables to plot.
 	KinemCuts []*Selection // List of cuts to apply (default: no cut).
-	Nevts     int64        // Maximum number of event to process.
-
+	Nevts     int64        // Maximum number of events per components.
+	SampleMT   bool        // Enable concurency accross samples
+	
 	// Ouputs
 	SavePath     string // Path to which plot will be saved (default: 'plots').
 	SaveFormat   string // Plot file extension: 'png' (default), 'pdf' or 'png'.
@@ -80,6 +81,7 @@ func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 		Samples:      s,
 		Variables:    v,
 		Nevts:        -1,
+		SampleMT:     true,
 		AutoStyle:    true,
 		SavePath:     "plots",
 		SaveFormat:   "png",
@@ -107,6 +109,9 @@ func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 	}
 	if cfg.Nevts.usr {
 		a.Nevts = cfg.Nevts.val
+	}
+	if cfg.SampleMT.usr {
+		a.SampleMT = cfg.SampleMT.val
 	}
 	if cfg.SavePath.usr {
 		a.SavePath = cfg.SavePath.val
@@ -195,19 +200,16 @@ func (ana *Maker) FillHistos() error {
 	start := time.Now()
 
 	// Loop over the samples
-	doConc := true
-	if doConc {
+	if ana.SampleMT {
 		var wg sync.WaitGroup
 		for i := range ana.Samples {
 			wg.Add(1)
-			histos := make(chan [][]*hbook.H1D)
-			go ana.concurrentFillSampleHistos(i, &wg, histos)
-			ana.HbookHistos[i] = <-histos
+			go ana.concurrentFillSampleHistos(i, &wg)
 		}
 		wg.Wait()
 	} else {
 		for i := range ana.Samples {
-			ana.HbookHistos[i] = ana.fillSampleHistos(i)
+			ana.fillSampleHistos(i)
 		}
 	}
 
@@ -220,19 +222,16 @@ func (ana *Maker) FillHistos() error {
 	return nil
 }
 
-func (ana *Maker) concurrentFillSampleHistos(sampleIdx int, wg *sync.WaitGroup, hres chan [][]*hbook.H1D) {
+func (ana *Maker) concurrentFillSampleHistos(sampleIdx int, wg *sync.WaitGroup) {
 
 	// Handle concurency
 	defer wg.Done()
 
 	// Fill the histo
-	h := ana.fillSampleHistos(sampleIdx)
-
-	// Fill the channel
-	hres <- h
+	ana.fillSampleHistos(sampleIdx)
 }
 
-func (ana *Maker) fillSampleHistos(sampleIdx int) [][]*hbook.H1D {
+func (ana *Maker) fillSampleHistos(sampleIdx int) {
 
 	// Current sample
 	samp := ana.Samples[sampleIdx]
@@ -281,18 +280,22 @@ func (ana *Maker) fillSampleHistos(sampleIdx int) [][]*hbook.H1D {
 			getF64 := make([]func() float64, len(ana.Variables))
 			getF64s := make([]func() []float64, len(ana.Variables))
 			for iv, v := range ana.Variables {
-				v.isSlice = false
 				idx := iv
-				if getF64[idx], ok = v.TreeFunc.GetFuncF64(r); !ok {
-					v.isSlice = true
+				if !v.isSlice {
+					if getF64[idx], ok = v.TreeFunc.GetFuncF64(r); !ok {
+						err := "Type assertion failed [variable \"%v\"]:"
+						err += " this TreeFunc.Fct is supposed to return a float64."
+						log.Fatalf(err, v.Name)
+					}
+				} else {
 					if getF64s[idx], ok = v.TreeFunc.GetFuncF64s(r); !ok {
 						err := "Type assertion failed [variable \"%v\"]:"
-						err += " TreeFunc.Fct must return a float64 or a []float64."
+						err += " this TreeFunc.Fct is supposed to return a []float64."
 						log.Fatalf(err, v.Name)
 					}
 				}
 			}
-
+			
 			// Prepare the sample global weight
 			getWeightSamp := func() float64 { return float64(1.0) }
 			if samp.WeightFunc.Fct != nil {
@@ -394,7 +397,7 @@ func (ana *Maker) fillSampleHistos(sampleIdx int) [][]*hbook.H1D {
 					}
 
 				}
-
+				
 				if ana.DumpTree {
 					_, err = tOut.Write()
 					if err != nil {
@@ -422,7 +425,7 @@ func (ana *Maker) fillSampleHistos(sampleIdx int) [][]*hbook.H1D {
 		}(iComp)
 	}
 
-	return h
+	ana.HbookHistos[sampleIdx] = h
 }
 
 // PlotHistos loops over all filled histograms and produce one plot
