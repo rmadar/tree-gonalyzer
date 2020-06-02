@@ -3,7 +3,11 @@
 [![Documentation](https://godoc.org/github.com/rmadar/tree-gonalyzer?status.svg)](https://godoc.org/github.com/rmadar/tree-gonalyzer)
 
 This is a tool written in go to produce publication-quality plots from ROOT TTrees in an flexible and easy way.
-This tool is built on top of [go-hep.org](https://go-hep.org).
+This tool is built on top of [go-hep.org](https://go-hep.org). The main supported features are:
+ - histograming over many samples, selections and variables
+ - computation of new (high-level) variables
+ - tree dumping
+ - concurent sample processings.
 
 ## In a nutshell
 
