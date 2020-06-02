@@ -24,7 +24,7 @@ func main() {
 
 	// Scan number of events
 	nEvts1, nEvts2, nEvts3, nEvts4 := 10, 20, 50, 100
-	
+
 	// Containers
 	t1 := make([]float64, len(nVars))
 	t2 := make([]float64, len(nVars))
@@ -129,43 +129,43 @@ func runTest(n10kEvtsPerSample, nVariables int) float64 {
 	samples := []*ana.Sample{splData, splBkg1, splBkg2, splBkg3, splBkg4}
 
 	// Variables, organized in bunch of 17
-	variables := []*ana.Variable {
-		
+	variables := []*ana.Variable{
+
 		/*var_dphi, var_Crr, var_Cnn, var_Ckk, var_dphi,
-			var_dphi, var_Crr, var_Cnn, var_Ckk, var_dphi,
-			var_dphi, var_Crr, var_Cnn, var_Ckk, var_dphi,
-			var_dphi, var_Crr, var_Cnn, var_Ckk, var_dphi,
-			
-			var_dphi, var_Crr, var_Cnn, var_Ckk, var_dphi,
-			var_dphi, var_Crr, var_Cnn, var_Ckk, var_dphi,
-			var_dphi, var_Crr, var_Cnn, var_Ckk, var_dphi,
-			var_dphi, var_Crr, var_Cnn, var_Ckk, var_dphi,
-			
-			var_dphi, var_Crr, var_Cnn, var_Ckk, var_dphi,
-			var_dphi, var_Crr, var_Cnn, var_Ckk, var_dphi,
-			var_dphi, var_Crr, var_Cnn, var_Ckk, var_dphi,
-			var_dphi, var_Crr, var_Cnn, var_Ckk, var_dphi,
-		*/	
+		var_dphi, var_Crr, var_Cnn, var_Ckk, var_dphi,
+		var_dphi, var_Crr, var_Cnn, var_Ckk, var_dphi,
+		var_dphi, var_Crr, var_Cnn, var_Ckk, var_dphi,
+
+		var_dphi, var_Crr, var_Cnn, var_Ckk, var_dphi,
+		var_dphi, var_Crr, var_Cnn, var_Ckk, var_dphi,
+		var_dphi, var_Crr, var_Cnn, var_Ckk, var_dphi,
+		var_dphi, var_Crr, var_Cnn, var_Ckk, var_dphi,
+
+		var_dphi, var_Crr, var_Cnn, var_Ckk, var_dphi,
+		var_dphi, var_Crr, var_Cnn, var_Ckk, var_dphi,
+		var_dphi, var_Crr, var_Cnn, var_Ckk, var_dphi,
+		var_dphi, var_Crr, var_Cnn, var_Ckk, var_dphi,
+		*/
 
 		var_dphi, var_m_tt, var_eta_t, var_pt_lep, var_Ckk,
-			var_Crr, var_Cnn, var_pt_lep, var_eta_lep, var_pt_b,
-			var_eta_b, var_pt_vsum, var_pt_t, var_pt_tt, var_x1,
-			var_x1x2, var_GG,
-			
-			var_dphi, var_m_tt, var_eta_t, var_pt_lep, var_Ckk,
-			var_Crr, var_Cnn, var_pt_lep, var_eta_lep, var_pt_b,
-			var_eta_b, var_pt_vsum, var_pt_t, var_pt_tt, var_x1,
-			var_x1x2, var_GG,
-			
-			var_dphi, var_m_tt, var_eta_t, var_pt_lep, var_Ckk,
-			var_Crr, var_Cnn, var_pt_lep, var_eta_lep, var_pt_b,
-			var_eta_b, var_pt_vsum, var_pt_t, var_pt_tt, var_x1,
-			var_x1x2, var_GG,
-			
-			var_dphi, var_m_tt, var_eta_t, var_pt_lep, var_Ckk,
-			var_Crr, var_Cnn, var_pt_lep, var_eta_lep, var_pt_b,
-			var_eta_b, var_pt_vsum, var_pt_t, var_pt_tt, var_x1,
-			var_x1x2, var_GG,
+		var_Crr, var_Cnn, var_pt_lep, var_eta_lep, var_pt_b,
+		var_eta_b, var_pt_vsum, var_pt_t, var_pt_tt, var_x1,
+		var_x1x2, var_GG,
+
+		var_dphi, var_m_tt, var_eta_t, var_pt_lep, var_Ckk,
+		var_Crr, var_Cnn, var_pt_lep, var_eta_lep, var_pt_b,
+		var_eta_b, var_pt_vsum, var_pt_t, var_pt_tt, var_x1,
+		var_x1x2, var_GG,
+
+		var_dphi, var_m_tt, var_eta_t, var_pt_lep, var_Ckk,
+		var_Crr, var_Cnn, var_pt_lep, var_eta_lep, var_pt_b,
+		var_eta_b, var_pt_vsum, var_pt_t, var_pt_tt, var_x1,
+		var_x1x2, var_GG,
+
+		var_dphi, var_m_tt, var_eta_t, var_pt_lep, var_Ckk,
+		var_Crr, var_Cnn, var_pt_lep, var_eta_lep, var_pt_b,
+		var_eta_b, var_pt_vsum, var_pt_t, var_pt_tt, var_x1,
+		var_x1x2, var_GG,
 	}
 
 	// Protection for too high number of variables
@@ -179,7 +179,6 @@ func runTest(n10kEvtsPerSample, nVariables int) float64 {
 
 	// Create analyzer object with options
 	analyzer := ana.New(samples, variables[:nVars],
-		ana.WithAutoStyle(true),
 		ana.WithCompileLatex(false),
 		ana.WithHistoNorm(true),
 		ana.WithHistoStack(true),
@@ -192,7 +191,7 @@ func runTest(n10kEvtsPerSample, nVariables int) float64 {
 	if err := analyzer.PlotHistos(); err != nil {
 		log.Fatal("Cannot plot histos:", err)
 	}
-	
+
 	return analyzer.RunTimePerKEvts()
 }
 
@@ -205,16 +204,16 @@ var (
 	tname = "truth"
 
 	// Some TreeFunc: weights and cuts
-	w1   = ana.NewValF64(0.5)
-	w2   = ana.NewValF64(2.0)
-	isGG = ana.NewVarBool("init_gg")
-	isQQ = ana.NewVarBool("init_qq")
+	w1   = ana.TreeValF64(0.5)
+	w2   = ana.TreeValF64(2.0)
+	isGG = ana.TreeVarBool("init_gg")
+	isQQ = ana.TreeVarBool("init_qq")
 
 	// Variables
 	var_dphi = &ana.Variable{
 		Name:       "truth_dphi_ll",
 		SaveName:   "truth_dphi_ll",
-		TreeFunc:   ana.NewVarF64("truth_dphi_ll"),
+		TreeFunc:   ana.TreeVarF64("truth_dphi_ll"),
 		Nbins:      15,
 		Xmin:       0,
 		Xmax:       math.Pi,
@@ -228,7 +227,7 @@ var (
 	var_Ckk = &ana.Variable{
 		Name:       "truth_Ckk",
 		SaveName:   "truth_Ckk",
-		TreeFunc:   ana.NewVarF64("truth_Ckk"),
+		TreeFunc:   ana.TreeVarF64("truth_Ckk"),
 		Nbins:      25,
 		Xmin:       -1,
 		Xmax:       1,
@@ -243,7 +242,7 @@ var (
 	var_Crr = &ana.Variable{
 		Name:       "truth_Crr",
 		SaveName:   "truth_Crr",
-		TreeFunc:   ana.NewVarF64("truth_Crr"),
+		TreeFunc:   ana.TreeVarF64("truth_Crr"),
 		Nbins:      25,
 		Xmin:       -1,
 		Xmax:       1,
@@ -258,7 +257,7 @@ var (
 	var_Cnn = &ana.Variable{
 		Name:       "truth_Cnn",
 		SaveName:   "truth_Cnn",
-		TreeFunc:   ana.NewVarF64("truth_Cnn"),
+		TreeFunc:   ana.TreeVarF64("truth_Cnn"),
 		Nbins:      25,
 		Xmin:       -1,
 		Xmax:       1,
@@ -273,7 +272,7 @@ var (
 	var_pt_lep = &ana.Variable{
 		Name:       "pt_lep",
 		SaveName:   "pt_lep",
-		TreeFunc:   ana.NewVarF32("l_pt"),
+		TreeFunc:   ana.TreeVarF32("l_pt"),
 		Nbins:      25,
 		Xmin:       0,
 		Xmax:       500,
@@ -286,7 +285,7 @@ var (
 	var_eta_lep = &ana.Variable{
 		Name:       "eta_lep",
 		SaveName:   "eta_lep",
-		TreeFunc:   ana.NewVarF32("l_eta"),
+		TreeFunc:   ana.TreeVarF32("l_eta"),
 		Nbins:      25,
 		Xmin:       -5,
 		Xmax:       5,
@@ -300,7 +299,7 @@ var (
 	var_pt_b = &ana.Variable{
 		Name:       "pt_b",
 		SaveName:   "pt_b",
-		TreeFunc:   ana.NewVarF32("b_pt"),
+		TreeFunc:   ana.TreeVarF32("b_pt"),
 		Nbins:      25,
 		Xmin:       0,
 		Xmax:       500,
@@ -313,7 +312,7 @@ var (
 	var_eta_b = &ana.Variable{
 		Name:       "eta_b",
 		SaveName:   "eta_b",
-		TreeFunc:   ana.NewVarF32("b_eta"),
+		TreeFunc:   ana.TreeVarF32("b_eta"),
 		Nbins:      25,
 		Xmin:       -5,
 		Xmax:       5,
@@ -327,7 +326,7 @@ var (
 	var_pt_vsum = &ana.Variable{
 		Name:        "vsum_pt",
 		SaveName:    "pt_vsum",
-		TreeFunc:    ana.NewVarF32("vsum_pt"),
+		TreeFunc:    ana.TreeVarF32("vsum_pt"),
 		Nbins:       25,
 		Xmin:        0,
 		Xmax:        250,
@@ -341,7 +340,7 @@ var (
 	var_pt_t = &ana.Variable{
 		Name:     "t_pt",
 		SaveName: "pt_t",
-		TreeFunc: ana.NewVarF32("t_pt"),
+		TreeFunc: ana.TreeVarF32("t_pt"),
 		Nbins:    100,
 		Xmin:     0,
 		Xmax:     500,
@@ -356,7 +355,7 @@ var (
 	var_eta_t = &ana.Variable{
 		Name:       "eta_t",
 		SaveName:   "eta_t",
-		TreeFunc:   ana.NewVarF32("t_eta"),
+		TreeFunc:   ana.TreeVarF32("t_eta"),
 		Nbins:      25,
 		Xmin:       -5,
 		Xmax:       5,
@@ -371,7 +370,7 @@ var (
 	var_m_tt = &ana.Variable{
 		Name:       "m_tt",
 		SaveName:   "m_tt",
-		TreeFunc:   ana.NewVarF32("ttbar_m"),
+		TreeFunc:   ana.TreeVarF32("ttbar_m"),
 		Nbins:      25,
 		Xmin:       300,
 		Xmax:       1500,
@@ -384,7 +383,7 @@ var (
 	var_pt_tt = &ana.Variable{
 		Name:       "pt_tt",
 		SaveName:   "pt_tt",
-		TreeFunc:   ana.NewVarF32("ttbar_pt"),
+		TreeFunc:   ana.TreeVarF32("ttbar_pt"),
 		Nbins:      25,
 		Xmin:       0,
 		Xmax:       150,
@@ -396,16 +395,15 @@ var (
 
 	var_x1 = &ana.Variable{
 		SaveName: "init_x1",
-		TreeFunc: ana.NewVarF32("init_x1"),
+		TreeFunc: ana.TreeVarF32("init_x1"),
 		Nbins:    25,
 		Xmin:     0,
 		Xmax:     1,
 	}
 
-
 	var_GG = &ana.Variable{
 		SaveName: "init_gg",
-		TreeFunc: ana.NewVarBool("init_qq"),
+		TreeFunc: ana.TreeVarBool("init_qq"),
 		Nbins:    2,
 		Xmin:     0,
 		Xmax:     2,
