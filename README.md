@@ -6,7 +6,7 @@ This is a tool written in go to produce publication-quality plots from ROOT TTre
 This tool is built on top of [go-hep.org](https://go-hep.org). The main supported features are:
  - histograming variables over many samples and selections,
  - computing of new variables of arbitrary complexity,
- - tree dumping,
+ - dumping `TTree`s
  - concurent sample processings,
 
 ## In a nutshell
@@ -74,7 +74,6 @@ For 2M events and 60 variables, a comparison with similar ROOT-based code
  + `ROOT  -> 6.2 ms/kEvts`
  + `GOHEP -> 2.0 ms/kEvts`
  
-Testing on only one variable to avoid event-loop repetition
-in case of `t->Draw()` (even if it's probably not like doing N times the loop):
+For 2M event and one variable (avoiding `t->Draw()` repetition)
  + `ROOT  -> 0.39 ms/kEvts`
  + `GOHEP -> 0.11 ms/kEvts`
