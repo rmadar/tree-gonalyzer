@@ -33,6 +33,9 @@ func main() {
 
 	// Run all test
 	for i, n := range nVars {
+		//if n != 60 {
+		//	continue
+		//}
 		fmt.Println("Running for nVars =", n)
 		t1[i] = runTest(nEvts1, int(n))
 		fmt.Printf("  -> 0.5M evts: %.2f ms/kEvts\n", t1[i])
@@ -179,6 +182,7 @@ func runTest(n10kEvtsPerSample, nVariables int) float64 {
 
 	// Create analyzer object with options
 	analyzer := ana.New(samples, variables[:nVars],
+		ana.WithSaveFormat("tex"),
 		ana.WithCompileLatex(false),
 		ana.WithHistoNorm(true),
 		ana.WithHistoStack(true),
