@@ -7,7 +7,8 @@ import (
 	"log"
 	"os"
 	"time"
-
+	"sync"
+	
 	"gonum.org/v1/plot/plotutil"
 	"gonum.org/v1/plot/vg"
 
@@ -192,12 +193,24 @@ func (ana *Maker) FillHistos() error {
 
 	// Start timing
 	start := time.Now()
-
+	
 	// Loop over the samples
-	for i := range ana.Samples {
-		ana.HbookHistos[i] = ana.fillSampleHistos(i)
+	doConc := false
+	if doConc {
+		var wg sync.WaitGroup
+		for i := range ana.Samples {
+			wg.Add(1)
+			histos := make(chan [][]*hbook.H1D)
+			go ana.concurrentFillSampleHistos(i, histos)
+			ana.HbookHistos[i] = <- histos
+		}
+		wg.Wait()
+	} else {
+		for i := range ana.Samples {
+			ana.HbookHistos[i] = ana.fillSampleHistos(i)
+		}
 	}
-
+	
 	// Histograms are now filled.
 	ana.histoFilled = true
 
@@ -207,8 +220,22 @@ func (ana *Maker) FillHistos() error {
 	return nil
 }
 
+//func (ana *Maker) concurrentFillSampleHistos(sampleIdx int, wg *sync.WaitGroup, hres chan [][]*hbook.H1D) {
+func (ana *Maker) concurrentFillSampleHistos(sampleIdx int,  hres chan [][]*hbook.H1D) {
+
+	// Handle concurency
+	// defer wg.Done()
+
+	// Fill the histo
+	h := ana.fillSampleHistos(sampleIdx)
+
+	// Fill the channel
+	hres <- h
+}
+
 func (ana *Maker) fillSampleHistos(sampleIdx int) [][]*hbook.H1D {
 
+	
 	// Current sample
 	samp := ana.Samples[sampleIdx]
 
@@ -391,6 +418,7 @@ func (ana *Maker) fillSampleHistos(sampleIdx int) [][]*hbook.H1D {
 			return nil
 		}(iComp)
 	}
+
 	return h
 }
 
