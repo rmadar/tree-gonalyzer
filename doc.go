@@ -15,9 +15,9 @@
 //	   ana.NewVariable("plot3", ana.TreeVarF64("branchF64"), 50, 0, 1000),
 //      }
 //
-//      // Create analyzer object with some options
-//      analyzer := ana.New(samples, variables, ana.WithHistoNorm(true))
+// // Create analyzer object with some options
+// analyzer := ana.New(samples, variables, ana.WithHistoNorm(true))
 //
-//      // Produce plots
-//      analyzer.Run()
+// // Produce plots
+// analyzer.Run()
 package gonalyzer 
