@@ -379,48 +379,46 @@ func Example_shapeDistortion() {
 
 func Example_withKinemCuts() {
 
-
-	
 }
 
 func Example_withTreeDumping() {
 	// Weights and cuts
 	w := ana.TreeVarF32("weight")
 	isQQ := ana.TreeCutBool("init_qq")
-	
+
 	// Data sample.
 	data := ana.NewSample("data", "data", `Data 18-20`)
 	data.AddComponent(fData, tName)
 	data.AddComponent(fBkg1, tName)
-	
+
 	// Background A sample including three components.
 	bkgA := ana.NewSample("BkgTotA", "bkg", `Total Bkg A`, ana.WithWeight(w))
 	bkgA.AddComponent(fBkg1, tName)
 	bkgA.AddComponent(fBkg2, tName)
 	bkgA.AddComponent(fBkg1, tName, ana.WithCut(isQQ))
-	
+
 	// Background B sample including two components.
 	bkgB := ana.NewSample("BkgTotB", "bkg", `Total Bkg B`, ana.WithWeight(w))
 	bkgB.AddComponent(fBkg1, tName)
 	bkgB.AddComponent(fBkg2, tName)
-	
+
 	// Put samples together.
 	samples := []*ana.Sample{data, bkgA, bkgB}
-	
+
 	// Define variables
 	variables := []*ana.Variable{
 		ana.NewVariable("Mttbar", ana.TreeVarF32("ttbar_m"), 25, 350, 1000),
 		ana.NewVariable("DphiLL", ana.TreeVarF64("truth_dphi_ll"), 10, 0, math.Pi),
 	}
-	
+
 	// Define some selections
 	selections := []*ana.Selection{
 		&ana.Selection{
-			Name: "LowM",
+			Name:     "LowM",
 			TreeFunc: cutMlt500,
 		},
 		&ana.Selection{
-			Name: "HighM",
+			Name:     "HighM",
 			TreeFunc: cutMgt500,
 		},
 	}
@@ -495,13 +493,13 @@ var (
 	}
 	cutMlt500 = ana.TreeFunc{
 		VarsName: []string{"ttbar_m"},
-		Fct: func (m float32) bool { return m<500 },
+		Fct:      func(m float32) bool { return m < 500 },
 	}
 	cutMgt500 = ana.TreeFunc{
 		VarsName: []string{"ttbar_m"},
-		Fct: func (m float32) bool { return m>=500 },
+		Fct:      func(m float32) bool { return m >= 500 },
 	}
-	
+
 	// Some colors
 	noColor    = color.NRGBA{}
 	softBlack  = color.NRGBA{R: 50, G: 30, B: 50, A: 200}

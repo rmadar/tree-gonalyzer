@@ -6,9 +6,9 @@ import (
 	"image/color"
 	"log"
 	"os"
-	"time"
 	"sync"
-	
+	"time"
+
 	"gonum.org/v1/plot/plotutil"
 	"gonum.org/v1/plot/vg"
 
@@ -158,10 +158,10 @@ func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 	//                 by doing a loop over variables for the first
 	//                 component of the first sample to fill v.isSlice.
 	a.assessVariableTypes()
-	
+
 	// Initialize the variable with the proper types
 	a.initDumpedVars()
-	
+
 	return a
 }
 
@@ -193,7 +193,7 @@ func (ana *Maker) FillHistos() error {
 
 	// Start timing
 	start := time.Now()
-	
+
 	// Loop over the samples
 	doConc := true
 	if doConc {
@@ -202,7 +202,7 @@ func (ana *Maker) FillHistos() error {
 			wg.Add(1)
 			histos := make(chan [][]*hbook.H1D)
 			go ana.concurrentFillSampleHistos(i, &wg, histos)
-			ana.HbookHistos[i] = <- histos
+			ana.HbookHistos[i] = <-histos
 		}
 		wg.Wait()
 	} else {
@@ -210,12 +210,12 @@ func (ana *Maker) FillHistos() error {
 			ana.HbookHistos[i] = ana.fillSampleHistos(i)
 		}
 	}
-	
+
 	// Histograms are now filled.
 	ana.histoFilled = true
 
 	// End timing.
-	ana.timeLoop = time.Now().Sub(start)
+	ana.timeLoop = time.Since(start)
 
 	return nil
 }
@@ -234,7 +234,6 @@ func (ana *Maker) concurrentFillSampleHistos(sampleIdx int, wg *sync.WaitGroup, 
 
 func (ana *Maker) fillSampleHistos(sampleIdx int) [][]*hbook.H1D {
 
-	
 	// Current sample
 	samp := ana.Samples[sampleIdx]
 
@@ -369,7 +368,7 @@ func (ana *Maker) fillSampleHistos(sampleIdx int) [][]*hbook.H1D {
 					} else {
 						ana.dumpedVar[ana.nVars+ic] = 1.0
 					}
-					
+
 					// Otherwise, loop over variables.
 					for iv, v := range ana.Variables {
 
@@ -383,7 +382,7 @@ func (ana *Maker) fillSampleHistos(sampleIdx int) [][]*hbook.H1D {
 								ana.dumpedVars[iv] = xs
 								ana.dumpedVarsN[iv] = int32(len(xs))
 							}
-							
+
 						} else {
 							// ... or the single variable value.
 							x := getF64[iv]()
@@ -393,18 +392,23 @@ func (ana *Maker) fillSampleHistos(sampleIdx int) [][]*hbook.H1D {
 							}
 						}
 					}
-					
+
 				}
-				
+
 				if ana.DumpTree {
 					_, err = tOut.Write()
 					if err != nil {
 						log.Fatalf("could not write event in a tree: %+v", err)
 					}
 				}
-				
+
 				return nil
 			})
+
+			// Error check of rtree.Reader
+			if err != nil {
+				log.Fatalf("could not read tree: %+v", err)
+			}
 
 			// Keep track of the number of processed events.
 			switch ana.Nevts {
@@ -720,7 +724,7 @@ func (ana *Maker) PlotHistos() error {
 	}
 
 	// End timing
-	ana.timePlot = time.Now().Sub(start)
+	ana.timePlot = time.Since(start)
 
 	return nil
 }
@@ -857,7 +861,7 @@ func (ana *Maker) assessVariableTypes() {
 	tName := ana.Samples[0].components[0].TreeName
 	f, t := getTreeFromFile(fName, tName)
 	defer f.Close()
-	r, err := rtree.NewReader(t, []rtree.ReadVar{})
+	r, err := rtree.NewReader(t, rtree.NewReadVars(t))
 	if err != nil {
 		log.Fatal("could not create tree reader: %w", err)
 	}
@@ -867,8 +871,8 @@ func (ana *Maker) assessVariableTypes() {
 		if _, ok := v.TreeFunc.GetFuncF64(r); !ok {
 			v.isSlice = true
 			if _, ok = v.TreeFunc.GetFuncF64s(r); !ok {
-				err := `Type assertion failed [variable "%v"]:`
-				err += ` TreeFunc.Fct must return a float64 or a []float64.`
+				err := "Type assertion failed [variable \"%v\"]:"
+				err += " TreeFunc.Fct must return a float64 or a []float64."
 				log.Fatalf(err, v.Name)
 			}
 		}
