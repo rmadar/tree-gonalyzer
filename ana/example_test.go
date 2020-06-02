@@ -59,6 +59,13 @@ func TestWithStackedSignals(t *testing.T) {
 	)
 }
 
+func TestWithTreeDumping(t *testing.T) {
+	cmpimg.CheckPlot(Example_withTreeDumping, t,
+		"Plots_withTreeDumping/LowM/Mttbar.png",
+		"Plots_withTreeDumping/LowM/DphiLL.png",
+	)
+}
+
 // Creation of the default analysis maker type with
 // single-component samples.
 func Example_aSimpleUseCase() {
@@ -82,8 +89,6 @@ func Example_aSimpleUseCase() {
 
 	// Create analyzer object
 	analyzer := ana.New(samples, variables,
-		ana.WithDumpTree(true),
-		ana.WithSaveFormat("png"),
 		ana.WithSavePath("testdata/Plots_simpleUseCase"),
 	)
 
@@ -129,7 +134,6 @@ func Example_withSignals() {
 
 	// Create analyzer object
 	analyzer := ana.New(samples, variables,
-		ana.WithSaveFormat("png"),
 		ana.WithSavePath("testdata/Plots_withSignals"),
 	)
 
@@ -166,7 +170,6 @@ func Example_withStackedSignals() {
 
 	// Create analyzer object
 	analyzer := ana.New(samples, variables,
-		ana.WithSaveFormat("png"),
 		ana.WithSignalStack(true),
 		ana.WithSavePath("testdata/Plots_withStackedSignals"),
 	)
@@ -213,7 +216,6 @@ func Example_multiComponentSamples() {
 	// Create analyzer object with normalized histograms.
 	analyzer := ana.New(samples, variables,
 		ana.WithHistoNorm(true),
-		ana.WithSaveFormat("png"),
 		ana.WithSavePath("testdata/Plots_multiComponents"),
 	)
 
@@ -254,7 +256,6 @@ func Example_shapeComparison() {
 		ana.WithHistoStack(false),
 		ana.WithHistoNorm(true),
 		ana.WithRatioPlot(false),
-		ana.WithSaveFormat("png"),
 		ana.WithSavePath("testdata/Plots_shapeComparison"),
 	)
 
@@ -303,7 +304,6 @@ func Example_systematicVariations() {
 		ana.WithRatioPlot(true),
 		ana.WithHistoStack(false),
 		ana.WithHistoNorm(true),
-		ana.WithSaveFormat("png"),
 		ana.WithSavePath("testdata/Plots_systVariations"),
 	)
 
@@ -368,7 +368,6 @@ func Example_shapeDistortion() {
 		ana.WithHistoStack(false),
 		ana.WithRatioPlot(false),
 		ana.WithHistoNorm(true),
-		ana.WithSaveFormat("png"),
 		ana.WithSavePath("testdata/Plots_shapeDistortion"),
 	)
 
@@ -380,6 +379,62 @@ func Example_shapeDistortion() {
 
 func Example_withKinemCuts() {
 
+
+	
+}
+
+func Example_withTreeDumping() {
+	// Weights and cuts
+	w := ana.TreeVarF32("weight")
+	isQQ := ana.TreeCutBool("init_qq")
+	
+	// Data sample.
+	data := ana.NewSample("data", "data", `Data 18-20`)
+	data.AddComponent(fData, tName)
+	data.AddComponent(fBkg1, tName)
+	
+	// Background A sample including three components.
+	bkgA := ana.NewSample("BkgTotA", "bkg", `Total Bkg A`, ana.WithWeight(w))
+	bkgA.AddComponent(fBkg1, tName)
+	bkgA.AddComponent(fBkg2, tName)
+	bkgA.AddComponent(fBkg1, tName, ana.WithCut(isQQ))
+	
+	// Background B sample including two components.
+	bkgB := ana.NewSample("BkgTotB", "bkg", `Total Bkg B`, ana.WithWeight(w))
+	bkgB.AddComponent(fBkg1, tName)
+	bkgB.AddComponent(fBkg2, tName)
+	
+	// Put samples together.
+	samples := []*ana.Sample{data, bkgA, bkgB}
+	
+	// Define variables
+	variables := []*ana.Variable{
+		ana.NewVariable("Mttbar", ana.TreeVarF32("ttbar_m"), 25, 350, 1000),
+		ana.NewVariable("DphiLL", ana.TreeVarF64("truth_dphi_ll"), 10, 0, math.Pi),
+	}
+	
+	// Define some selections
+	selections := []*ana.Selection{
+		&ana.Selection{
+			Name: "LowM",
+			TreeFunc: cutMlt500,
+		},
+		&ana.Selection{
+			Name: "HighM",
+			TreeFunc: cutMgt500,
+		},
+	}
+	// Create analyzer object with normalized histograms.
+	analyzer := ana.New(samples, variables,
+		ana.WithKinemCuts(selections),
+		ana.WithDumpTree(true),
+		ana.WithSavePath("testdata/Plots_withTreeDumping"),
+	)
+
+	// Run the analyzer to produce all the plots
+	if err := analyzer.Run(); err != nil {
+		panic(err)
+	}
 }
 
 func Example_withSliceVariables() {
@@ -401,7 +456,6 @@ func Example_withSliceVariables() {
 		ana.WithDumpTree(true),
 		ana.WithHistoStack(false),
 		ana.WithRatioPlot(false),
-		ana.WithSaveFormat("png"),
 		ana.WithSavePath("testdata/Plots_withSliceVariables"),
 	)
 
@@ -418,7 +472,7 @@ var (
 	fBkg2 = "../testdata/file3.root"
 	tName = "truth"
 
-	// Some weights and cutw TreeFunc's
+	// Some weights and cuts TreeFunc's
 	w1 = ana.TreeValF64(1.0)
 	w2 = ana.TreeValF64(0.5)
 	w3 = ana.TreeFunc{
@@ -439,7 +493,15 @@ var (
 			},
 		}
 	}
-
+	cutMlt500 = ana.TreeFunc{
+		VarsName: []string{"ttbar_m"},
+		Fct: func (m float32) bool { return m<500 },
+	}
+	cutMgt500 = ana.TreeFunc{
+		VarsName: []string{"ttbar_m"},
+		Fct: func (m float32) bool { return m>=500 },
+	}
+	
 	// Some colors
 	noColor    = color.NRGBA{}
 	softBlack  = color.NRGBA{R: 50, G: 30, B: 50, A: 200}

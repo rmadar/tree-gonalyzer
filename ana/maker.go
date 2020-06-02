@@ -36,7 +36,7 @@ type Maker struct {
 
 	// Ouputs
 	SavePath     string // Path to which plot will be saved (default: 'plots').
-	SaveFormat   string // Plot file extension: 'tex' (default), 'pdf' or 'png'.
+	SaveFormat   string // Plot file extension: 'png' (default), 'pdf' or 'png'.
 	CompileLatex bool   // On-the-fly latex compilation (default: true).
 	DumpTree     bool   // Dump a TTree in a file for each sample (default: false).
 
@@ -81,7 +81,7 @@ func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 		Nevts:        -1,
 		AutoStyle:    true,
 		SavePath:     "plots",
-		SaveFormat:   "tex",
+		SaveFormat:   "png",
 		PlotTitle:    "TTree GOnalyzer",
 		CompileLatex: true,
 		HistoStack:   true,
@@ -153,17 +153,14 @@ func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 	a.initHistoContainers()
 
 	// Build the slice of values to store
-	if a.DumpTree {
-
-		// FIX-ME(rmadar): this is not so clean to assess slice of not
-		//                 by doing a loop over variables for the first
-		//                 component of the first sample to fill v.isSlice.
-		a.assessVariableTypes()
-
-		// Initialize the variable with the proper types
-		a.initDumpedVars()
-	}
-
+	// FIX-ME(rmadar): this is not so clean to assess slice of not
+	//                 by doing a loop over variables for the first
+	//                 component of the first sample to fill v.isSlice.
+	a.assessVariableTypes()
+	
+	// Initialize the variable with the proper types
+	a.initDumpedVars()
+	
 	return a
 }
 
@@ -225,10 +222,14 @@ func (ana *Maker) fillSampleHistos(sampleIdx int) [][]*hbook.H1D {
 	}
 
 	// Output in case of TTree dumping
+	path := ana.SavePath + "/ntuples/"
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		os.MkdirAll(path, 0755)
+	}
 	var fOut *groot.File
 	var tOut rtree.Writer
 	if ana.DumpTree {
-		fOut, tOut = ana.getOutFileTree(samp.Name+".root", "GOtree")
+		fOut, tOut = ana.getOutFileTree(path+samp.Name+".root", "GOtree")
 		defer fOut.Close()
 		defer tOut.Close()
 	}
@@ -260,8 +261,8 @@ func (ana *Maker) fillSampleHistos(sampleIdx int) [][]*hbook.H1D {
 				if getF64[idx], ok = v.TreeFunc.GetFuncF64(r); !ok {
 					v.isSlice = true
 					if getF64s[idx], ok = v.TreeFunc.GetFuncF64s(r); !ok {
-						err := `Type assertion failed [variable "%v"]:`
-						err += ` TreeFunc.Fct must return a float64 or a []float64.`
+						err := "Type assertion failed [variable \"%v\"]:"
+						err += " TreeFunc.Fct must return a float64 or a []float64."
 						log.Fatalf(err, v.Name)
 					}
 				}
@@ -271,8 +272,8 @@ func (ana *Maker) fillSampleHistos(sampleIdx int) [][]*hbook.H1D {
 			getWeightSamp := func() float64 { return float64(1.0) }
 			if samp.WeightFunc.Fct != nil {
 				if getWeightSamp, ok = samp.WeightFunc.GetFuncF64(r); !ok {
-					err := `Type assertion failed [weight of %v]:`
-					err += ` TreeFunc.Fct must return a float64.`
+					err := "Type assertion failed [weight of %v]:"
+					err += " TreeFunc.Fct must return a float64."
 					log.Fatalf(err, samp.Name)
 				}
 			}
@@ -281,8 +282,8 @@ func (ana *Maker) fillSampleHistos(sampleIdx int) [][]*hbook.H1D {
 			getWeightComp := func() float64 { return float64(1.0) }
 			if comp.WeightFunc.Fct != nil {
 				if getWeightComp, ok = comp.WeightFunc.GetFuncF64(r); !ok {
-					err := `Type assertion failed [weight of (%v, %v)]:`
-					err += ` TreeFunc.Fct must return a float64.`
+					err := "Type assertion failed [weight of (%v, %v)]:"
+					err += " TreeFunc.Fct must return a float64."
 					log.Fatalf(err, samp.Name, comp.FileName)
 				}
 			}
@@ -291,9 +292,9 @@ func (ana *Maker) fillSampleHistos(sampleIdx int) [][]*hbook.H1D {
 			passCutSamp := func() bool { return true }
 			if samp.CutFunc.Fct != nil {
 				if passCutSamp, ok = samp.CutFunc.GetFuncBool(r); !ok {
-					err := `Type assertion failed [Cut of %v]:`
-					err += ` TreeFunc.Fct must return a bool.\n`
-					err += `\t -> Make sure to use NewCutBool(), not NewVarBool().`
+					err := "Type assertion failed [Cut of %v]:"
+					err += " TreeFunc.Fct must return a bool.\n"
+					err += "\t -> Make sure to use NewCutBool(), not NewVarBool()."
 					log.Fatalf(err, samp.Name)
 				}
 			}
@@ -302,9 +303,9 @@ func (ana *Maker) fillSampleHistos(sampleIdx int) [][]*hbook.H1D {
 			passCutComp := func() bool { return true }
 			if comp.CutFunc.Fct != nil {
 				if passCutComp, ok = comp.CutFunc.GetFuncBool(r); !ok {
-					err := `Type assertion failed [Cut of (%v, %v)]:`
-					err += ` TreeFunc.Fct must return a bool.\n`
-					err += `\t -> Make sure to use NewCutBool(), not NewVarBool().`
+					err := "Type assertion failed [Cut of (%v, %v)]:"
+					err += " TreeFunc.Fct must return a bool.\n"
+					err += "\t -> Make sure to use NewCutBool(), not NewVarBool()."
 					log.Fatalf(err, samp.Name, comp.FileName)
 				}
 			}
@@ -337,14 +338,12 @@ func (ana *Maker) fillSampleHistos(sampleIdx int) [][]*hbook.H1D {
 
 					// Look at the next selection if the event is not selected.
 					if !passKinemCut[ic]() {
+						ana.dumpedVar[ana.nVars+ic] = 0.0
 						continue
-					}
-
-					// Keep track which selection is passed.
-					if ana.DumpTree {
+					} else {
 						ana.dumpedVar[ana.nVars+ic] = 1.0
 					}
-
+					
 					// Otherwise, loop over variables.
 					for iv, v := range ana.Variables {
 
@@ -358,7 +357,7 @@ func (ana *Maker) fillSampleHistos(sampleIdx int) [][]*hbook.H1D {
 								ana.dumpedVars[iv] = xs
 								ana.dumpedVarsN[iv] = int32(len(xs))
 							}
-
+							
 						} else {
 							// ... or the single variable value.
 							x := getF64[iv]()
@@ -368,16 +367,16 @@ func (ana *Maker) fillSampleHistos(sampleIdx int) [][]*hbook.H1D {
 							}
 						}
 					}
-
+					
 				}
-
+				
 				if ana.DumpTree {
 					_, err = tOut.Write()
 					if err != nil {
 						log.Fatalf("could not write event in a tree: %+v", err)
 					}
 				}
-
+				
 				return nil
 			})
 
