@@ -125,7 +125,7 @@ func NewSample(sname, stype, sleg string, opts ...SampleOptions) *Sample {
 
 func (s *Sample) applyConfig() {
 
-	// Set setting with the updated configuration	
+	// Set setting with the updated configuration
 	if s.config.WeightFunc.usr {
 		s.WeightFunc = s.config.WeightFunc.val
 	}
@@ -275,7 +275,7 @@ func (s Sample) CreateHisto(hdata *hbook.H1D, opts ...hplot.Options) *hplot.H1D 
 	if h.Band != nil {
 		s.setBandStyle(h.Band)
 	}
-	
+
 	return h
 }
 

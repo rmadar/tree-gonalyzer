@@ -27,14 +27,14 @@ func NewVariable(name string, tFunc TreeFunc, nBins int, xMin, xMax float64, opt
 
 	// Create the object
 	v := &Variable{
-		Name:     name,
-		TreeFunc: tFunc,
-		Nbins:    nBins,
-		Xmin:     xMin,
-		Xmax:     xMax,
-		SaveName: name,
-		XLabel: `Variable`,
-		YLabel: `Events`,
+		Name:      name,
+		TreeFunc:  tFunc,
+		Nbins:     nBins,
+		Xmin:      xMin,
+		Xmax:      xMax,
+		SaveName:  name,
+		XLabel:    `Variable`,
+		YLabel:    `Events`,
 		LegPosTop: true,
 	}
 
@@ -45,9 +45,9 @@ func NewVariable(name string, tFunc TreeFunc, nBins int, xMin, xMax float64, opt
 	for _, opt := range opts {
 		opt(cfg)
 	}
-	
+
 	// Set fields with updaded configuration
-	if  cfg.SaveName.usr {
+	if cfg.SaveName.usr {
 		v.SaveName = cfg.SaveName.val
 	}
 	if cfg.XLabel.usr {

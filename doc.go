@@ -1,4 +1,4 @@
-// Package tree-gonalyzer exposes types and functions to ease the analysis of ROOT trees.
+// Package gonalyzer exposes types and functions to ease the analysis of ROOT trees.
 //
 //  // Define samples
 //  samples := []*ana.Sample{

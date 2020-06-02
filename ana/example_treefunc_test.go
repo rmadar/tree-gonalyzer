@@ -27,7 +27,7 @@ func ExampleTreeFunc_general() {
 
 	// Get the rtree.Formula object
 	formula := treeFunc.TreeFormulaFrom(r)
-	
+
 	// Go function to be called in the event loop
 	getValue := formula.Func().(func() float64)
 

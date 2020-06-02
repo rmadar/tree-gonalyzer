@@ -216,7 +216,7 @@ func WithNevts(n int64) Options {
 	return func(cfg *config) {
 		cfg.Nevts.val = n
 		cfg.Nevts.usr = true
-		
+
 	}
 }
 

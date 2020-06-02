@@ -39,7 +39,7 @@ type Maker struct {
 	SaveFormat   string // Plot file extension: 'tex' (default), 'pdf' or 'png'.
 	CompileLatex bool   // On-the-fly latex compilation (default: true).
 	DumpTree     bool   // Dump a TTree in a file for each sample (default: false).
-	
+
 	// Plots
 	AutoStyle    bool        // Enable automatic styling (default: true).
 	PlotTitle    string      // General plot title (default: 'TTree GOnalyzer').
@@ -54,11 +54,13 @@ type Maker struct {
 	HbookHistos [][][]*hbook.H1D
 	HplotHistos [][][]*hplot.H1D
 
-	// Internal fields
-	nVars       int            // number of variables
-	dumpedVar   []float64      // Storing the F64 variables values to dump the TTree. 
-	dumpedVars  [][]float64    // Storing the F64s variable values to dump the TTree.
-	dumpedVarsN []int32        // Storing the number of object in the F64s to dump the TTree. 
+	// Internal: tree dumping
+	nVars       int         // number of variables
+	dumpedVar   []float64   // Storing the F64 variables values to dump the TTree.
+	dumpedVars  [][]float64 // Storing the F64s variable values to dump the TTree.
+	dumpedVarsN []int32     // Storing the number of object in the F64s to dump the TTree.
+
+	// Internal management
 	cutIdx      map[string]int // Linking cut name and cut index
 	samIdx      map[string]int // Linking sample name and sample index
 	varIdx      map[string]int // Linking variable name and variable index
@@ -66,7 +68,6 @@ type Maker struct {
 	nEvents     int64          // Number of processed events
 	timeLoop    time.Duration  // Processing time for filling histograms (event loop over samples x cuts x histos)
 	timePlot    time.Duration  // Processing time for plotting histogram
-
 }
 
 // New creates a default analysis maker from a list of sample
@@ -75,20 +76,20 @@ func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 
 	// Create the object
 	a := Maker{
-		Samples:   s,
-		Variables: v,
-		Nevts: -1,
-		AutoStyle: true,
-		SavePath: "plots",
-		SaveFormat: "tex",
-		PlotTitle: "TTree GOnalyzer",
+		Samples:      s,
+		Variables:    v,
+		Nevts:        -1,
+		AutoStyle:    true,
+		SavePath:     "plots",
+		SaveFormat:   "tex",
+		PlotTitle:    "TTree GOnalyzer",
 		CompileLatex: true,
-		HistoStack: true,
-		RatioPlot: true,
-		TotalBand: true,
+		HistoStack:   true,
+		RatioPlot:    true,
+		TotalBand:    true,
 		ErrBandColor: color.NRGBA{A: 100},
-		KinemCuts: []*Selection{NewSelection()},
-		nVars: len(v),
+		KinemCuts:    []*Selection{NewSelection()},
+		nVars:        len(v),
 	}
 
 	// Configuration with default values for all optional fields
@@ -152,17 +153,17 @@ func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 	a.initHistoContainers()
 
 	// Build the slice of values to store
-	if a.DumpTree { 
+	if a.DumpTree {
 
 		// FIX-ME(rmadar): this is not so clean to assess slice of not
 		//                 by doing a loop over variables for the first
 		//                 component of the first sample to fill v.isSlice.
 		a.assessVariableTypes()
-		
+
 		// Initialize the variable with the proper types
 		a.initDumpedVars()
 	}
-	
+
 	return a
 }
 
@@ -222,33 +223,33 @@ func (ana *Maker) fillSampleHistos(sampleIdx int) [][]*hbook.H1D {
 			h[iCut][iVar] = hbook.NewH1D(v.Nbins, v.Xmin, v.Xmax)
 		}
 	}
-	
+
 	// Output in case of TTree dumping
 	var fOut *groot.File
-	var tOut  rtree.Writer
+	var tOut rtree.Writer
 	if ana.DumpTree {
 		fOut, tOut = ana.getOutFileTree(samp.Name+".root", "GOtree")
 		defer fOut.Close()
 		defer tOut.Close()
 	}
-	
+
 	// Loop over the sample components
 	for iComp, comp := range samp.components {
-		
+
 		// Anonymous function to avoid memory-leaks due to 'defer'
 		func(j int) error {
-			
+
 			// Get the file and tree
 			f, t := getTreeFromFile(comp.FileName, comp.TreeName)
 			defer f.Close()
-			
+
 			// Get the tree reader
 			r, err := rtree.NewReader(t, []rtree.ReadVar{}, rtree.WithRange(0, ana.Nevts))
 			if err != nil {
 				log.Fatal("could not create tree reader: %w", err)
 			}
 			defer r.Close()
-			
+
 			// Prepare variables
 			ok := false
 			getF64 := make([]func() float64, len(ana.Variables))
@@ -265,7 +266,7 @@ func (ana *Maker) fillSampleHistos(sampleIdx int) [][]*hbook.H1D {
 					}
 				}
 			}
-			
+
 			// Prepare the sample global weight
 			getWeightSamp := func() float64 { return float64(1.0) }
 			if samp.WeightFunc.Fct != nil {
@@ -275,7 +276,7 @@ func (ana *Maker) fillSampleHistos(sampleIdx int) [][]*hbook.H1D {
 					log.Fatalf(err, samp.Name)
 				}
 			}
-			
+
 			// Prepare the additional weight of the component
 			getWeightComp := func() float64 { return float64(1.0) }
 			if comp.WeightFunc.Fct != nil {
@@ -285,7 +286,7 @@ func (ana *Maker) fillSampleHistos(sampleIdx int) [][]*hbook.H1D {
 					log.Fatalf(err, samp.Name, comp.FileName)
 				}
 			}
-			
+
 			// Prepare the sample global cut
 			passCutSamp := func() bool { return true }
 			if samp.CutFunc.Fct != nil {
@@ -294,9 +295,9 @@ func (ana *Maker) fillSampleHistos(sampleIdx int) [][]*hbook.H1D {
 					err += ` TreeFunc.Fct must return a bool.\n`
 					err += `\t -> Make sure to use NewCutBool(), not NewVarBool().`
 					log.Fatalf(err, samp.Name)
-					}
+				}
 			}
-			
+
 			// Prepare the component additional cut
 			passCutComp := func() bool { return true }
 			if comp.CutFunc.Fct != nil {
@@ -307,7 +308,7 @@ func (ana *Maker) fillSampleHistos(sampleIdx int) [][]*hbook.H1D {
 					log.Fatalf(err, samp.Name, comp.FileName)
 				}
 			}
-			
+
 			// Prepare the cut string for kinematics
 			passKinemCut := make([]func() bool, len(ana.KinemCuts))
 			for ic, cut := range ana.KinemCuts {
@@ -317,39 +318,39 @@ func (ana *Maker) fillSampleHistos(sampleIdx int) [][]*hbook.H1D {
 					err += " TreeFunc.Fct must return a bool.\n"
 					err += "\t -> Make sure to use NewCutBool(), not NewVarBool()."
 					log.Fatal(fmt.Sprintf(err, cut.Name))
-					}
+				}
 			}
-			
+
 			// Read the tree (event loop)
 			err = r.Read(func(ctx rtree.RCtx) error {
-				
+
 				// Sample-level and component-level cut
-				if !( passCutSamp() && passCutComp() ) {
+				if !(passCutSamp() && passCutComp()) {
 					return nil
 				}
-				
+
 				// Get the event weight
 				w := getWeightSamp() * getWeightComp()
-				
+
 				// Loop over selection and variables
 				for ic := range ana.KinemCuts {
-					
+
 					// Look at the next selection if the event is not selected.
 					if !passKinemCut[ic]() {
 						continue
 					}
-					
+
 					// Keep track which selection is passed.
 					if ana.DumpTree {
 						ana.dumpedVar[ana.nVars+ic] = 1.0
 					}
-					
+
 					// Otherwise, loop over variables.
 					for iv, v := range ana.Variables {
-						
+
 						// Fill histo (and fill tree) with full slices...
 						if v.isSlice {
-							xs := getF64s[iv]()								
+							xs := getF64s[iv]()
 							for _, x := range xs {
 								h[ic][iv].Fill(x, w)
 							}
@@ -357,7 +358,7 @@ func (ana *Maker) fillSampleHistos(sampleIdx int) [][]*hbook.H1D {
 								ana.dumpedVars[iv] = xs
 								ana.dumpedVarsN[iv] = int32(len(xs))
 							}
-							
+
 						} else {
 							// ... or the single variable value.
 							x := getF64[iv]()
@@ -367,19 +368,19 @@ func (ana *Maker) fillSampleHistos(sampleIdx int) [][]*hbook.H1D {
 							}
 						}
 					}
-					
+
 				}
-				
+
 				if ana.DumpTree {
 					_, err = tOut.Write()
 					if err != nil {
 						log.Fatalf("could not write event in a tree: %+v", err)
 					}
 				}
-				
+
 				return nil
 			})
-			
+
 			// Keep track of the number of processed events.
 			switch ana.Nevts {
 			case -1:
@@ -387,7 +388,7 @@ func (ana *Maker) fillSampleHistos(sampleIdx int) [][]*hbook.H1D {
 			default:
 				ana.nEvents += ana.Nevts
 			}
-			
+
 			return nil
 		}(iComp)
 	}
@@ -397,7 +398,7 @@ func (ana *Maker) fillSampleHistos(sampleIdx int) [][]*hbook.H1D {
 // PlotHistos loops over all filled histograms and produce one plot
 // for each variable and selection, including all sample histograms.
 func (ana *Maker) PlotHistos() error {
-	
+
 	// Start timing
 	start := time.Now()
 
@@ -425,13 +426,13 @@ func (ana *Maker) PlotHistos() error {
 
 	// Loop over variables
 	for _, iVar := range ana.varIdx {
-		
+
 		// Current variable
 		v := ana.Variables[iVar]
-		
+
 		// Loop over selections
 		for _, iCut := range ana.cutIdx {
-			
+
 			var (
 				p               = hplot.New()
 				bhData          = hbook.NewH1D(v.Nbins, v.Xmin, v.Xmax)
@@ -454,7 +455,7 @@ func (ana *Maker) PlotHistos() error {
 
 				// Get the current histogram
 				h := ana.HbookHistos[iSample][iCut][iVar]
-				
+
 				// Compute the integral of the current histo
 				n := h.Integral()
 
@@ -479,10 +480,10 @@ func (ana *Maker) PlotHistos() error {
 
 			// Second sample loop: normalize bh, prepare background stack
 			for iSample := range ana.Samples {
-				
+
 				// Get the current histogram
 				h := ana.HbookHistos[iSample][iCut][iVar]
-				
+
 				// Deal with normalization
 				if ana.HistoNorm {
 					switch ana.Samples[iSample].sType {
@@ -496,14 +497,14 @@ func (ana *Maker) PlotHistos() error {
 						}
 					}
 				}
-				
+
 				// Get plottable histogram and add it to the legend
 				ana.HplotHistos[iSample][iCut][iVar] = ana.Samples[iSample].CreateHisto(h)
 				p.Legend.Add(ana.Samples[iSample].LegLabel, ana.HplotHistos[iSample][iCut][iVar])
-				
+
 				// Keep track of different histo given their type
 				switch ana.Samples[iSample].sType {
-					
+
 				// Keep data appart from backgrounds, style it.
 				case data:
 					phData = ana.HplotHistos[iSample][iCut][iVar]
@@ -770,7 +771,7 @@ func (ana *Maker) initHistoContainers() {
 	// Initialize hbook H1D as N[samples] 2D-slices.
 	// Cut x variable initialization is done in fillSampleHistos().
 	ana.HbookHistos = make([][][]*hbook.H1D, len(ana.Samples))
-	
+
 	// Inititialize hplot H1D
 	ana.HplotHistos = make([][][]*hplot.H1D, len(ana.Samples))
 	for iSamp := range ana.Samples {
@@ -845,11 +846,11 @@ func (ana *Maker) assessVariableTypes() {
 				log.Fatalf(err, v.Name)
 			}
 		}
-	}	
+	}
 }
 
 func (ana *Maker) initDumpedVars() {
-	ana.dumpedVar = make([]float64, len(ana.Variables)+len(ana.KinemCuts)) 
+	ana.dumpedVar = make([]float64, len(ana.Variables)+len(ana.KinemCuts))
 	ana.dumpedVars = make([][]float64, len(ana.Variables))
 	ana.dumpedVarsN = make([]int32, len(ana.Variables))
 	for i, v := range ana.Variables {
@@ -878,28 +879,28 @@ func (ana *Maker) getOutFileTree(fname, tname string) (*groot.File, rtree.Writer
 	for i, v := range ana.Variables {
 		if v.isSlice {
 			wvars = append(wvars, rtree.WriteVar{
-				Name: v.Name+"N",
+				Name:  v.Name + "N",
 				Value: &ana.dumpedVarsN[i]},
 			)
 			wvars = append(wvars, rtree.WriteVar{
-				Name: v.Name,
+				Name:  v.Name,
 				Value: &ana.dumpedVars[i],
-				Count: v.Name+"N"},
+				Count: v.Name + "N"},
 			)
 		} else {
 			wvars = append(wvars, rtree.WriteVar{
-				Name: v.Name,
+				Name:  v.Name,
 				Value: &ana.dumpedVar[i]},
 			)
 		}
 	}
 	for i, s := range ana.KinemCuts {
 		wvars = append(wvars, rtree.WriteVar{
-			Name: "pass"+s.Name,
+			Name:  "pass" + s.Name,
 			Value: &ana.dumpedVar[ana.nVars+i]},
 		)
 	}
-	
+
 	// Create a new TTree
 	t, err := rtree.NewWriter(f, tname, wvars)
 	if err != nil {
