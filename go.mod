@@ -9,8 +9,8 @@ require (
 	go-hep.org/x/hep v0.27.1-0.20200529195039-3b702ec41bed
 	golang.org/x/image v0.0.0-20200430140353-33d19683fad8 // indirect
 	golang.org/x/tools v0.0.0-20200526224456-8b020aee10d2 // indirect
-	gonum.org/v1/gonum v0.7.1-0.20200522112325-9c4b7ca31365
-	gonum.org/v1/plot v0.7.1-0.20200522144533-3b246acc696f
+	gonum.org/v1/gonum v0.7.1-0.20200602002949-4ff1bb0a480e
+	gonum.org/v1/plot v0.7.1-0.20200602093449-6d232e045386
 )
 
 //replace github.com/rmadar/hplot-style => /home/rmadar/cernbox/goDev/hplot-style

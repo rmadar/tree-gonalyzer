@@ -58,9 +58,8 @@ type Maker struct {
 
 	// Internal: tree dumping
 	nVars       int         // number of variables
-	dumpedVar   []float64   // Storing the F64 variables values to dump the TTree.
-	dumpedVars  [][]float64 // Storing the F64s variable values to dump the TTree.
-	dumpedVarsN []int32     // Storing the number of object in the F64s to dump the TTree.
+	nEvtsSample []int64     // number of events per sample
+	treeDumpers []dumper    // contains all object to dump a tree
 
 	// Internal management
 	cutIdx      map[string]int // Linking cut name and cut index
@@ -70,6 +69,12 @@ type Maker struct {
 	nEvents     int64          // Number of processed events
 	timeLoop    time.Duration  // Processing time for filling histograms (event loop over samples x cuts x histos)
 	timePlot    time.Duration  // Processing time for plotting histogram
+}
+
+type dumper struct { 
+	Var   []float64   // Storing the F64 variables values to dump the TTree.
+	Vars  [][]float64 // Storing the F64s variable values to dump the TTree.
+	VarsN []int32     // Storing the number of object in the F64s to dump the TTree.
 }
 
 // New creates a default analysis maker from a list of sample
@@ -97,7 +102,7 @@ func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 
 	// Configuration with default values for all optional fields
 	cfg := newConfig()
-
+	
 	// Update the configuration looping over functional options
 	for _, opt := range opts {
 		opt(cfg)
@@ -155,6 +160,9 @@ func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 	a.varIdx = getIdxMap(a.Variables, &Variable{})
 	a.cutIdx = getIdxMap(a.KinemCuts, &Selection{})
 
+	// Managing event number with concurrency
+	a.nEvtsSample = make([]int64, len(a.Samples))
+	
 	// Build hbook and hplot H1D containers
 	a.initHistoContainers()
 
@@ -165,7 +173,7 @@ func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 	a.assessVariableTypes()
 
 	// Initialize the variable with the proper types
-	a.initDumpedVars()
+	// a.initDumpedVars()
 
 	return a
 }
@@ -213,6 +221,10 @@ func (ana *Maker) FillHistos() error {
 		}
 	}
 
+	for _, n := range ana.nEvtsSample {
+		ana.nEvents += n
+
+	}
 	// Histograms are now filled.
 	ana.histoFilled = true
 
@@ -247,13 +259,14 @@ func (ana *Maker) fillSampleHistos(sampleIdx int) {
 
 	// Output in case of TTree dumping
 	path := ana.SavePath + "/ntuples/"
-	if _, err := os.Stat(path); os.IsNotExist(err) {
+	if _, err := os.Stat(path); os.IsNotExist(err) && ana.DumpTree {
 		os.MkdirAll(path, 0755)
 	}
 	var fOut *groot.File
 	var tOut rtree.Writer
+	dump := ana.newDumper()
 	if ana.DumpTree {
-		fOut, tOut = ana.getOutFileTree(path+samp.Name+".root", "GOtree")
+		fOut, tOut = ana.getOutFileTree(path+samp.Name+".root", "GOtree", dump)
 		defer fOut.Close()
 		defer tOut.Close()
 	}
@@ -366,10 +379,10 @@ func (ana *Maker) fillSampleHistos(sampleIdx int) {
 
 					// Look at the next selection if the event is not selected.
 					if !passKinemCut[ic]() {
-						ana.dumpedVar[ana.nVars+ic] = 0.0
+						dump.Var[ana.nVars+ic] = 0.0
 						continue
 					} else {
-						ana.dumpedVar[ana.nVars+ic] = 1.0
+						dump.Var[ana.nVars+ic] = 1.0
 					}
 
 					// Otherwise, loop over variables.
@@ -382,8 +395,8 @@ func (ana *Maker) fillSampleHistos(sampleIdx int) {
 								h[ic][iv].Fill(x, w)
 							}
 							if ana.DumpTree {
-								ana.dumpedVars[iv] = xs
-								ana.dumpedVarsN[iv] = int32(len(xs))
+								dump.Vars[iv] = xs
+								dump.VarsN[iv] = int32(len(xs))
 							}
 
 						} else {
@@ -391,7 +404,7 @@ func (ana *Maker) fillSampleHistos(sampleIdx int) {
 							x := getF64[iv]()
 							h[ic][iv].Fill(x, w)
 							if ana.DumpTree {
-								ana.dumpedVar[iv] = x
+								dump.Var[iv] = x
 							}
 						}
 					}
@@ -412,15 +425,15 @@ func (ana *Maker) fillSampleHistos(sampleIdx int) {
 			if err != nil {
 				log.Fatalf("could not read tree: %+v", err)
 			}
-
+			
 			// Keep track of the number of processed events.
 			switch ana.Nevts {
 			case -1:
-				ana.nEvents += t.Entries()
+				ana.nEvtsSample[sampleIdx] += t.Entries()
 			default:
-				ana.nEvents += ana.Nevts
+				ana.nEvtsSample[sampleIdx] += ana.Nevts
 			}
-
+			
 			return nil
 		}(iComp)
 	}
@@ -882,24 +895,31 @@ func (ana *Maker) assessVariableTypes() {
 	}
 }
 
-func (ana *Maker) initDumpedVars() {
-	ana.dumpedVar = make([]float64, len(ana.Variables)+len(ana.KinemCuts))
-	ana.dumpedVars = make([][]float64, len(ana.Variables))
-	ana.dumpedVarsN = make([]int32, len(ana.Variables))
+func (ana *Maker) newDumper() dumper {
+	dVar := make([]float64, len(ana.Variables)+len(ana.KinemCuts))
+	dVars := make([][]float64, len(ana.Variables))
+	dVarsN := make([]int32, len(ana.Variables))
 	for i, v := range ana.Variables {
 		if v.isSlice {
-			ana.dumpedVars[i] = []float64{}
-			ana.dumpedVarsN[i] = 0
+			dVars[i] = []float64{}
+			dVarsN[i] = 0
 		} else {
-			ana.dumpedVar[i] = 0
+			dVar[i] = 0
 		}
 	}
 	for i := range ana.KinemCuts {
-		ana.dumpedVar[ana.nVars+i] = 0
+		dVar[ana.nVars+i] = 0
+	}
+
+	// Return the dumper
+	return dumper{
+		Var: dVar,
+		Vars: dVars,
+		VarsN: dVarsN,
 	}
 }
 
-func (ana *Maker) getOutFileTree(fname, tname string) (*groot.File, rtree.Writer) {
+func (ana *Maker) getOutFileTree(fname, tname string, d dumper) (*groot.File, rtree.Writer) {
 
 	// Create a new ROOT file
 	f, err := groot.Create(fname)
@@ -913,24 +933,24 @@ func (ana *Maker) getOutFileTree(fname, tname string) (*groot.File, rtree.Writer
 		if v.isSlice {
 			wvars = append(wvars, rtree.WriteVar{
 				Name:  v.Name + "N",
-				Value: &ana.dumpedVarsN[i]},
+				Value: &d.VarsN[i]},
 			)
 			wvars = append(wvars, rtree.WriteVar{
 				Name:  v.Name,
-				Value: &ana.dumpedVars[i],
+				Value: &d.Vars[i],
 				Count: v.Name + "N"},
 			)
 		} else {
 			wvars = append(wvars, rtree.WriteVar{
 				Name:  v.Name,
-				Value: &ana.dumpedVar[i]},
+				Value: &d.Var[i]},
 			)
 		}
 	}
 	for i, s := range ana.KinemCuts {
 		wvars = append(wvars, rtree.WriteVar{
 			Name:  "pass" + s.Name,
-			Value: &ana.dumpedVar[ana.nVars+i]},
+			Value: &d.Var[ana.nVars+i]},
 		)
 	}
 

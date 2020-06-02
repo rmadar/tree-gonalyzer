@@ -54,7 +54,11 @@ func main() {
 	selections := []*ana.Selection{sel0, sel1, sel2}
 
 	// Create analyzer object with some selections, enabeling automatic style
-	analyzer := ana.New(samples, variables, ana.WithKinemCuts(selections), ana.WithAutoStyle(true))
+	analyzer := ana.New(samples, variables,
+		ana.WithKinemCuts(selections),
+		ana.WithDumpTree(true),
+		ana.WithSampleMT(true),
+	)
 
 	// Command line options
 	analyzer.Nevts = *nMax

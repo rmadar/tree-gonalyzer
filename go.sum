@@ -276,6 +276,8 @@ gonum.org/v1/gonum v0.7.1-0.20200330111830-e98ce15ff236 h1:SOhSD/rlx1DzJVHAHInC3
 gonum.org/v1/gonum v0.7.1-0.20200330111830-e98ce15ff236/go.mod h1:L02bwd0sqlsvRv41G7wGWFCsVNZFv/k1xzGIxeANHGM=
 gonum.org/v1/gonum v0.7.1-0.20200522112325-9c4b7ca31365 h1:QMaGTLiND/xpnscPPvx+K/uxeKGMMBKOjToI+nlMKXA=
 gonum.org/v1/gonum v0.7.1-0.20200522112325-9c4b7ca31365/go.mod h1:L02bwd0sqlsvRv41G7wGWFCsVNZFv/k1xzGIxeANHGM=
+gonum.org/v1/gonum v0.7.1-0.20200602002949-4ff1bb0a480e h1:59R5OJD3msBCNQ2GujO0levDKSwYW6sXT1OxsFsnVfU=
+gonum.org/v1/gonum v0.7.1-0.20200602002949-4ff1bb0a480e/go.mod h1:L02bwd0sqlsvRv41G7wGWFCsVNZFv/k1xzGIxeANHGM=
 gonum.org/v1/netlib v0.0.0-20180816165226-ebcc3d2662d3/go.mod h1:wa6Ws7BG/ESfp6dHfk7C6KdzKA7wR7u/rKwOGE66zvw=
 gonum.org/v1/netlib v0.0.0-20190313105609-8cb42192e0e0/go.mod h1:wa6Ws7BG/ESfp6dHfk7C6KdzKA7wR7u/rKwOGE66zvw=
 gonum.org/v1/netlib v0.0.0-20190331212654-76723241ea4e/go.mod h1:kS+toOQn6AQKjmKJ7gzohV1XkqsFehRA2FbsbkopSuQ=
@@ -294,6 +296,8 @@ gonum.org/v1/plot v0.7.1-0.20200414075901-f4e1939a9e7a h1:tBDQRiC/lYKhx2AC87XbGs
 gonum.org/v1/plot v0.7.1-0.20200414075901-f4e1939a9e7a/go.mod h1:2wtU6YrrdQAhAF9+MTd5tOQjrov/zF70b1i99Npjvgo=
 gonum.org/v1/plot v0.7.1-0.20200522144533-3b246acc696f h1:WAacwJD13RlCZWZdqUO3SZncMo1DU4g2sBVIK6Y6pi0=
 gonum.org/v1/plot v0.7.1-0.20200522144533-3b246acc696f/go.mod h1:BCHZ+YSvjoscp+v8yU26t8mxytnp3UOu+3bn70hP+dE=
+gonum.org/v1/plot v0.7.1-0.20200602093449-6d232e045386 h1:OaEl2Ntk8g56oPNkmQfRyXQN4fgAjYpXQlNunEZrx/k=
+gonum.org/v1/plot v0.7.1-0.20200602093449-6d232e045386/go.mod h1:yGbCJMcwFiouE6IEpRGTW4gkKr8zMOKkS13yvgTbA0Y=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/jcmturner/aescts.v1 v1.0.1/go.mod h1:nsR8qBOg+OucoIW+WMhB3GspUQXq9XorLnQb9XtvcOo=
 gopkg.in/jcmturner/dnsutils.v1 v1.0.1/go.mod h1:m3v+5svpVOhtFAP/wSz+yzh4Mc0Fg7eRhxkJMWSIz9Q=
