@@ -195,13 +195,13 @@ func (ana *Maker) FillHistos() error {
 	start := time.Now()
 	
 	// Loop over the samples
-	doConc := false
+	doConc := true
 	if doConc {
 		var wg sync.WaitGroup
 		for i := range ana.Samples {
 			wg.Add(1)
 			histos := make(chan [][]*hbook.H1D)
-			go ana.concurrentFillSampleHistos(i, histos)
+			go ana.concurrentFillSampleHistos(i, &wg, histos)
 			ana.HbookHistos[i] = <- histos
 		}
 		wg.Wait()
@@ -220,11 +220,10 @@ func (ana *Maker) FillHistos() error {
 	return nil
 }
 
-//func (ana *Maker) concurrentFillSampleHistos(sampleIdx int, wg *sync.WaitGroup, hres chan [][]*hbook.H1D) {
-func (ana *Maker) concurrentFillSampleHistos(sampleIdx int,  hres chan [][]*hbook.H1D) {
+func (ana *Maker) concurrentFillSampleHistos(sampleIdx int, wg *sync.WaitGroup, hres chan [][]*hbook.H1D) {
 
 	// Handle concurency
-	// defer wg.Done()
+	defer wg.Done()
 
 	// Fill the histo
 	h := ana.fillSampleHistos(sampleIdx)
