@@ -55,8 +55,8 @@ func TestWithSignals(t *testing.T) {
 	)
 }
 
-func TestWithStackedSignals(t *testing.T) {
-	cmpimg.CheckPlot(Example_withStackedSignals, t,
+func TestWithSignalsStacked(t *testing.T) {
+	cmpimg.CheckPlot(Example_withSignalsStacked, t,
 		"Plots_withStackedSignals/Mttbar.png",
 		"Plots_withStackedSignals/DphiLL.png",
 	)
@@ -115,17 +115,20 @@ func Example_withSignals() {
 		ana.CreateSample("bkg1", "bkg", `Proc 1`, fBkg1, tName, ana.WithWeight(w1)),
 		ana.CreateSample("bkg2", "bkg", `Proc 2`, fBkg2, tName, ana.WithWeight(w2)),
 		ana.CreateSample("bkg3", "bkg", `Proc 3`, fBkg1, tName, ana.WithWeight(w2)),
-		ana.CreateSample("sig1", "sig", `Sig 1`, fBkg2, tName, ana.WithWeight(wSigM(500, 0.04)),
+		ana.CreateSample("sig1", "sig", `Sig 1`, fBkg2, tName,
+			ana.WithWeight(wSigM(500, 0.04)),
 			ana.WithLineColor(darkRed),
 			ana.WithLineDashes([]vg.Length{2, 3, 2}),
 			ana.WithLineWidth(3),
 		),
-		ana.CreateSample("sig2", "sig", `Sig 2`, fBkg2, tName, ana.WithWeight(wSigM(650, 0.02)),
+		ana.CreateSample("sig2", "sig", `Sig 2`, fBkg2, tName,
+			ana.WithWeight(wSigM(650, 0.02)),
 			ana.WithLineColor(darkGreen),
 			ana.WithLineDashes([]vg.Length{1, 1, 1}),
 			ana.WithLineWidth(3),
 		),
-		ana.CreateSample("sig3", "sig", `Sig 2`, fBkg2, tName, ana.WithWeight(wSigM(800, 0.01)),
+		ana.CreateSample("sig3", "sig", `Sig 2`, fBkg2, tName,
+			ana.WithWeight(wSigM(800, 0.01)),
 			ana.WithLineColor(darkBlue),
 			ana.WithLineDashes([]vg.Length{3, 3, 3}),
 			ana.WithLineWidth(3),
@@ -153,7 +156,7 @@ func Example_withSignals() {
 	}
 }
 
-func Example_withStackedSignals() {
+func Example_withSignalsStacked() {
 	// Define samples
 	samples := []*ana.Sample{
 		ana.CreateSample("data", "data", `Data`, fData, tName,
@@ -163,9 +166,12 @@ func Example_withStackedSignals() {
 		ana.CreateSample("bkg1", "bkg", `Proc 1`, fBkg1, tName, ana.WithWeight(w1)),
 		ana.CreateSample("bkg2", "bkg", `Proc 2`, fBkg2, tName, ana.WithWeight(w2)),
 		ana.CreateSample("bkg3", "bkg", `Proc 3`, fBkg1, tName, ana.WithWeight(w2)),
-		ana.CreateSample("sig1", "sig", `Sig 1`, fBkg2, tName, ana.WithWeight(wSigM(500, 0.04))),
-		ana.CreateSample("sig2", "sig", `Sig 2`, fBkg2, tName, ana.WithWeight(wSigM(650, 0.02))),
-		ana.CreateSample("sig3", "sig", `Sig 2`, fBkg2, tName, ana.WithWeight(wSigM(800, 0.01))),
+		ana.CreateSample("sig1", "sig", `Sig 1`, fBkg2, tName,
+			ana.WithWeight(wSigM(500, 0.04))),
+		ana.CreateSample("sig2", "sig", `Sig 2`, fBkg2, tName,
+			ana.WithWeight(wSigM(650, 0.02))),
+		ana.CreateSample("sig3", "sig", `Sig 2`, fBkg2, tName,
+			ana.WithWeight(wSigM(800, 0.01))),
 	}
 
 	// Define variables
