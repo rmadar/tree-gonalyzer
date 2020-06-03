@@ -9,6 +9,7 @@ type Variable struct {
 	TreeFunc                 TreeFunc // Variable definition from branches & functions.
 	Nbins                    int      // Number of bins of final histograms.
 	Xmin, Xmax               float64  // Mininum and maximum values of the histogram.
+	LogY                     bool     // Enable logarithm scale for the y-axis.
 	SaveName                 string   // Name of the saved plot (default 'Name').
 	XLabel, YLabel           string   // Axis labels (default: 'Variable', 'Events').
 	XTickFormat, YTickFormat string   // Axis tick formatting (default: hplot default).
@@ -49,6 +50,9 @@ func NewVariable(name string, tFunc TreeFunc, nBins int, xMin, xMax float64, opt
 	// Set fields with updaded configuration
 	if cfg.SaveName.usr {
 		v.SaveName = cfg.SaveName.val
+	}
+	if cfg.LogY.usr {
+		v.LogY = cfg.LogY.val
 	}
 	if cfg.XLabel.usr {
 		v.XLabel = cfg.XLabel.val

@@ -9,6 +9,7 @@ import (
 	"sync"
 	"time"
 
+	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotutil"
 	"gonum.org/v1/plot/vg"
 
@@ -541,7 +542,7 @@ func (ana *Maker) PlotVariables() error {
 
 			// Add plot title
 			p.Title.Text = ana.PlotTitle
-
+			
 			// First sample loop: compute normalisation, sum bkg bh, keep data bh
 			for iSample := range ana.Samples {
 
@@ -591,7 +592,7 @@ func (ana *Maker) PlotVariables() error {
 				}
 
 				// Get plottable histogram and add it to the legend
-				ana.HplotHistos[iSample][iCut][iVar] = ana.Samples[iSample].CreateHisto(h)
+				ana.HplotHistos[iSample][iCut][iVar] = ana.Samples[iSample].CreateHisto(h, hplot.WithLogY(v.LogY))
 				p.Legend.Add(ana.Samples[iSample].LegLabel, ana.HplotHistos[iSample][iCut][iVar])
 
 				// Keep track of different histo given their type
@@ -648,7 +649,7 @@ func (ana *Maker) PlotVariables() error {
 				}
 
 				// Stacking the background histo
-				stack := hplot.NewHStack(phStack, hplot.WithBand(ana.TotalBand))
+				stack := hplot.NewHStack(phStack, hplot.WithBand(ana.TotalBand), hplot.WithLogY(v.LogY))
 				if ana.HistoStack && ana.TotalBand {
 					stack.Band.FillColor = ana.ErrBandColor
 					hBand := hplot.NewH1D(hbook.NewH1D(1, 0, 1), hplot.WithBand(true))
@@ -681,6 +682,13 @@ func (ana *Maker) PlotVariables() error {
 			//                  loop and I am not sure why.
 			style.ApplyToPlot(p)
 			v.setPlotStyle(p)
+			
+			// Manage log scale after settings
+			if v.LogY {
+				p.Y.Scale = plot.LogScale{}
+				p.Y.Tick.Marker = plot.LogTicks{}
+			}
+
 			plt = p
 
 			// Addition of the ratio plot

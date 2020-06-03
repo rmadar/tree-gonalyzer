@@ -166,8 +166,8 @@ type config struct {
 		val string // Filename for a variable plot
 		usr bool
 	}
-	TreeVar struct {
-		val TreeFunc // TreeFunc for a computed variable (ie not a single branch)
+	LogY struct {
+		val bool // Enable y-axis log scale
 		usr bool
 	}
 	XLabel struct {
@@ -534,12 +534,11 @@ func WithSaveName(n string) VariableOptions {
 	}
 }
 
-// WithTreeVar sets a TreeFunc object for an on-the-fly
-// computed variable.
-func WithTreeVar(f TreeFunc) VariableOptions {
+// WithLogy enable y-axis log scale 
+func WithLogy(b bool) VariableOptions {
 	return func(cfg *config) {
-		cfg.TreeVar.val = f
-		cfg.TreeVar.usr = true
+		cfg.LogY.val = b
+		cfg.LogY.usr = true
 	}
 }
 
