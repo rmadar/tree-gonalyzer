@@ -30,7 +30,7 @@ variables := []*ana.Variable{
 // Create analyzer object with some options
 analyzer := ana.New(samples, variables, ana.WithHistoNorm(true))
 
-// Produce plots and/or dump one tree per sample
+// Produce plots and dump trees
 analyzer.Run()
 
 ```
