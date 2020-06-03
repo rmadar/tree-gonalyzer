@@ -5,6 +5,8 @@
 This is a tool written in go to produce publication-quality plots from ROOT TTrees in an flexible and easy way.
 This tool is built on top of [go-hep.org](https://go-hep.org). The main supported features are:
  - histograming variables over many samples and selections,
+ - overlayed or stacked stacked,
+ - sample normalisation using cross-section and/or luminosity and/or number of generated events,
  - computing of new variables of arbitrary complexity,
  - dumping `TTree`'s with `float64` and `[]float64` branches
  - concurent sample processings,
