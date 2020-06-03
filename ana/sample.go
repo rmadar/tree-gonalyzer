@@ -43,7 +43,7 @@ type Sample struct {
 	// Gobal weight and cut (applied to all components).
 	CutFunc    TreeFunc
 	WeightFunc TreeFunc
-
+	
 	// Cosmetic settings
 	DataStyle         bool        // Enable data-like style (default: Type == 'data').
 	LineColor         color.NRGBA // Line color of the histogram (default: blue).
@@ -73,6 +73,8 @@ type sampleComponent struct {
 	TreeName   string
 	WeightFunc TreeFunc
 	CutFunc    TreeFunc
+	Xsec       float64
+	Ngen       float64
 }
 
 // NewSample creates a new empty sample, ie without any components,
@@ -183,6 +185,24 @@ func CreateSample(sname, stype, sleg, fname, tname string, opts ...SampleOptions
 	// Add it to component the sample
 	s.AddComponent(fname, tname)
 
+	// Loop over all options, just to pass Xsec and Ngen
+	// for this compnent.
+	// FIX-ME (rmadar): it's not nice, and there is no other way
+	//                  than having SampleOptions and ComponentOptions
+	//                  separated to avoid this. In such a case, we
+	//                  loose the ability to create a sample with one
+	//                  component in one line.
+	cfg := newConfig()
+	for _, opt := range opts {
+		opt(cfg)
+	}
+	if cfg.Xsec.usr {
+		s.components[0].Xsec = cfg.Xsec.val
+	}
+	if cfg.Ngen.usr {
+		s.components[0].Ngen = cfg.Ngen.val
+	}
+	
 	return s
 }
 
@@ -203,12 +223,26 @@ func (s *Sample) AddComponent(fname, tname string, opts ...SampleOptions) {
 
 	// Create a component
 	c := &sampleComponent{
-		FileName:   fname,
-		TreeName:   tname,
-		WeightFunc: cfg.WeightFunc.val,
-		CutFunc:    cfg.CutFunc.val,
+		FileName: fname,
+		TreeName: tname,
+		Xsec:     1.0,
+		Ngen:     1.0,
 	}
-
+	
+	// Update the fields with the passed options
+	if cfg.WeightFunc.usr {
+		c.WeightFunc = cfg.WeightFunc.val
+	}
+	if cfg.CutFunc.usr {
+		c.CutFunc = cfg.CutFunc.val
+	}
+	if cfg.Xsec.usr {
+		c.Xsec = cfg.Xsec.val
+	}
+	if cfg.Ngen.usr {
+		c.Ngen = cfg.Ngen.val
+	}
+	
 	// Append it to the pointer-receiver sample
 	s.components = append(s.components, c)
 }

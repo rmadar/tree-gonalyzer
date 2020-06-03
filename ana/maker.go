@@ -33,8 +33,9 @@ type Maker struct {
 	Samples   []*Sample    // List of samples on which to run.
 	Variables []*Variable  // List of variables to plot.
 	KinemCuts []*Selection // List of cuts to apply (default: no cut).
-	Nevts     int64        // Maximum number of events per components.
-	SampleMT  bool         // Enable concurency accross samples
+	NevtsMax  int64        // Maximum event number per components (default: -1),
+	Lumi      float64      // Integrated luminosity en 1/fb (default: 1/pb).
+	SampleMT  bool         // Enable concurency accross samples (default: true).
 
 	// Ouputs
 	SavePath     string // Path to which plot will be saved (default: 'outputs').
@@ -85,7 +86,8 @@ func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 	a := Maker{
 		Samples:      s,
 		Variables:    v,
-		Nevts:        -1,
+		NevtsMax:     -1,
+		Lumi    :     1e-3,
 		PlotHisto:    true,
 		SampleMT:     true,
 		AutoStyle:    true,
@@ -113,8 +115,11 @@ func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 	if cfg.KinemCuts.usr {
 		a.KinemCuts = cfg.KinemCuts.val
 	}
-	if cfg.Nevts.usr {
-		a.Nevts = cfg.Nevts.val
+	if cfg.NevtsMax.usr {
+		a.NevtsMax = cfg.NevtsMax.val
+	}
+	if cfg.Lumi.usr {
+		a.Lumi = cfg.Lumi.val
 	}
 	if cfg.SampleMT.usr {
 		a.SampleMT = cfg.SampleMT.val
@@ -289,7 +294,7 @@ func (ana *Maker) sampleEventLoop(sampleIdx int) {
 			defer f.Close()
 
 			// Get the tree reader
-			r, err := rtree.NewReader(t, []rtree.ReadVar{}, rtree.WithRange(0, ana.Nevts))
+			r, err := rtree.NewReader(t, []rtree.ReadVar{}, rtree.WithRange(0, ana.NevtsMax))
 			if err != nil {
 				log.Fatal("could not create tree reader: %w", err)
 			}
@@ -317,7 +322,7 @@ func (ana *Maker) sampleEventLoop(sampleIdx int) {
 			}
 
 			// Prepare the sample global weight
-			getWeightSamp := func() float64 { return float64(1.0) }
+			getWeightSamp := func() float64 { return 1.0 }
 			if samp.WeightFunc.Fct != nil {
 				if getWeightSamp, ok = samp.WeightFunc.GetFuncF64(r); !ok {
 					err := "Type assertion failed [weight of %v]:"
@@ -326,8 +331,14 @@ func (ana *Maker) sampleEventLoop(sampleIdx int) {
 				}
 			}
 
+			// Prepare the normalization weight of this component
+			normWeight := ana.Lumi * 1000 * comp.Xsec / comp.Ngen
+			if samp.sType == data {
+				normWeight = 1.0
+			}
+			
 			// Prepare the additional weight of the component
-			getWeightComp := func() float64 { return float64(1.0) }
+			getWeightComp := func() float64 { return 1.0 }
 			if comp.WeightFunc.Fct != nil {
 				if getWeightComp, ok = comp.WeightFunc.GetFuncF64(r); !ok {
 					err := "Type assertion failed [weight of (%v, %v)]:"
@@ -379,7 +390,7 @@ func (ana *Maker) sampleEventLoop(sampleIdx int) {
 				}
 
 				// Get the event weight
-				w := getWeightSamp() * getWeightComp()
+				w := getWeightSamp() * getWeightComp() * normWeight
 
 				// Loop over selection and variables
 				for ic := range ana.KinemCuts {
@@ -434,11 +445,11 @@ func (ana *Maker) sampleEventLoop(sampleIdx int) {
 			}
 
 			// Keep track of the number of processed events.
-			switch ana.Nevts {
+			switch ana.NevtsMax {
 			case -1:
 				ana.nEvtsSample[sampleIdx] += t.Entries()
 			default:
-				ana.nEvtsSample[sampleIdx] += ana.Nevts
+				ana.nEvtsSample[sampleIdx] += ana.NevtsMax
 			}
 
 			return nil
@@ -450,8 +461,12 @@ func (ana *Maker) sampleEventLoop(sampleIdx int) {
 
 	// Explicitely close file and tree
 	if ana.DumpTree {
-		if err := tOut.Close(); err != nil { panic(err) }
-		if err := fOut.Close(); err != nil { panic(err) }
+		if err := tOut.Close(); err != nil {
+			log.Fatalf("could not close tree: %+v", err)
+		}
+		if err := fOut.Close(); err != nil {
+			log.Fatalf("could not close root file: %+v", err)
+		}
 	}
 	
 }

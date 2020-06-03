@@ -82,9 +82,12 @@ func Example_aSimpleUseCase() {
 	// Define samples
 	samples := []*ana.Sample{
 		ana.CreateSample("data", "data", `Data`, fData, tName),
-		ana.CreateSample("bkg1", "bkg", `Proc 1`, fBkg1, tName, ana.WithWeight(w1)),
-		ana.CreateSample("bkg2", "bkg", `Proc 2`, fBkg2, tName, ana.WithWeight(w2)),
-		ana.CreateSample("bkg3", "bkg", `Proc 3`, fBkg1, tName, ana.WithWeight(w2)),
+		ana.CreateSample("bkg1", "bkg", `Proc 1 (2.1 pb)`, fBkg1, tName,
+			ana.WithWeight(w1), ana.WithXsec(1.2)),
+		ana.CreateSample("bkg2", "bkg", `Proc 2 (0.5 pb)`, fBkg2, tName,
+			ana.WithWeight(w2), ana.WithXsec(0.6)),
+		ana.CreateSample("bkg3", "bkg", `Proc 3 (0.9 pb)`, fBkg1, tName,
+			ana.WithWeight(w2), ana.WithXsec(0.9)),
 	}
 
 	// Define variables
@@ -99,6 +102,7 @@ func Example_aSimpleUseCase() {
 
 	// Create analyzer object
 	analyzer := ana.New(samples, variables,
+		//ana.WithLumi(0.01),
 		ana.WithSavePath("testdata/Plots_simpleUseCase"),
 	)
 
@@ -268,7 +272,7 @@ func Example_shapeComparison() {
 
 	// Create analyzer object
 	analyzer := ana.New(samples, variables,
-		ana.WithNevts(500),
+		ana.WithNevtsMax(500),
 		ana.WithHistoStack(false),
 		ana.WithHistoNorm(true),
 		ana.WithRatioPlot(false),

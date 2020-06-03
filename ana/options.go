@@ -26,8 +26,12 @@ type config struct {
 		val []*Selection // List of cuts.
 		usr bool
 	}
-	Nevts struct {
+	NevtsMax struct {
 		val int64 // Maximum of processed events.
+		usr bool
+	}
+	Lumi struct {
+		val float64 // Integrated luminosity.
 		usr bool
 	}
 	SampleMT struct {
@@ -89,11 +93,19 @@ type config struct {
 
 	// Sample options
 	WeightFunc struct {
-		val TreeFunc // Weight applied to the sample
+		val TreeFunc // Weight applied to the sample/component
 		usr bool
 	}
 	CutFunc struct {
-		val TreeFunc // Cut applied to the sample
+		val TreeFunc // Cut applied to the sample/component
+		usr bool
+	}
+	Xsec struct {
+		val float64 // cross-section of this sample/component
+		usr bool
+	}
+	Ngen struct {
+		val float64 // Number of (weighted) generated events
 		usr bool
 	}
 	LineColor struct { // Line color of the sample histogram
@@ -218,13 +230,25 @@ func WithKinemCuts(c []*Selection) Options {
 	}
 }
 
-// WithNevts sets the maximum processed event for
+// WithNevtsMax sets the maximum processed event for
 // each sample component.
-func WithNevts(n int64) Options {
+func WithNevtsMax(n int64) Options {
 	return func(cfg *config) {
-		cfg.Nevts.val = n
-		cfg.Nevts.usr = true
+		cfg.NevtsMax.val = n
+		cfg.NevtsMax.usr = true
 
+	}
+}
+
+// WithLumi sets the integrated luminosity [1/fb]
+// The full normalisation factor is (xsec*lumi)/ngen. 'ngen' and
+// 'xsec' are given for each sample/component, via ana.CreateSample()
+// or s.AddComponent(). While the 'lumi' is given to
+// via ana.New(). By default, lumi = 1/fb.
+func WithLumi(l float64) Options {
+	return func(cfg *config) {
+		cfg.Lumi.val = l
+		cfg.Lumi.usr = true
 	}
 }
 
@@ -362,6 +386,28 @@ func WithCut(f TreeFunc) SampleOptions {
 	return func(cfg *config) {
 		cfg.CutFunc.val = f
 		cfg.CutFunc.usr = true
+	}
+}
+
+// WithXsect sets the cross-section [pb] to the sample/component.
+// The full normalisation factor is (xsec*lumi)/ngen. 'ngen' and
+// 'xsec' are given by sample/component while 'lumi' is given to
+// via ana.New(). By default, xsec = 1 pb.
+func WithXsec(s float64) SampleOptions {
+	return func(cfg *config) {
+		cfg.Xsec.val = s
+		cfg.Xsec.usr = true
+	}
+}
+
+// WithNgen sets the total number of generated events for the
+// sample/component. The full normalisation factor is (xsec*lumi)/ngen.
+// 'ngen' and 'xsec' are given by sample/component while 'lumi' is given to
+// via ana.New(). By default, Ngen = 1.
+func WithNgen(n float64) SampleOptions {
+	return func(cfg *config) {
+		cfg.Ngen.val = n
+		cfg.Ngen.usr = true
 	}
 }
 
