@@ -4,7 +4,7 @@ import (
 	"image/color"
 	"math"
 	"testing"
-
+	
 	"gonum.org/v1/gonum/stat/distuv"
 	"gonum.org/v1/plot/cmpimg"
 	"gonum.org/v1/plot/vg"
@@ -68,7 +68,10 @@ func TestWithTreeDumping(t *testing.T) {
 }
 
 func TestProduceTreesNewVariables(t *testing.T) {
-	Example_produceTreesNewVariables()
+	cmpimg.CheckPlot(Example_produceTreesNewVariables, t,
+		"Plots_produceTreeNewVar/Mttbar.png",
+		"Plots_produceTreeNewVar/smearMttbar.png",
+	)
 }
 
 // Creation of the default analysis maker type with
@@ -444,11 +447,11 @@ func Example_produceTreesNewVariables() {
 		ana.NewVariable("DphiLL", ana.TreeVarF64("truth_dphi_ll"), 0, 0, 0),
 	}
 
-	// Add a new (relarively) complex variable: a smeared ttbar mass
+	// Add a new (relarively) complex variable: a smeared ttbar mass by 10%
 	smearedMtt := ana.TreeFunc{
 		VarsName: []string{"ttbar_m"},
 		Fct: func(m float32) float64 {
-			return float64(m) * (1.0 + gausDist(0, 0.1).Rand())
+			return float64(m) * (1.0 + gausDist(0, 0.10).Rand())
 		},
 	}
 	variables = append(variables, ana.NewVariable("smearMttbar", smearedMtt, 0, 0, 0))
@@ -464,6 +467,30 @@ func Example_produceTreesNewVariables() {
 	if err := analyzer.Run(); err != nil {
 		panic(err)
 	}
+
+	// Read back 'data.root' and plot the two variables.
+	newFilePath := "testdata/Plots_produceTreeNewVar/ntuples/data.root"
+	newTreeName := "GOtree"
+	plotter := ana.New(
+		[]*ana.Sample{
+			ana.CreateSample("NewNtuple", "bkg", `Produced ntuple`, newFilePath, newTreeName),
+		},
+		[]*ana.Variable{
+			ana.NewVariable("Mttbar", ana.TreeVarF64("Mttbar"),
+				50, 0, 1500, ana.WithTickFormats("", "%.0f"),
+				ana.WithAxisLabels("Orignal Mass [GeV]", "Events"),
+			),
+			ana.NewVariable("smearMttbar", ana.TreeVarF64("smearMttbar"),
+				50, 0, 1500, ana.WithTickFormats("", "%.0f"),
+				ana.WithAxisLabels("Smeared Mass [GeV]", "Events"),
+				),
+		},
+		ana.WithSavePath("testdata/Plots_produceTreeNewVar"),
+	)
+	if err := plotter.Run(); err != nil {
+		panic(err)
+	}
+	
 }
 
 func Example_withSliceVariables() {
@@ -531,10 +558,10 @@ var (
 	}
 
 	// Random number distribution
-	gausDist = func(mean, sigma float64) distuv.Normal {
+	gausDist = func(mu, sigma float64) distuv.Normal {
 		return distuv.Normal{
-			Mu:    0,
-			Sigma: 0.25,
+			Mu:    mu,
+			Sigma: sigma,
 		}
 	}
 	

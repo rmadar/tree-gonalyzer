@@ -668,20 +668,24 @@ func (ana *Maker) PlotVariables() error {
 				// Update the drawer and figure size
 				figWidth, figHeight = 6*vg.Inch, 4.5*vg.Inch
 				plt = rp
-
+				
 				// Compute and store the ratio (type hbook.S2D)
 				switch {
 				case ana.HistoStack:
-					// Data to MC
-					hbs2d_ratio, err := hbook.DivideH1D(bhData, bhBkgTot, hbook.DivIgnoreNaNs())
-					if err != nil {
-						log.Fatal("cannot divide histo for the ratio plot")
-					}
-					hps2d_ratio := hplot.NewS2D(hbs2d_ratio, hplot.WithYErrBars(true),
-						hplot.WithStepsKind(hplot.HiSteps),
-					)
-					style.CopyStyleH1DtoS2D(hps2d_ratio, phData)
 
+					if bhData.Entries() > 0 {
+						// Data to MC
+						hbs2d_ratio, err := hbook.DivideH1D(bhData, bhBkgTot, hbook.DivIgnoreNaNs())
+						if err != nil {
+							log.Fatal("cannot divide histo for the ratio plot")
+						}
+						hps2d_ratio := hplot.NewS2D(hbs2d_ratio, hplot.WithYErrBars(true),
+							hplot.WithStepsKind(hplot.HiSteps),
+						)
+						style.CopyStyleH1DtoS2D(hps2d_ratio, phData)
+						rp.Bottom.Add(hps2d_ratio)
+					}
+					
 					// MC to MC
 					hbs2d_ratioMC, err := hbook.DivideH1D(bhBkgTot, bhBkgTot, hbook.DivIgnoreNaNs())
 					if err != nil {
@@ -694,7 +698,6 @@ func (ana *Maker) PlotVariables() error {
 					hps2d_ratioMC.LineStyle.Width = 0.0
 					hps2d_ratioMC.Band.FillColor = ana.ErrBandColor
 					rp.Bottom.Add(hps2d_ratioMC)
-					rp.Bottom.Add(hps2d_ratio)
 
 				default:
 					// FIX-ME (rmadar): Ratio wrt data (or first bkg if data is empty)
