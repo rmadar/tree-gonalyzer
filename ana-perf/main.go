@@ -182,6 +182,8 @@ func runTest(n10kEvtsPerSample, nVariables int) float64 {
 
 	// Create analyzer object with options
 	analyzer := ana.New(samples, variables[:nVars],
+		//ana.WithDumpTree(true),
+		//ana.WithPlotHisto(false),
 		ana.WithSaveFormat("tex"),
 		ana.WithCompileLatex(false),
 		ana.WithHistoNorm(true),
@@ -189,10 +191,10 @@ func runTest(n10kEvtsPerSample, nVariables int) float64 {
 	)
 
 	// Run the analyzer and produce all plots
-	if err := analyzer.FillHistos(); err != nil {
+	if err := analyzer.RunEventLoops(); err != nil {
 		log.Fatal("Cannot fill histos:", err)
 	}
-	if err := analyzer.PlotHistos(); err != nil {
+	if err := analyzer.PlotVariables(); err != nil {
 		log.Fatal("Cannot plot histos:", err)
 	}
 
