@@ -5,6 +5,8 @@ import (
 	"math"
 	"testing"
 	
+	"golang.org/x/exp/rand"
+	
 	"gonum.org/v1/gonum/stat/distuv"
 	"gonum.org/v1/plot/cmpimg"
 	"gonum.org/v1/plot/vg"
@@ -473,7 +475,7 @@ func Example_produceTreesNewVariables() {
 	newTreeName := "GOtree"
 	plotter := ana.New(
 		[]*ana.Sample{
-			ana.CreateSample("NewNtuple", "bkg", `Produced ntuple`, newFilePath, newTreeName),
+			ana.CreateSample("new", "bkg", `Produced ntuple`, newFilePath, newTreeName),
 		},
 		[]*ana.Variable{
 			ana.NewVariable("Mttbar", ana.TreeVarF64("Mttbar"),
@@ -562,6 +564,7 @@ var (
 		return distuv.Normal{
 			Mu:    mu,
 			Sigma: sigma,
+			Src:   rand.New(rand.NewSource(0)),
 		}
 	}
 	
