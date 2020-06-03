@@ -7,6 +7,7 @@ github.com/ajstarks/svgo v0.0.0-20200320125537-f189e35d30ca/go.mod h1:K08gAheRH3
 github.com/apache/arrow/go/arrow v0.0.0-20191119113437-a5a67e8c5460/go.mod h1:VTxUBvSJ3s3eHAg65PNgrsn5BtqCRPdmyXh6rAfdxN0=
 github.com/apache/arrow/go/arrow v0.0.0-20200228160020-c67ff099122d/go.mod h1:QNYViu/X0HXDHw7m3KXzWSVXIbfUvJqBFe6Gj8/pYA0=
 github.com/apache/arrow/go/arrow v0.0.0-20200403134915-89ce1cadb678/go.mod h1:QNYViu/X0HXDHw7m3KXzWSVXIbfUvJqBFe6Gj8/pYA0=
+github.com/apache/arrow/go/arrow v0.0.0-20200603085845-24b352135a5b/go.mod h1:QNYViu/X0HXDHw7m3KXzWSVXIbfUvJqBFe6Gj8/pYA0=
 github.com/astrogo/fitsio v0.1.0/go.mod h1:AMazbBDPn8fcAglKAWIR5+5iDBnBv78pf6UHmTKSCbE=
 github.com/boombuler/barcode v1.0.0/go.mod h1:paBWMcWSl3LHKBqUq+rly7CNSldXjb2rDl3JlRe0mD8=
 github.com/campoy/embedmd v1.0.0 h1:V4kI2qTJJLf4J29RzI/MAt2c3Bl4dQSYPuflzwFH2hY=
@@ -181,6 +182,8 @@ go-hep.org/x/hep v0.27.1-0.20200529093836-4d1e5f0811fb h1:xEDjSM775PWpeN+IvIzoSP
 go-hep.org/x/hep v0.27.1-0.20200529093836-4d1e5f0811fb/go.mod h1:6e2bMlQQKxIljS9dsWZVqsfqTBqegTu57cpOcgMcNDQ=
 go-hep.org/x/hep v0.27.1-0.20200529195039-3b702ec41bed h1:6qPTx55x1x78grDSsQDsF5oEQy9g3hPxlOxTn0o5/jA=
 go-hep.org/x/hep v0.27.1-0.20200529195039-3b702ec41bed/go.mod h1:6e2bMlQQKxIljS9dsWZVqsfqTBqegTu57cpOcgMcNDQ=
+go-hep.org/x/hep v0.27.1-0.20200603124917-364dcc3f97c9 h1:SNCaeDr2RRseyIxIRNT8LSEKplNSTq1LdhoGBlgmSXo=
+go-hep.org/x/hep v0.27.1-0.20200603124917-364dcc3f97c9/go.mod h1:jvhNNiRSZTK01gID+i02mN/u+AE5tUE8hICSfCY0G04=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
 golang.org/x/crypto v0.0.0-20190510104115-cbcb75029529/go.mod h1:yigFU9vqHzYiE8UmvKecakEJjdnWj3jj499lnFckfCI=
 golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550/go.mod h1:yigFU9vqHzYiE8UmvKecakEJjdnWj3jj499lnFckfCI=
