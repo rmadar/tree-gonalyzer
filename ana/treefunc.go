@@ -184,6 +184,8 @@ func (f *TreeFunc) FuncFormula() rfunc.Formula {
 			ff = rfunc.NewFuncF64ToBool(f.VarsName, fct)
 		case func(bool) float64:
 			ff = newUsrFuncBoolToF64(f.VarsName, fct)
+		case func([]float32, float64) []float64:
+			ff = newUsrFuncF32sF64ToF64s(f.VarsName ,fct)
 		default:
 			ff, err = rfunc.NewGenericFormula(f.VarsName, f.Fct)
 			if err != nil {
@@ -254,6 +256,43 @@ func (usr *userFuncBoolToF64) Func() interface{} {
 		return usr.fct(*usr.v1)
 	}
 }
+
+
+func newUsrFuncF32sF64ToF64s(varsName []string, fct func([]float32, float64) []float64) *userFuncF32sF64ToF64s {
+	return &userFuncF32sF64ToF64s{
+		rvars: varsName,
+		fct:   fct,
+	}
+}
+
+type userFuncF32sF64ToF64s struct {
+	rvars []string
+	v1    *[]float32
+	v2    *float64
+	fct   func([]float32, float64) []float64
+}
+
+func (usr *userFuncF32sF64ToF64s) RVars() []string { return usr.rvars }
+
+func (usr *userFuncF32sF64ToF64s) Bind(args []interface{}) error {
+	if got, want := len(args), 2; got != want {
+		return fmt.Errorf(
+			"rfunc: invalid number of bind arguments (got=%d, want=%d)",
+			got, want,
+		)
+	}
+	usr.v1 = args[0].(*[]float32)
+	usr.v2 = args[1].(*float64)
+	return nil
+}
+
+func (usr *userFuncF32sF64ToF64s) Func() interface{} {
+	return func() []float64 {
+		return usr.fct(*usr.v1, *usr.v2)
+	}
+}
+
+
 
 func newUsrFuncF32F32ToF64(varsName []string, fct func(float32, float32) float64) *userFuncF32F32ToF64 {
 	return &userFuncF32F32ToF64{
