@@ -4,9 +4,9 @@ import (
 	"image/color"
 	"math"
 	"testing"
-	
+
 	"golang.org/x/exp/rand"
-	
+
 	"gonum.org/v1/gonum/stat/distuv"
 	"gonum.org/v1/plot/cmpimg"
 	"gonum.org/v1/plot/vg"
@@ -325,13 +325,13 @@ func Example_systematicVariations() {
 
 func Example_shapeDistortion() {
 	// Selection TreeFunc generator
-	ptTopGT := func (th float32) ana.TreeFunc {
+	ptTopGT := func(th float32) ana.TreeFunc {
 		return ana.TreeFunc{
 			VarsName: []string{"t_pt"},
 			Fct:      func(pt float32) bool { return pt > th },
 		}
 	}
-	
+
 	// Samples
 	samples := []*ana.Sample{
 		ana.CreateSample("noCut", "bkg", `No cut`, fBkg1, tName,
@@ -457,14 +457,14 @@ func Example_produceTreesNewVariables() {
 		},
 	}
 	variables = append(variables, ana.NewVariable("smearMttbar", smearedMtt, 0, 0, 0))
-	
+
 	// Create analyzer object with normalized histograms.
 	analyzer := ana.New(samples, variables,
 		ana.WithDumpTree(true),
 		ana.WithPlotHisto(false),
 		ana.WithSavePath("testdata/Plots_produceTreeNewVar"),
 	)
-	
+
 	// Run the analyzer and dump on tree per sample
 	if err := analyzer.Run(); err != nil {
 		panic(err)
@@ -485,14 +485,14 @@ func Example_produceTreesNewVariables() {
 			ana.NewVariable("smearMttbar", ana.TreeVarF64("smearMttbar"),
 				50, 0, 1500, ana.WithTickFormats("", "%.0f"),
 				ana.WithAxisLabels("Smeared Mass [GeV]", "Events"),
-				),
+			),
 		},
 		ana.WithSavePath("testdata/Plots_produceTreeNewVar"),
 	)
 	if err := plotter.Run(); err != nil {
 		panic(err)
 	}
-	
+
 }
 
 func Example_withSliceVariables() {
@@ -567,7 +567,7 @@ var (
 			Src:   rand.New(rand.NewSource(0)),
 		}
 	}
-	
+
 	// Some colors
 	noColor    = color.NRGBA{}
 	softBlack  = color.NRGBA{R: 50, G: 30, B: 50, A: 200}

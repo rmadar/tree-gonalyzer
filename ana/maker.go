@@ -34,8 +34,8 @@ type Maker struct {
 	Variables []*Variable  // List of variables to plot.
 	KinemCuts []*Selection // List of cuts to apply (default: no cut).
 	Nevts     int64        // Maximum number of events per components.
-	SampleMT   bool        // Enable concurency accross samples
-	
+	SampleMT  bool         // Enable concurency accross samples
+
 	// Ouputs
 	SavePath     string // Path to which plot will be saved (default: 'outputs').
 	SaveFormat   string // Plot file extension: 'png' (default), 'pdf' or 'png'.
@@ -58,8 +58,8 @@ type Maker struct {
 	HplotHistos [][][]*hplot.H1D
 
 	// Internal: tree dumping
-	nVars       int         // number of variables
-	nEvtsSample []int64     // number of events per sample
+	nVars       int     // number of variables
+	nEvtsSample []int64 // number of events per sample
 
 	// Internal management
 	cutIdx      map[string]int // Linking cut name and cut index
@@ -71,7 +71,7 @@ type Maker struct {
 	timePlot    time.Duration  // Processing time for plotting histogram
 }
 
-type dumper struct { 
+type dumper struct {
 	Var   []float64   // Storing the F64 variables values to dump the TTree.
 	Vars  [][]float64 // Storing the F64s variable values to dump the TTree.
 	VarsN []int32     // Storing the number of object in the F64s to dump the TTree.
@@ -103,7 +103,7 @@ func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 
 	// Configuration with default values for all optional fields
 	cfg := newConfig()
-	
+
 	// Update the configuration looping over functional options
 	for _, opt := range opts {
 		opt(cfg)
@@ -166,7 +166,7 @@ func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 
 	// Managing event number with concurrency
 	a.nEvtsSample = make([]int64, len(a.Samples))
-	
+
 	// Build hbook and hplot H1D containers
 	a.initHistoContainers()
 
@@ -247,7 +247,7 @@ func (ana *Maker) concurrentSampleEventLoop(sampleIdx int, wg *sync.WaitGroup) {
 }
 
 func (ana *Maker) sampleEventLoop(sampleIdx int) {
-	
+
 	// Current sample
 	samp := ana.Samples[sampleIdx]
 
@@ -315,7 +315,7 @@ func (ana *Maker) sampleEventLoop(sampleIdx int) {
 					}
 				}
 			}
-			
+
 			// Prepare the sample global weight
 			getWeightSamp := func() float64 { return float64(1.0) }
 			if samp.WeightFunc.Fct != nil {
@@ -417,7 +417,7 @@ func (ana *Maker) sampleEventLoop(sampleIdx int) {
 					}
 
 				}
-				
+
 				if ana.DumpTree {
 					_, err = tOut.Write()
 					if err != nil {
@@ -432,7 +432,7 @@ func (ana *Maker) sampleEventLoop(sampleIdx int) {
 			if err != nil {
 				log.Fatalf("could not read tree: %+v", err)
 			}
-			
+
 			// Keep track of the number of processed events.
 			switch ana.Nevts {
 			case -1:
@@ -440,7 +440,7 @@ func (ana *Maker) sampleEventLoop(sampleIdx int) {
 			default:
 				ana.nEvtsSample[sampleIdx] += ana.Nevts
 			}
-			
+
 			return nil
 		}(iComp)
 	}
@@ -455,7 +455,7 @@ func (ana *Maker) PlotVariables() error {
 	if !ana.PlotHisto {
 		return nil
 	}
-	
+
 	// Start timing
 	start := time.Now()
 
@@ -668,7 +668,7 @@ func (ana *Maker) PlotVariables() error {
 				// Update the drawer and figure size
 				figWidth, figHeight = 6*vg.Inch, 4.5*vg.Inch
 				plt = rp
-				
+
 				// Compute and store the ratio (type hbook.S2D)
 				switch {
 				case ana.HistoStack:
@@ -685,7 +685,7 @@ func (ana *Maker) PlotVariables() error {
 						style.CopyStyleH1DtoS2D(hps2d_ratio, phData)
 						rp.Bottom.Add(hps2d_ratio)
 					}
-					
+
 					// MC to MC
 					hbs2d_ratioMC, err := hbook.DivideH1D(bhBkgTot, bhBkgTot, hbook.DivIgnoreNaNs())
 					if err != nil {
@@ -927,8 +927,8 @@ func (ana *Maker) newDumper() dumper {
 
 	// Return the dumper
 	return dumper{
-		Var: dVar,
-		Vars: dVars,
+		Var:   dVar,
+		Vars:  dVars,
 		VarsN: dVarsN,
 	}
 }

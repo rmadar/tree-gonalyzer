@@ -23,10 +23,7 @@ func EmptySelection() *Selection {
 // and TreeFunc fct. Fct must return a boolean.
 func NewSelection(name string, fct TreeFunc) *Selection {
 	return &Selection{
-		Name: name,
+		Name:     name,
 		TreeFunc: fct,
 	}
 }
-
-
-	

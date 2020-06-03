@@ -7,6 +7,7 @@ require (
 	github.com/mattn/go-runewidth v0.0.9 // indirect
 	github.com/rmadar/hplot-style v0.0.0-20200526215101-0690a1dea78f
 	go-hep.org/x/hep v0.27.1-0.20200529195039-3b702ec41bed
+	golang.org/x/exp v0.0.0-20200331195152-e8c3332aa8e5
 	golang.org/x/image v0.0.0-20200430140353-33d19683fad8 // indirect
 	golang.org/x/tools v0.0.0-20200526224456-8b020aee10d2 // indirect
 	gonum.org/v1/gonum v0.7.1-0.20200602002949-4ff1bb0a480e
