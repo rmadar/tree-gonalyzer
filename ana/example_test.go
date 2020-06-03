@@ -314,42 +314,36 @@ func Example_systematicVariations() {
 }
 
 func Example_shapeDistortion() {
-	// Selections as TreeFunc's
-	ptTopGT50 := ana.TreeFunc{
-		VarsName: []string{"t_pt"},
-		Fct:      func(pt float32) bool { return pt > 50. },
+	// Selection TreeFunc generator
+	ptTopGT := func (th float32) ana.TreeFunc {
+		return ana.TreeFunc{
+			VarsName: []string{"t_pt"},
+			Fct:      func(pt float32) bool { return pt > th },
+		}
 	}
-	ptTopGT100 := ana.TreeFunc{
-		VarsName: []string{"t_pt"},
-		Fct:      func(pt float32) bool { return pt > 100. },
-	}
-	ptTopGT200 := ana.TreeFunc{
-		VarsName: []string{"t_pt"},
-		Fct:      func(pt float32) bool { return pt > 200. },
-	}
-
+	
 	// Samples
 	samples := []*ana.Sample{
 		ana.CreateSample("noCut", "bkg", `No cut`, fBkg1, tName,
 			ana.WithFillColor(shadowBlue),
 		),
 		ana.CreateSample("cut1", "bkg", `pT>50`, fBkg1, tName,
-			ana.WithCut(ptTopGT50),
+			ana.WithCut(ptTopGT(50)),
 			ana.WithLineColor(darkRed),
 			ana.WithLineWidth(2),
 		),
 		ana.CreateSample("cut2", "bkg", `pT>100`, fBkg1, tName,
-			ana.WithCut(ptTopGT100),
+			ana.WithCut(ptTopGT(100)),
 			ana.WithLineColor(darkBlue),
 			ana.WithLineWidth(2),
 		),
 		ana.CreateSample("cut3", "bkg", `pT>200`, fBkg1, tName,
-			ana.WithCut(ptTopGT200),
+			ana.WithCut(ptTopGT(200)),
 			ana.WithLineColor(darkGreen),
 			ana.WithLineWidth(2),
 		),
 	}
-
+	
 	// Define variables
 	variables := []*ana.Variable{
 		ana.NewVariable("Mttbar", ana.TreeVarF32("ttbar_m"), 25, 350, 1500,
