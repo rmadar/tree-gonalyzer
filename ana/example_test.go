@@ -102,7 +102,6 @@ func Example_aSimpleUseCase() {
 
 	// Create analyzer object
 	analyzer := ana.New(samples, variables,
-		//ana.WithLumi(0.01),
 		ana.WithSavePath("testdata/Plots_simpleUseCase"),
 	)
 

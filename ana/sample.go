@@ -197,9 +197,15 @@ func CreateSample(sname, stype, sleg, fname, tname string, opts ...SampleOptions
 		opt(cfg)
 	}
 	if cfg.Xsec.usr {
+		if s.sType == data {
+			log.Fatalf("sample type 'data' doesn't support xsection option.")
+		}
 		s.components[0].Xsec = cfg.Xsec.val
 	}
 	if cfg.Ngen.usr {
+		if s.sType == data {
+			log.Fatalf("sample type 'data' doesn't support Ngen option.")
+		}
 		s.components[0].Ngen = cfg.Ngen.val
 	}
 	
@@ -237,9 +243,15 @@ func (s *Sample) AddComponent(fname, tname string, opts ...SampleOptions) {
 		c.CutFunc = cfg.CutFunc.val
 	}
 	if cfg.Xsec.usr {
+		if s.sType == data {
+			log.Fatalf("component of type 'data' sample doesn't support xsection option.")
+		}
 		c.Xsec = cfg.Xsec.val
 	}
 	if cfg.Ngen.usr {
+		if s.sType == data {
+			log.Fatalf("component of type 'data' sample doesn't support Ngen option.")
+		}
 		c.Ngen = cfg.Ngen.val
 	}
 	

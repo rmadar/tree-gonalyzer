@@ -392,7 +392,8 @@ func WithCut(f TreeFunc) SampleOptions {
 // WithXsect sets the cross-section [pb] to the sample/component.
 // The full normalisation factor is (xsec*lumi)/ngen. 'ngen' and
 // 'xsec' are given by sample/component while 'lumi' is given to
-// via ana.New(). By default, xsec = 1 pb.
+// via ana.New(). By default, xsec = 1 pb. This option cannot be passed to
+// a sample (or component) of type "data".
 func WithXsec(s float64) SampleOptions {
 	return func(cfg *config) {
 		cfg.Xsec.val = s
@@ -403,7 +404,8 @@ func WithXsec(s float64) SampleOptions {
 // WithNgen sets the total number of generated events for the
 // sample/component. The full normalisation factor is (xsec*lumi)/ngen.
 // 'ngen' and 'xsec' are given by sample/component while 'lumi' is given to
-// via ana.New(). By default, Ngen = 1.
+// via ana.New(). By default, Ngen = 1. This option cannot be passed to
+// a sample (or component) of type "data".
 func WithNgen(n float64) SampleOptions {
 	return func(cfg *config) {
 		cfg.Ngen.val = n
