@@ -200,9 +200,11 @@ func getIdxMap(objs interface{}, objType interface{}) map[string]int {
 	return res
 }
 
-// FillHistos runs the one event loop per sample to fill
-// histograms for each variables and selections.
-func (ana *Maker) FillHistos() error {
+// RunEventLoops runs one event loop per sample to fill
+// histograms for each variables and selections. If DumpTree
+// is true, a tree is also dumped with all variables and one
+// branch per selection.
+func (ana *Maker) RunEventLoops() error {
 
 	// Start timing
 	start := time.Now()
@@ -212,12 +214,12 @@ func (ana *Maker) FillHistos() error {
 		var wg sync.WaitGroup
 		for i := range ana.Samples {
 			wg.Add(1)
-			go ana.concurrentFillSampleHistos(i, &wg)
+			go ana.concurrentSampleEventLoop(i, &wg)
 		}
 		wg.Wait()
 	} else {
 		for i := range ana.Samples {
-			ana.fillSampleHistos(i)
+			ana.sampleEventLoop(i)
 		}
 	}
 
@@ -234,16 +236,16 @@ func (ana *Maker) FillHistos() error {
 	return nil
 }
 
-func (ana *Maker) concurrentFillSampleHistos(sampleIdx int, wg *sync.WaitGroup) {
+func (ana *Maker) concurrentSampleEventLoop(sampleIdx int, wg *sync.WaitGroup) {
 
-	// Handle concurency
+	// Handle concurrency
 	defer wg.Done()
 
 	// Fill the histo
-	ana.fillSampleHistos(sampleIdx)
+	ana.sampleEventLoop(sampleIdx)
 }
 
-func (ana *Maker) fillSampleHistos(sampleIdx int) {
+func (ana *Maker) sampleEventLoop(sampleIdx int) {
 
 	// Current sample
 	samp := ana.Samples[sampleIdx]
@@ -792,8 +794,8 @@ func (ana *Maker) RunTimePerKEvts() float64 {
 // and print report.
 func (ana *Maker) Run() error {
 
-	// Create histograms via an event loop
-	err := ana.FillHistos()
+	// Create histograms via event loops
+	err := ana.RunEventLoops()
 	if err != nil {
 		return err
 	}

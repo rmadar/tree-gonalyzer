@@ -446,7 +446,6 @@ func Example_withSliceVariables() {
 
 	// Analyzer
 	analyzer := ana.New(samples, variables,
-		ana.WithDumpTree(true),
 		ana.WithHistoStack(false),
 		ana.WithRatioPlot(false),
 		ana.WithSavePath("testdata/Plots_withSliceVariables"),
