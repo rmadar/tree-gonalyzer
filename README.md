@@ -75,7 +75,7 @@ analyzer.Run()
 For 2M events and 60 variables, a comparison with similar ROOT-based code
 (using `t->Draw()`) gives:
  + `ROOT  -> 6.2 ms/kEvts`
- + `GOHEP -> 1.8 ms/kEvts`
+ + `GOHEP -> 1.7 ms/kEvts`
  
 For 2M event and one variable (avoiding `t->Draw()` repetition)
  + `ROOT  -> 0.39 ms/kEvts`

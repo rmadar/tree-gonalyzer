@@ -188,6 +188,7 @@ func runTest(n10kEvtsPerSample, nVariables int) float64 {
 		ana.WithCompileLatex(false),
 		ana.WithHistoNorm(true),
 		ana.WithHistoStack(true),
+		ana.WithSampleMT(true),
 	)
 
 	// Run the analyzer and produce all plots
