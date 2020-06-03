@@ -37,10 +37,11 @@ type Maker struct {
 	SampleMT   bool        // Enable concurency accross samples
 	
 	// Ouputs
-	SavePath     string // Path to which plot will be saved (default: 'plots').
+	SavePath     string // Path to which plot will be saved (default: 'outputs').
 	SaveFormat   string // Plot file extension: 'png' (default), 'pdf' or 'png'.
 	CompileLatex bool   // On-the-fly latex compilation (default: true).
 	DumpTree     bool   // Dump a TTree in a file for each sample (default: false).
+	PlotHisto    bool   // Enable histogram plotting (default: true).
 
 	// Plots
 	AutoStyle    bool        // Enable automatic styling (default: true).
@@ -59,7 +60,6 @@ type Maker struct {
 	// Internal: tree dumping
 	nVars       int         // number of variables
 	nEvtsSample []int64     // number of events per sample
-	treeDumpers []dumper    // contains all object to dump a tree
 
 	// Internal management
 	cutIdx      map[string]int // Linking cut name and cut index
@@ -86,9 +86,10 @@ func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 		Samples:      s,
 		Variables:    v,
 		Nevts:        -1,
+		PlotHisto:    true,
 		SampleMT:     true,
 		AutoStyle:    true,
-		SavePath:     "plots",
+		SavePath:     "outputs",
 		SaveFormat:   "png",
 		PlotTitle:    "TTree GOnalyzer",
 		CompileLatex: true,
@@ -126,6 +127,9 @@ func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 	}
 	if cfg.DumpTree.usr {
 		a.DumpTree = cfg.DumpTree.val
+	}
+	if cfg.PlotHisto.usr {
+		a.PlotHisto = cfg.PlotHisto.val
 	}
 	if cfg.AutoStyle.usr {
 		a.AutoStyle = cfg.AutoStyle.val
@@ -171,9 +175,6 @@ func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 	//                 by doing a loop over variables for the first
 	//                 component of the first sample to fill v.isSlice.
 	a.assessVariableTypes()
-
-	// Initialize the variable with the proper types
-	// a.initDumpedVars()
 
 	return a
 }
@@ -246,7 +247,7 @@ func (ana *Maker) concurrentSampleEventLoop(sampleIdx int, wg *sync.WaitGroup) {
 }
 
 func (ana *Maker) sampleEventLoop(sampleIdx int) {
-
+	
 	// Current sample
 	samp := ana.Samples[sampleIdx]
 
@@ -255,7 +256,11 @@ func (ana *Maker) sampleEventLoop(sampleIdx int) {
 	for iCut := range ana.KinemCuts {
 		h[iCut] = make([]*hbook.H1D, len(ana.Variables))
 		for iVar, v := range ana.Variables {
-			h[iCut][iVar] = hbook.NewH1D(v.Nbins, v.Xmin, v.Xmax)
+			if ana.PlotHisto {
+				h[iCut][iVar] = hbook.NewH1D(v.Nbins, v.Xmin, v.Xmax)
+			} else {
+				h[iCut][iVar] = hbook.NewH1D(1, 0, 1)
+			}
 		}
 	}
 
@@ -443,10 +448,14 @@ func (ana *Maker) sampleEventLoop(sampleIdx int) {
 	ana.HbookHistos[sampleIdx] = h
 }
 
-// PlotHistos loops over all filled histograms and produce one plot
+// PlotVariables loops over all filled histograms and produce one plot
 // for each variable and selection, including all sample histograms.
-func (ana *Maker) PlotHistos() error {
+func (ana *Maker) PlotVariables() error {
 
+	if !ana.PlotHisto {
+		return nil
+	}
+	
 	// Start timing
 	start := time.Now()
 
@@ -458,7 +467,7 @@ func (ana *Maker) PlotHistos() error {
 	// Return an error if HbookHistos is empty
 	if !ana.histoFilled {
 		err := "There is no histograms. Please make sure that"
-		err += "'FillHistos()' is called before 'PlotHistos()'"
+		err += "'FillHistos()' is called before 'PlotVariables()'"
 		log.Fatalf(err)
 	}
 
@@ -800,8 +809,8 @@ func (ana *Maker) Run() error {
 		return err
 	}
 
-	// Plot them on the same canvas
-	err = ana.PlotHistos()
+	// Plot each variable x selection, overlaying samples.
+	err = ana.PlotVariables()
 	if err != nil {
 		return err
 	}

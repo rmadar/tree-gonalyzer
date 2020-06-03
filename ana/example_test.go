@@ -5,6 +5,7 @@ import (
 	"math"
 	"testing"
 
+	"gonum.org/v1/gonum/stat/distuv"
 	"gonum.org/v1/plot/cmpimg"
 	"gonum.org/v1/plot/vg"
 
@@ -64,6 +65,10 @@ func TestWithTreeDumping(t *testing.T) {
 		"Plots_withTreeDumping/LowM/Mttbar.png",
 		"Plots_withTreeDumping/LowM/DphiLL.png",
 	)
+}
+
+func TestProduceTreesNewVariables(t *testing.T) {
+	Example_produceTreesNewVariables()
 }
 
 // Creation of the default analysis maker type with
@@ -343,7 +348,7 @@ func Example_shapeDistortion() {
 			ana.WithLineWidth(2),
 		),
 	}
-	
+
 	// Define variables
 	variables := []*ana.Variable{
 		ana.NewVariable("Mttbar", ana.TreeVarF32("ttbar_m"), 25, 350, 1500,
@@ -424,6 +429,43 @@ func Example_withTreeDumping() {
 	}
 }
 
+func Example_produceTreesNewVariables() {
+	// Sample to process
+	data := ana.CreateSample("data", "data", `Data 18-20`, fData, tName)
+	bkgA := ana.CreateSample("BkgTotA", "bkg", `Total Bkg A`, fBkg1, tName)
+	bkgB := ana.CreateSample("BkgTotB", "bkg", `Total Bkg B`, fBkg2, tName)
+
+	// Put samples together.
+	samples := []*ana.Sample{data, bkgA, bkgB}
+
+	// Define variables from the original tree
+	variables := []*ana.Variable{
+		ana.NewVariable("Mttbar", ana.TreeVarF32("ttbar_m"), 0, 0, 0),
+		ana.NewVariable("DphiLL", ana.TreeVarF64("truth_dphi_ll"), 0, 0, 0),
+	}
+
+	// Add a new (relarively) complex variable: a smeared ttbar mass
+	smearedMtt := ana.TreeFunc{
+		VarsName: []string{"ttbar_m"},
+		Fct: func(m float32) float64 {
+			return float64(m) * (1.0 + gausDist(0, 0.1).Rand())
+		},
+	}
+	variables = append(variables, ana.NewVariable("smearMttbar", smearedMtt, 0, 0, 0))
+	
+	// Create analyzer object with normalized histograms.
+	analyzer := ana.New(samples, variables,
+		ana.WithDumpTree(true),
+		ana.WithPlotHisto(false),
+		ana.WithSavePath("testdata/Plots_produceTreeNewVar"),
+	)
+	
+	// Run the analyzer and dump on tree per sample
+	if err := analyzer.Run(); err != nil {
+		panic(err)
+	}
+}
+
 func Example_withSliceVariables() {
 	// File and tree names
 	fName, tName := "../testdata/fileSlices.root", "modules"
@@ -488,6 +530,14 @@ var (
 		Fct:      func(m float32) bool { return m >= 500 },
 	}
 
+	// Random number distribution
+	gausDist = func(mean, sigma float64) distuv.Normal {
+		return distuv.Normal{
+			Mu:    0,
+			Sigma: 0.25,
+		}
+	}
+	
 	// Some colors
 	noColor    = color.NRGBA{}
 	softBlack  = color.NRGBA{R: 50, G: 30, B: 50, A: 200}

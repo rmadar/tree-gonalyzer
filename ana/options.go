@@ -50,8 +50,12 @@ type config struct {
 		val bool // Enable Tree dumping
 		usr bool
 	}
+	PlotHisto struct {
+		val bool // Enable histograms plotting
+		usr bool
+	}
 	AutoStyle struct {
-		val bool // Enable auto style of the histogram.
+		val bool // Enable auto style of histograms.
 		usr bool
 	}
 	PlotTitle struct {
@@ -256,11 +260,20 @@ func WithCompileLatex(b bool) Options {
 	}
 }
 
-// WithCompileLatex enables automatic latex compilation.
+// WithDumpTree enables tree dumping (one per sample).
 func WithDumpTree(b bool) Options {
 	return func(cfg *config) {
 		cfg.DumpTree.val = b
 		cfg.DumpTree.usr = true
+	}
+}
+
+// WithPlotHisto enables histogram plotting. It can be
+// set to false to only dump trees.
+func WithPlotHisto(b bool) Options {
+	return func(cfg *config) {
+		cfg.PlotHisto.val = b
+		cfg.PlotHisto.usr = true
 	}
 }
 
