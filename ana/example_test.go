@@ -475,7 +475,7 @@ func Example_produceTreesNewVariables() {
 	newTreeName := "GOtree"
 	plotter := ana.New(
 		[]*ana.Sample{
-			ana.CreateSample("new", "bkg", `Produced ntuple`, newFilePath, newTreeName),
+			ana.CreateSample("new", "bkg", `new ntuple`, newFilePath, newTreeName),
 		},
 		[]*ana.Variable{
 			ana.NewVariable("Mttbar", ana.TreeVarF64("Mttbar"),
