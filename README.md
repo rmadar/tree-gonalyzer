@@ -8,6 +8,7 @@ This tool is built on top of [go-hep.org](https://go-hep.org). The main supporte
  - displaying one or several signals (overlaid or stacked),
  - sample normalisation using cross-section and/or luminosity and/or number of generated events,
  - computing of new variables of arbitrary complexity,
+ - joint trees to the main one, as in `TTreeFriend`,
  - dumping `TTree`'s with `float64` and `[]float64` branches,
  - concurent sample processings.
 
