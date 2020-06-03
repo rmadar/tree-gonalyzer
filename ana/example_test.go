@@ -76,6 +76,14 @@ func TestProduceTreesNewVariables(t *testing.T) {
 	)
 }
 
+func TestWithJointTrees(t *testing.T) {
+	cmpimg.CheckPlot(Example_withJointTrees, t,
+		"Plots_withJointTrees/hitTimes.png",
+		"Plots_withJointTrees/calibCon.png",
+		"Plots_withJointTrees/calibHit.png",
+	)
+}
+
 // Creation of the default analysis maker type with
 // single-component samples.
 func Example_aSimpleUseCase() {
@@ -523,6 +531,61 @@ func Example_withSliceVariables() {
 		ana.WithHistoStack(false),
 		ana.WithRatioPlot(false),
 		ana.WithSavePath("testdata/Plots_withSliceVariables"),
+	)
+
+	// Run the analyzer to produce all the plots
+	if err := analyzer.Run(); err != nil {
+		panic(err)
+	}
+}
+
+func Example_withJointTrees() {
+	// File and tree names
+	fNameM, tNameM := "../testdata/fileSlices.root", "modules"
+	fNameJ, tNameJ := "../testdata/fileSlicesJoint.root", "constants"
+
+	// Samples
+	samples := []*ana.Sample{
+		ana.CreateSample("HGTD", "bkg", `Minimum Bias`, fNameM, tNameM,
+			ana.WithJointTree(fNameJ, tNameJ),
+		),
+	}
+
+	calibHits := ana.TreeFunc{
+		VarsName: []string{"hits_time_mc", "c_mc_excl_mean"},
+		Fct: func(ts []float32, c float64) []float64 {
+			res := make([]float64, len(ts))
+			for i, t := range ts {
+				res[i] = float64(t) - c
+			}
+			return res
+		},
+	}
+	
+	// Variables
+	variables := []*ana.Variable{
+
+		// Variable in the main Tree
+		ana.NewVariable("hitTimes", ana.TreeVarF32s("hits_time_mc"), 100, 10, 15,
+			ana.WithAxisLabels("Uncalibrated times", "Number of Hits"),
+		),
+		
+		// Variable in the joint Tree
+		ana.NewVariable("calibCon", ana.TreeVarF64("c_mc_excl_mean"), 50, 10, 15,
+			ana.WithAxisLabels("Calibration constants", "Number of Modules"),
+		),
+		
+		// Newly computed based on both
+		ana.NewVariable("calibHit", calibHits, 100, -2, 3,
+			ana.WithAxisLabels("Calibrated Time", "Number of Hits"),
+		),
+	}
+	
+	// Analyzer
+	analyzer := ana.New(samples, variables,
+		ana.WithHistoStack(false),
+		ana.WithRatioPlot(false),
+		ana.WithSavePath("testdata/Plots_withJointTrees"),
 	)
 
 	// Run the analyzer to produce all the plots

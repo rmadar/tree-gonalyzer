@@ -71,12 +71,19 @@ type Sample struct {
 type sampleComponent struct {
 	FileName   string
 	TreeName   string
+	JointTrees []input
 	WeightFunc TreeFunc
 	CutFunc    TreeFunc
 	Xsec       float64
 	Ngen       float64
 }
 
+// Helper structure to describe JointTrees
+type input struct {
+	FileName string
+	TreeName string
+}
+	
 // NewSample creates a new empty sample, ie without any components,
 // with the default options. Components can be then added using
 // s.AddComponent(...) function.
@@ -196,6 +203,11 @@ func CreateSample(sname, stype, sleg, fname, tname string, opts ...SampleOptions
 	for _, opt := range opts {
 		opt(cfg)
 	}
+	
+	if cfg.JointTrees.usr {
+		s.components[0].JointTrees = cfg.JointTrees.val
+	}
+	
 	if cfg.Xsec.usr {
 		if s.sType == data {
 			log.Fatalf("sample type 'data' doesn't support xsection option.")

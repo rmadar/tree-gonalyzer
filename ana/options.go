@@ -100,6 +100,10 @@ type config struct {
 		val TreeFunc // Cut applied to the sample/component
 		usr bool
 	}
+	JointTrees struct {
+		val []input // slice of file/tree name of joints trees
+		usr bool
+	}
 	Xsec struct {
 		val float64 // cross-section of this sample/component
 		usr bool
@@ -386,6 +390,17 @@ func WithCut(f TreeFunc) SampleOptions {
 	return func(cfg *config) {
 		cfg.CutFunc.val = f
 		cfg.CutFunc.usr = true
+	}
+}
+
+// WithJointTree adds a tree to be joint for this sample/component.
+// Branches of joint tree are added to the list of available variables.
+// Several joint trees can be added using  WithJointTree() option several
+// times.
+func WithJointTree(fname, tname string) SampleOptions {
+	return func(cfg *config) {
+		cfg.JointTrees.val = append(cfg.JointTrees.val, input{FileName: fname, TreeName: tname})
+		cfg.JointTrees.usr = true
 	}
 }
 

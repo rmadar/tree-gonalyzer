@@ -289,10 +289,22 @@ func (ana *Maker) sampleEventLoop(sampleIdx int) {
 		// Anonymous function to avoid memory-leaks due to 'defer'
 		func(j int) error {
 
-			// Get the file and tree
-			f, t := getTreeFromFile(comp.FileName, comp.TreeName)
+			// Get the main file and tree
+			f, tMain := getTreeFromFile(comp.FileName, comp.TreeName)
 			defer f.Close()
 
+			// Get the trees to be joint
+			trees := []rtree.Tree{tMain}
+			for _, in := range comp.JointTrees {
+				fJoin, tJoin := getTreeFromFile(in.FileName, in.TreeName)
+				trees = append(trees, tJoin)
+				defer fJoin.Close()
+			}
+			t, err := rtree.Join(trees...)
+			if err != nil {
+				log.Fatalf("could not join trees: %+v", err)
+			}
+			
 			// Get the tree reader
 			r, err := rtree.NewReader(t, []rtree.ReadVar{}, rtree.WithRange(0, ana.NevtsMax))
 			if err != nil {
@@ -912,8 +924,20 @@ func (ana *Maker) assessVariableTypes() {
 
 	fName := ana.Samples[0].components[0].FileName
 	tName := ana.Samples[0].components[0].TreeName
-	f, t := getTreeFromFile(fName, tName)
+	f, tMain := getTreeFromFile(fName, tName)
 	defer f.Close()
+	trees := []rtree.Tree{tMain}
+	for _, in := range ana.Samples[0].components[0].JointTrees {
+		fJoin, tJoin := getTreeFromFile(in.FileName, in.TreeName)
+		trees = append(trees, tJoin)
+		defer fJoin.Close()
+	}
+	t, err := rtree.Join(trees...)
+	if err != nil {
+		log.Fatalf("could not join trees: %+v", err)
+	}
+
+	// Get reader
 	r, err := rtree.NewReader(t, rtree.NewReadVars(t))
 	if err != nil {
 		log.Fatal("could not create tree reader: %w", err)
