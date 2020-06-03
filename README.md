@@ -6,7 +6,7 @@ This is a tool written in go to produce publication-quality plots from ROOT TTre
 This tool is built on top of [go-hep.org](https://go-hep.org). The main supported features are:
  - histograming variables over many samples and selections,
  - computing of new variables of arbitrary complexity,
- - dumping `TTree`s
+ - dumping `TTree`'s with `float64` and `[]float64` branches
  - concurent sample processings,
 
 ## In a nutshell
