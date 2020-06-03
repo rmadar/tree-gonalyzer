@@ -413,15 +413,10 @@ func Example_withTreeDumping() {
 
 	// Define some selections
 	selections := []*ana.Selection{
-		&ana.Selection{
-			Name:     "LowM",
-			TreeFunc: cutMlt500,
-		},
-		&ana.Selection{
-			Name:     "HighM",
-			TreeFunc: cutMgt500,
-		},
+		ana.NewSelection("LowM", cutMlt500),
+		ana.NewSelection("HighM", cutMgt500),
 	}
+
 	// Create analyzer object with normalized histograms.
 	analyzer := ana.New(samples, variables,
 		ana.WithKinemCuts(selections),

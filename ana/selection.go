@@ -1,13 +1,15 @@
 package ana
 
 // The returned type of TreeFunc must be a boolean.
-// It will panic otherwise.
 type Selection struct {
 	Name     string
 	TreeFunc TreeFunc
 }
 
-func NewSelection() *Selection {
+// EmptySelection returns an empty selection type,
+// i.e. without name (empty string) and returning
+// always true.
+func EmptySelection() *Selection {
 	return &Selection{
 		Name: "",
 		TreeFunc: TreeFunc{
@@ -16,3 +18,15 @@ func NewSelection() *Selection {
 		},
 	}
 }
+
+// NewSelection returns a selection with the specified name
+// and TreeFunc fct. Fct must return a boolean.
+func NewSelection(name string, fct TreeFunc) *Selection {
+	return &Selection{
+		Name: name,
+		TreeFunc: fct,
+	}
+}
+
+
+	

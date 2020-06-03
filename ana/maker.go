@@ -96,7 +96,7 @@ func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 		RatioPlot:    true,
 		TotalBand:    true,
 		ErrBandColor: color.NRGBA{A: 100},
-		KinemCuts:    []*Selection{NewSelection()},
+		KinemCuts:    []*Selection{EmptySelection()},
 		nVars:        len(v),
 	}
 

@@ -51,7 +51,11 @@ func main() {
 	}
 
 	// Selections
-	selections := []*ana.Selection{sel0, sel1, sel2}
+	selections := []*ana.Selection{
+		ana.EmptySelection(),
+		ana.NewSelection("HighM", mtGT800),
+		ana.NewSelection("LowDphi", dphiLT1),
+	}
 
 	// Create analyzer object with some selections, enabeling automatic style
 	analyzer := ana.New(samples, variables,
@@ -111,13 +115,4 @@ var (
 	}
 
 	// Selections
-	sel0 = ana.NewSelection()
-	sel1 = &ana.Selection{
-		Name:     "m_gt_800",
-		TreeFunc: mtGT800,
-	}
-	sel2 = &ana.Selection{
-		Name:     "dphi_lg_1",
-		TreeFunc: dphiLT1,
-	}
 )
