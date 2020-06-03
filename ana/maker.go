@@ -213,8 +213,8 @@ func (ana *Maker) RunEventLoops() error {
 	// Loop over the samples
 	if ana.SampleMT {
 		var wg sync.WaitGroup
+		wg.Add(len(ana.Samples))
 		for i := range ana.Samples {
-			wg.Add(1)
 			go ana.concurrentSampleEventLoop(i, &wg)
 		}
 		wg.Wait()
@@ -445,7 +445,15 @@ func (ana *Maker) sampleEventLoop(sampleIdx int) {
 		}(iComp)
 	}
 
+	// Fill the histos for this sample
 	ana.HbookHistos[sampleIdx] = h
+
+	// Explicitely close file and tree
+	if ana.DumpTree {
+		if err := tOut.Close(); err != nil { panic(err) }
+		if err := fOut.Close(); err != nil { panic(err) }
+	}
+	
 }
 
 // PlotVariables loops over all filled histograms and produce one plot
