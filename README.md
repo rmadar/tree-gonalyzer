@@ -44,8 +44,8 @@ analyzer.Run()
 |:---:|:---:|:---:|
 | ![](ana/testdata/Plots_simpleUseCase/Mttbar_golden.png) | ![](ana/testdata/Plots_withSignals/Mttbar_golden.png) | ![](ana/testdata/Plots_withStackedSignals/Mttbar_golden.png)
 | Data/Background [[code](https://godoc.org/github.com/rmadar/tree-gonalyzer/ana#example-package--ASimpleUseCase)]  | Unstacked signals [[code](https://godoc.org/github.com/rmadar/tree-gonalyzer/ana#example-package--WithSignals)] | Stacked signals [[code](https://godoc.org/github.com/rmadar/tree-gonalyzer/ana#example-package--WithStackedSignals)]  |
-| ![](ana/testdata/Plots_simpleUseCase/Mttbar_golden.png) | ![](ana/testdata/Plots_withSignals/Mttbar_golden.png) | ![](ana/testdata/Plots_withStackedSignals/Mttbar_golden.png)
-| Data/Background [[code](https://godoc.org/github.com/rmadar/tree-gonalyzer/ana#example-package--ASimpleUseCase)]  | Unstacked signals [[code](https://godoc.org/github.com/rmadar/tree-gonalyzer/ana#example-package--WithSignals)] | Stacked signals [[code](https://godoc.org/github.com/rmadar/tree-gonalyzer/ana#example-package--WithStackedSignals)]  |
+| ![](ana/testdata/Plots_shapeDistortion/DphiLL_golden.png) | ![](ana/testdata/Plots_shapeComparison/TopPt_golden.png) | ![](ana/testdata/Plots_systVariations/DphiLL_golden.png)
+| Shape distortion [[code](https://godoc.org/github.com/rmadar/tree-gonalyzer/ana#example-package--ShapeDistortion)]  | Shape comparison [[code](https://godoc.org/github.com/rmadar/tree-gonalyzer/ana#example-package--ShapeComparison)] | Systematic variation [[code](https://godoc.org/github.com/rmadar/tree-gonalyzer/ana#example-package--SystematicVariations)] |
 
 <table>
   <tr>
