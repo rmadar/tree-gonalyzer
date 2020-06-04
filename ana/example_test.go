@@ -21,6 +21,13 @@ func TestSimpleUseCase(t *testing.T) {
 	)
 }
 
+func TestLogy(t *testing.T) {
+	cmpimg.CheckPlot(Example_withLogScale, t,
+		"Plots_LogScale/Mttbar.png",
+		"Plots_LogScale/DphiLL.png",
+	)
+}
+
 func TestShapeComparison(t *testing.T) {
 	cmpimg.CheckPlot(Example_shapeComparison, t,
 		"Plots_shapeComparison/TopPt.png",
@@ -100,7 +107,7 @@ func Example_aSimpleUseCase() {
 
 	// Define variables
 	variables := []*ana.Variable{
-		ana.NewVariable("Mttbar", ana.TreeVarF32("ttbar_m"), 25, 350, 1000,
+		ana.NewVariable("Mttbar", ana.TreeVarF32("ttbar_m"), 25, 350, 3000,
 			ana.WithAxisLabels("M(t,t) [GeV]", "Events Yields"),
 		),
 		ana.NewVariable("DphiLL", ana.TreeVarF64("truth_dphi_ll"), 10, 0, math.Pi,
@@ -111,6 +118,40 @@ func Example_aSimpleUseCase() {
 	// Create analyzer object
 	analyzer := ana.New(samples, variables,
 		ana.WithSavePath("testdata/Plots_simpleUseCase"),
+	)
+
+	// Run the analyzer to produce all the plots
+	if err := analyzer.Run(); err != nil {
+		panic(err)
+	}
+}
+
+// Creation of the default analysis maker type with
+// single-component samples.
+func Example_withLogScale() {
+	// Define samples
+	samples := []*ana.Sample{
+		ana.CreateSample("data", "data", `Data`, fData, tName),
+		ana.CreateSample("bkg1", "bkg", `Proc 1`, fBkg1, tName, ana.WithWeight(w1)),
+		ana.CreateSample("bkg2", "bkg", `Proc 2`, fBkg2, tName, ana.WithWeight(w2)),
+		ana.CreateSample("bkg3", "bkg", `Proc 3`, fBkg1, tName, ana.WithWeight(w2)),
+	}
+	
+	// Define variables
+	variables := []*ana.Variable{
+		ana.NewVariable("Mttbar", ana.TreeVarF32("ttbar_m"), 30, 0, 3000,
+			ana.WithAxisLabels("M(t,t) [GeV]", "Events Yields"),
+			ana.WithLogY(true),
+		),
+		ana.NewVariable("DphiLL", ana.TreeVarF64("truth_dphi_ll"), 10, 0, math.Pi,
+			ana.WithAxisLabels("dPhi(l,l)", "Events Yields"),
+			ana.WithLegLeft(true)),
+	}
+
+	// Create analyzer object
+	analyzer := ana.New(samples, variables,
+		ana.WithSavePath("testdata/Plots_LogScale"),
+		ana.WithHistoStack(true),
 	)
 
 	// Run the analyzer to produce all the plots
@@ -576,7 +617,7 @@ func Example_withJointTrees() {
 		),
 		
 		// Newly computed based on both
-		ana.NewVariable("calibHit", calibHits, 100, -2, 3,
+		ana.NewVariable("calibHit", calibHits, 100, -2, 10,
 			ana.WithAxisLabels("Calibrated Time", "Number of Hits"),
 		),
 	}
