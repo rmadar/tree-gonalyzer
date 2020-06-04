@@ -40,6 +40,11 @@ analyzer.Run()
 
 ## Gallery
 
+|   |   |   |
+|---|---|---|
+| ![](ana/testdata/Plots_simpleUseCase/Mttbar_golden.png) | ![](ana/testdata/Plots_withSignals/Mttbar_golden.png) | ![](ana/testdata/Plots_withStackedSignals/Mttbar_golden.png)
+
+
 <table>
   <tr>
     <td><p align="center"><img src="ana/testdata/Plots_simpleUseCase/Mttbar_golden.png">
