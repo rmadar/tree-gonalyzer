@@ -91,8 +91,6 @@ func TestWithJointTrees(t *testing.T) {
 	)
 }
 
-// Creation of the default analysis maker type with
-// single-component samples.
 func Example_aSimpleUseCase() {
 	// Define samples
 	samples := []*ana.Sample{
@@ -126,8 +124,6 @@ func Example_aSimpleUseCase() {
 	}
 }
 
-// Creation of the default analysis maker type with
-// single-component samples.
 func Example_withLogScale() {
 	// Define samples
 	samples := []*ana.Sample{
@@ -145,7 +141,9 @@ func Example_withLogScale() {
 		),
 		ana.NewVariable("DphiLL", ana.TreeVarF64("truth_dphi_ll"), 10, 0, math.Pi,
 			ana.WithAxisLabels("dPhi(l,l)", "Events Yields"),
-			ana.WithLegLeft(true)),
+			ana.WithLegLeft(true),
+			ana.WithLogY(true),
+		),
 	}
 
 	// Create analyzer object

@@ -6,7 +6,7 @@ require (
 	github.com/cosmos72/gomacro v0.0.0-20200226185326-30b9859a00de // indirect
 	github.com/mattn/go-runewidth v0.0.9 // indirect
 	github.com/rmadar/hplot-style v0.0.0-20200526215101-0690a1dea78f
-	go-hep.org/x/hep v0.27.1-0.20200603124917-364dcc3f97c9
+	go-hep.org/x/hep v0.27.1-0.20200605091552-24781f7c6989
 	golang.org/x/exp v0.0.0-20200331195152-e8c3332aa8e5
 	golang.org/x/image v0.0.0-20200430140353-33d19683fad8 // indirect
 	golang.org/x/tools v0.0.0-20200526224456-8b020aee10d2 // indirect
