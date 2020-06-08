@@ -836,6 +836,10 @@ func (ana Maker) PrintReport() {
 	)
 }
 
+// PrintSlowTreeFuncs prints the list of TreeFunc which relies on
+// a generic groot/rfunc formula, ie based on 'reflect' calls. These
+// function are ~ 5 times slower than the one defined using this example
+// https://godoc.org/go-hep.org/x/hep/groot/rtree#example-Reader--WithFormulaFromUser
 func (ana *Maker) PrintSlowTreeFuncs() {
 	
 	printSlowFunc := func (f TreeFunc) {

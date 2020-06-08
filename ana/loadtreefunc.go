@@ -8,7 +8,7 @@ import (
 )
 
 // (bool) -> float64
-func NewFuncBoolToF64(varsName []string, fct interface{}) (rfunc.Formula, error) {
+func newFuncBoolToF64(varsName []string, fct interface{}) (rfunc.Formula, error) {
 	return &userFuncBoolToF64{
 		rvars: varsName,
 		fct:   fct.(func(bool) float64),
@@ -41,7 +41,7 @@ func (usr *userFuncBoolToF64) Func() interface{} {
 }
 
 // ([]float32, float64) -> []float64
-func NewFuncF32sF64ToF64s(varsName []string, fct interface{}) (rfunc.Formula, error) {
+func newFuncF32sF64ToF64s(varsName []string, fct interface{}) (rfunc.Formula, error) {
 	return &userFuncF32sF64ToF64s{
 		rvars: varsName,
 		fct:   fct.(func([]float32, float64) []float64),
@@ -76,7 +76,7 @@ func (usr *userFuncF32sF64ToF64s) Func() interface{} {
 }
 
 // (float32, float32) -> float64
-func NewFuncF32F32ToF64(varsName []string, fct interface{}) (rfunc.Formula, error) {
+func newFuncF32F32ToF64(varsName []string, fct interface{}) (rfunc.Formula, error) {
 	return &userFuncF32F32ToF64{
 		rvars: varsName,
 		fct:   fct.(func(float32, float32) float64),
@@ -113,7 +113,8 @@ func (usr *userFuncF32F32ToF64) Func() interface{} {
 // Maps of all pre-defined function types.
 var funcs = make(map[reflect.Type] func(rvars []string, fct interface{}) (rfunc.Formula, error) )
 
-// Load rfunc.Formula functions, pre-defined in rtree/rfunc
+// Load rfunc.Formula functions which are pre-defined in rtree/rfunc
+// or user-defined rfunc.
 func init() {
 
 	// () -> bool
@@ -147,11 +148,11 @@ func init() {
 	}
 	
 	// (bool) -> float64
-	funcs[reflect.TypeOf((func(bool)float64)(nil))] = NewFuncBoolToF64
+	funcs[reflect.TypeOf((func(bool)float64)(nil))] = newFuncBoolToF64
 
 	// ([]float32, float64) -> float64
-	funcs[reflect.TypeOf((func([]float32, float64)float64)(nil))] = NewFuncF32sF64ToF64s 
+	funcs[reflect.TypeOf((func([]float32, float64)float64)(nil))] = newFuncF32sF64ToF64s 
 
 	// (float32, float32) -> float64
-	funcs[reflect.TypeOf((func(float32, float32)float64)(nil))] = NewFuncF32F32ToF64
+	funcs[reflect.TypeOf((func(float32, float32)float64)(nil))] = newFuncF32F32ToF64
 }

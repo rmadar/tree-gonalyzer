@@ -190,6 +190,7 @@ func (f *TreeFunc) FuncFormula() rfunc.Formula {
 	}
 }
 
+// TreeFormulaFrom returns a rfunc.Formula bound to the reader r.
 func (f *TreeFunc) TreeFormulaFrom(r *rtree.Reader) rfunc.Formula {
 	tf, err := r.Formula(f.FuncFormula())
 	if err != nil {
