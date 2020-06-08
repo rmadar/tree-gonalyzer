@@ -439,7 +439,6 @@ func (ana *Maker) sampleEventLoop(sampleIdx int) {
 							}
 						}
 					}
-
 				}
 
 				if ana.DumpTree {
@@ -806,7 +805,7 @@ func (ana *Maker) PlotVariables() error {
 // of processed samples, events and produced histograms.
 func (ana Maker) PrintReport() {
 
-	// Event, histo info
+	// Event and histo info
 	nfiles := 0
 	for _, s := range ana.Samples {
 		for _ = range s.components {
@@ -818,7 +817,7 @@ func (ana Maker) PrintReport() {
 	if ncuts > 0 {
 		nhist *= ncuts
 	}
-
+	
 	// Time computation
 	nkevt := float64(ana.nEvents) / 1e3
 	dtLoop := float64(ana.timeLoop) / float64(time.Millisecond)
@@ -835,6 +834,39 @@ func (ana Maker) PrintReport() {
 		(dtLoop+dtPlot)/nkevt, fmtDuration(ana.timeLoop+ana.timePlot), nkevt,
 		dtLoop/(dtLoop+dtPlot)*100., dtPlot/(dtLoop+dtPlot)*100.,
 	)
+}
+
+func (ana *Maker) PrintSlowTreeFuncs() {
+	
+	printSlowFunc := func (f TreeFunc) {
+		if f.IsSlow() {
+			fmt.Printf("    - %T --> args = %v \n", f.Fct, f.VarsName)
+		}
+	}
+
+	fmt.Println("List of slow TreeFunc:")
+	
+	// Variables
+	for _, v := range ana.Variables {
+		printSlowFunc(v.TreeFunc)
+	}
+	
+	// Kinematic cuts.
+	for _, c := range ana.KinemCuts {
+		printSlowFunc(c.TreeFunc)
+	}
+
+	// Samples and component cuts & weights
+	for _, s := range ana.Samples {
+		printSlowFunc(s.CutFunc)
+		printSlowFunc(s.WeightFunc)
+		for _, c := range s.components {
+			printSlowFunc(c.CutFunc)
+			printSlowFunc(c.WeightFunc)
+		}
+	}
+
+	fmt.Println("")
 }
 
 // RunTimePerKEvts returns the running time in millisecond per kEvents.

@@ -1,0 +1,157 @@
+package ana
+
+import (
+	"fmt"
+	"reflect"
+	
+	"go-hep.org/x/hep/groot/rtree/rfunc"
+)
+
+// (bool) -> float64
+func NewFuncBoolToF64(varsName []string, fct interface{}) (rfunc.Formula, error) {
+	return &userFuncBoolToF64{
+		rvars: varsName,
+		fct:   fct.(func(bool) float64),
+	}, nil
+}
+
+type userFuncBoolToF64 struct {
+	rvars []string
+	v1    *bool
+	fct   func(bool) float64
+}
+
+func (usr *userFuncBoolToF64) RVars() []string { return usr.rvars }
+
+func (usr *userFuncBoolToF64) Bind(args []interface{}) error {
+	if got, want := len(args), 1; got != want {
+		return fmt.Errorf(
+			"rfunc: invalid number of bind arguments (got=%d, want=%d)",
+			got, want,
+		)
+	}
+	usr.v1 = args[0].(*bool)
+	return nil
+}
+
+func (usr *userFuncBoolToF64) Func() interface{} {
+	return func() float64 {
+		return usr.fct(*usr.v1)
+	}
+}
+
+// ([]float32, float64) -> []float64
+func NewFuncF32sF64ToF64s(varsName []string, fct interface{}) (rfunc.Formula, error) {
+	return &userFuncF32sF64ToF64s{
+		rvars: varsName,
+		fct:   fct.(func([]float32, float64) []float64),
+	}, nil
+}
+
+type userFuncF32sF64ToF64s struct {
+	rvars []string
+	v1    *[]float32
+	v2    *float64
+	fct   func([]float32, float64) []float64
+}
+
+func (usr *userFuncF32sF64ToF64s) RVars() []string { return usr.rvars }
+
+func (usr *userFuncF32sF64ToF64s) Bind(args []interface{}) error {
+	if got, want := len(args), 2; got != want {
+		return fmt.Errorf(
+			"rfunc: invalid number of bind arguments (got=%d, want=%d)",
+			got, want,
+		)
+	}
+	usr.v1 = args[0].(*[]float32)
+	usr.v2 = args[1].(*float64)
+	return nil
+}
+
+func (usr *userFuncF32sF64ToF64s) Func() interface{} {
+	return func() []float64 {
+		return usr.fct(*usr.v1, *usr.v2)
+	}
+}
+
+// (float32, float32) -> float64
+func NewFuncF32F32ToF64(varsName []string, fct interface{}) (rfunc.Formula, error) {
+	return &userFuncF32F32ToF64{
+		rvars: varsName,
+		fct:   fct.(func(float32, float32) float64),
+	}, nil
+}
+
+type userFuncF32F32ToF64 struct {
+	rvars []string
+	v1    *float32
+	v2    *float32
+	fct   func(float32, float32) float64
+}
+
+func (usr *userFuncF32F32ToF64) RVars() []string { return usr.rvars }
+
+func (usr *userFuncF32F32ToF64) Bind(args []interface{}) error {
+	if got, want := len(args), 2; got != want {
+		return fmt.Errorf(
+			"rfunc: invalid number of bind arguments (got=%d, want=%d)",
+			got, want,
+		)
+	}
+	usr.v1 = args[0].(*float32)
+	usr.v2 = args[1].(*float32)
+	return nil
+}
+
+func (usr *userFuncF32F32ToF64) Func() interface{} {
+	return func() float64 {
+		return usr.fct(*usr.v1, *usr.v2)
+	}
+}
+
+// Maps of all pre-defined function types.
+var funcs = make(map[reflect.Type] func(rvars []string, fct interface{}) (rfunc.Formula, error) )
+
+// Load rfunc.Formula functions, pre-defined in rtree/rfunc
+func init() {
+
+	// () -> bool
+	funcs[reflect.TypeOf((func()bool)(nil))] = func(rvars []string, fct interface{}) (rfunc.Formula, error) {
+		return rfunc.NewFuncToBool(rvars, fct.(func() bool)), nil
+	}
+
+	// () -> float64
+	funcs[reflect.TypeOf((func()float64)(nil))] = func(rvars []string, fct interface{}) (rfunc.Formula, error) {
+		return rfunc.NewFuncToF64(rvars, fct.(func() float64)), nil
+	}
+
+	// (float64) -> float64
+	funcs[reflect.TypeOf((func(float64)float64)(nil))] = func(rvars []string, fct interface{}) (rfunc.Formula, error) {
+		return rfunc.NewFuncF64ToF64(rvars, fct.(func(float64) float64)), nil
+	}
+	
+	// (float32) -> float64
+	funcs[reflect.TypeOf((func(float32)float64)(nil))] = func(rvars []string, fct interface{}) (rfunc.Formula, error) {
+		return rfunc.NewFuncF32ToF64(rvars, fct.(func(float32) float64)), nil
+	}
+	
+	// (float32) -> bool
+	funcs[reflect.TypeOf((func(float32)bool)(nil))] = func(rvars []string, fct interface{}) (rfunc.Formula, error) {
+		return rfunc.NewFuncF32ToBool(rvars, fct.(func(float32) bool)), nil
+	}
+
+	// (float64) -> bool
+	funcs[reflect.TypeOf((func(float64)bool)(nil))] = func(rvars []string, fct interface{}) (rfunc.Formula, error) {
+		return rfunc.NewFuncF64ToBool(rvars, fct.(func(float64) bool)), nil
+	}
+	
+	// (bool) -> float64
+	funcs[reflect.TypeOf((func(bool)float64)(nil))] = NewFuncBoolToF64
+
+	// ([]float32, float64) -> float64
+	funcs[reflect.TypeOf((func([]float32, float64)float64)(nil))] = NewFuncF32sF64ToF64s 
+
+	// (float32, float32) -> float64
+	funcs[reflect.TypeOf((func(float32, float32)float64)(nil))] = NewFuncF32F32ToF64
+}

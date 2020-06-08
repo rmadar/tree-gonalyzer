@@ -3,7 +3,7 @@ package main
 
 import (
 	"flag"
-
+		
 	"github.com/rmadar/tree-gonalyzer/ana"
 )
 
@@ -65,7 +65,7 @@ func main() {
 	)
 
 	// Command line options
-	analyzer.Nevts = *nMax
+	analyzer.NevtsMax = *nMax
 	analyzer.SaveFormat = *pFormat
 	analyzer.CompileLatex = *doLatex
 	analyzer.RatioPlot = *doRatio
@@ -76,6 +76,8 @@ func main() {
 	if err := analyzer.Run(); err != nil {
 		panic(err)
 	}
+
+	analyzer.PrintSlowTreeFuncs()
 }
 
 // Few definition
