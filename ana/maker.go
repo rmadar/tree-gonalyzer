@@ -35,13 +35,13 @@ type Maker struct {
 	PlotHisto    bool   // Enable histogram plotting (default: true).
 
 	// Plots
-	AutoStyle    bool        // Enable automatic styling (default: true).
-	PlotTitle    string      // General plot title (default: 'TTree GOnalyzer').
-	RatioPlot    bool        // Enable ratio plot (default: true).
-	HistoStack   bool        // Enable histogram stacking (default: true).
-	SignalStack  bool        // Enable signal stack (default: false).
-	HistoNorm    bool        // Normalize distributions to unit area (default: false).
-	TotalBand    bool        // Enable total error band in stack mode (default: true).
+	AutoStyle      bool        // Enable automatic styling (default: true).
+	PlotTitle      string      // General plot title (default: 'TTree GOnalyzer').
+	RatioPlot      bool        // Enable ratio plot (default: true).
+	HistoStack     bool        // Enable histogram stacking (default: true).
+	SignalStack    bool        // Enable signal stack (default: false).
+	HistoNorm      bool        // Normalize distributions to unit area (default: false).
+	TotalBand      bool        // Enable total error band in stack mode (default: true).
 	TotalBandColor color.NRGBA // Color for the uncertainty band (default: gray).
 
 	// Histograms for {samples x selections x variables}
@@ -68,23 +68,23 @@ func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 
 	// Create the object
 	a := Maker{
-		Samples:      s,
-		Variables:    v,
-		NevtsMax:     -1,
-		Lumi:         1e-3,
-		PlotHisto:    true,
-		SampleMT:     true,
-		AutoStyle:    true,
-		SavePath:     "outputs",
-		SaveFormat:   "png",
-		PlotTitle:    "TTree GOnalyzer",
-		CompileLatex: true,
-		HistoStack:   true,
-		RatioPlot:    true,
-		TotalBand:    true,
+		Samples:        s,
+		Variables:      v,
+		NevtsMax:       -1,
+		Lumi:           1e-3,
+		PlotHisto:      true,
+		SampleMT:       true,
+		AutoStyle:      true,
+		SavePath:       "outputs",
+		SaveFormat:     "png",
+		PlotTitle:      "TTree GOnalyzer",
+		CompileLatex:   true,
+		HistoStack:     true,
+		RatioPlot:      true,
+		TotalBand:      true,
 		TotalBandColor: color.NRGBA{A: 100},
-		KinemCuts:    []*Selection{EmptySelection()},
-		nVars:        len(v),
+		KinemCuts:      []*Selection{EmptySelection()},
+		nVars:          len(v),
 	}
 
 	// Configuration with default values for all optional fields
