@@ -3,7 +3,7 @@ package ana
 import (
 	"log"
 	"reflect"
-	
+
 	"go-hep.org/x/hep/groot/rtree"
 	"go-hep.org/x/hep/groot/rtree/rfunc"
 )
@@ -22,11 +22,10 @@ import (
 // by hplot.h1d.Fill(v, w) method. Instead `TreeCutBool()` lead to
 // a treeFunc.Fct returning a bool, specifically for cuts.
 type TreeFunc struct {
-	VarsName  []string       // List of branch names, being function arguments
-	Fct       interface{}    // User-defined function
-	Formula   rfunc.Formula  // Formula that can be bound to a ROOT tree
+	VarsName []string      // List of branch names, being function arguments
+	Fct      interface{}   // User-defined function
+	Formula  rfunc.Formula // Formula that can be bound to a ROOT tree
 }
-
 
 // IsSlow returns false if the f.Fct is already
 // defined in rtree/rfunc package or in TreeFunc.
@@ -36,7 +35,7 @@ func (f *TreeFunc) IsSlow() bool {
 	if f.Fct != nil {
 		_, ok := funcs[reflect.TypeOf(f.Fct)]
 		return !ok
-	} else  {
+	} else {
 		return false
 	}
 }

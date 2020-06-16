@@ -43,7 +43,7 @@ type Sample struct {
 	// Gobal weight and cut (applied to all components).
 	CutFunc    TreeFunc
 	WeightFunc TreeFunc
-	
+
 	// Cosmetic settings
 	DataStyle         bool        // Enable data-like style (default: Type == 'data').
 	LineColor         color.NRGBA // Line color of the histogram (default: blue).
@@ -83,7 +83,7 @@ type input struct {
 	FileName string
 	TreeName string
 }
-	
+
 // NewSample creates a new empty sample, ie without any components,
 // with the default options. Components can be then added using
 // s.AddComponent(...) function.
@@ -203,11 +203,11 @@ func CreateSample(sname, stype, sleg, fname, tname string, opts ...SampleOptions
 	for _, opt := range opts {
 		opt(cfg)
 	}
-	
+
 	if cfg.JointTrees.usr {
 		s.components[0].JointTrees = cfg.JointTrees.val
 	}
-	
+
 	if cfg.Xsec.usr {
 		if s.sType == data {
 			log.Fatalf("sample type 'data' doesn't support xsection option.")
@@ -220,7 +220,7 @@ func CreateSample(sname, stype, sleg, fname, tname string, opts ...SampleOptions
 		}
 		s.components[0].Ngen = cfg.Ngen.val
 	}
-	
+
 	return s
 }
 
@@ -246,7 +246,7 @@ func (s *Sample) AddComponent(fname, tname string, opts ...SampleOptions) {
 		Xsec:     1.0,
 		Ngen:     1.0,
 	}
-	
+
 	// Update the fields with the passed options
 	if cfg.WeightFunc.usr {
 		c.WeightFunc = cfg.WeightFunc.val
@@ -266,7 +266,7 @@ func (s *Sample) AddComponent(fname, tname string, opts ...SampleOptions) {
 		}
 		c.Ngen = cfg.Ngen.val
 	}
-	
+
 	// Append it to the pointer-receiver sample
 	s.components = append(s.components, c)
 }

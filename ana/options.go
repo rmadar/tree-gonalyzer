@@ -534,7 +534,7 @@ func WithSaveName(n string) VariableOptions {
 	}
 }
 
-// WithLogY enable y-axis log scale 
+// WithLogY enable y-axis log scale
 func WithLogY(b bool) VariableOptions {
 	return func(cfg *config) {
 		cfg.LogY.val = b

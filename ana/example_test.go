@@ -132,7 +132,7 @@ func Example_withLogScale() {
 		ana.CreateSample("bkg2", "bkg", `Proc 2`, fBkg2, tName, ana.WithWeight(w2)),
 		ana.CreateSample("bkg3", "bkg", `Proc 3`, fBkg1, tName, ana.WithWeight(w2)),
 	}
-	
+
 	// Define variables
 	variables := []*ana.Variable{
 		ana.NewVariable("Mttbar", ana.TreeVarF32("ttbar_m"), 30, 0, 3000,
@@ -600,7 +600,7 @@ func Example_withJointTrees() {
 			return res
 		},
 	}
-	
+
 	// Variables
 	variables := []*ana.Variable{
 
@@ -608,18 +608,18 @@ func Example_withJointTrees() {
 		ana.NewVariable("hitTimes", ana.TreeVarF32s("hits_time_mc"), 100, 10, 15,
 			ana.WithAxisLabels("Uncalibrated times", "Number of Hits"),
 		),
-		
+
 		// Variable in the joint Tree
 		ana.NewVariable("calibCon", ana.TreeVarF64("c_mc_excl_mean"), 50, 10, 15,
 			ana.WithAxisLabels("Calibration constants", "Number of Modules"),
 		),
-		
+
 		// Newly computed based on both
 		ana.NewVariable("calibHit", calibHits, 100, -2, 10,
 			ana.WithAxisLabels("Calibrated Time", "Number of Hits"),
 		),
 	}
-	
+
 	// Analyzer
 	analyzer := ana.New(samples, variables,
 		ana.WithHistoStack(false),
