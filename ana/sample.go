@@ -54,6 +54,7 @@ type Sample struct {
 	CircleSize        vg.Length   // Circle size (default: 0).
 	CircleColor       color.NRGBA // Circle color (default: transparent).
 	Band              bool        // Enable error band display.
+	BandColor         color.NRGBA // Circle color (default: gray). 
 	YErrBars          bool        // Display error bars (default: false || DataStyle).
 	YErrBarsLineWidth vg.Length   // Width of error bars line.
 	YErrBarsCapWidth  vg.Length   // Width of horizontal bars of the error bars.
@@ -164,6 +165,9 @@ func (s *Sample) applyConfig() {
 	}
 	if s.config.Band.usr {
 		s.Band = s.config.Band.val
+	}
+	if s.config.BandColor.usr {
+		s.BandColor = s.config.BandColor.val
 	}
 	if s.config.YErrBars.usr {
 		s.YErrBars = s.config.YErrBars.val
@@ -339,12 +343,14 @@ func (s Sample) CreateHisto(hdata *hbook.H1D, opts ...hplot.Options) *hplot.H1D 
 
 // Helper function to set the error band style.
 func (s Sample) setBandStyle(b *hplot.Band) {
-
 	if s.FillColor != colorNil {
-		b.FillColor = style.ChangeOpacity(s.FillColor, 150)
+		b.FillColor = style.ChangeOpacity(s.FillColor, 80)
 	}
 	if s.LineColor != colorNil {
-		b.FillColor = style.ChangeOpacity(s.LineColor, 150)
+		b.FillColor = style.ChangeOpacity(s.LineColor, 80)
+	}
+	if s.BandColor != colorNil {
+		b.FillColor = s.BandColor
 	}
 }
 

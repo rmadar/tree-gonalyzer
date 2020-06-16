@@ -42,7 +42,7 @@ type Maker struct {
 	SignalStack  bool        // Enable signal stack (default: false).
 	HistoNorm    bool        // Normalize distributions to unit area (default: false).
 	TotalBand    bool        // Enable total error band in stack mode (default: true).
-	ErrBandColor color.NRGBA // Color for the uncertainty band (default: gray).
+	TotalBandColor color.NRGBA // Color for the uncertainty band (default: gray).
 
 	// Histograms for {samples x selections x variables}
 	HbookHistos [][][]*hbook.H1D
@@ -82,7 +82,7 @@ func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 		HistoStack:   true,
 		RatioPlot:    true,
 		TotalBand:    true,
-		ErrBandColor: color.NRGBA{A: 100},
+		TotalBandColor: color.NRGBA{A: 100},
 		KinemCuts:    []*Selection{EmptySelection()},
 		nVars:        len(v),
 	}
@@ -144,8 +144,8 @@ func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 	if cfg.TotalBand.usr {
 		a.TotalBand = cfg.TotalBand.val
 	}
-	if cfg.ErrBandColor.usr {
-		a.ErrBandColor = cfg.ErrBandColor.val
+	if cfg.TotalBandColor.usr {
+		a.TotalBandColor = cfg.TotalBandColor.val
 	}
 
 	// Get mappings between slice indices and object names

@@ -86,7 +86,7 @@ type config struct {
 		val bool // Enable total error band for stacks.
 		usr bool
 	}
-	ErrBandColor struct {
+	TotalBandColor struct {
 		val color.NRGBA // Color for the uncertainty band.
 		usr bool
 	}
@@ -142,6 +142,10 @@ type config struct {
 	}
 	Band struct {
 		val bool // Enable error band display
+		usr bool
+	}
+	BandColor struct {
+		val color.NRGBA // Color of the error band
 		usr bool
 	}
 	YErrBars struct {
@@ -244,11 +248,11 @@ func WithNevtsMax(n int64) Options {
 	}
 }
 
-// WithLumi sets the integrated luminosity [1/fb]
+// WithLumi sets the integrated luminosity in fb-1.
 // The full normalisation factor is (xsec*lumi)/ngen. 'ngen' and
 // 'xsec' are given for each sample/component, via ana.CreateSample()
 // or s.AddComponent(). While the 'lumi' is given to
-// via ana.New(). By default, lumi = 1/fb.
+// via ana.New(). By default, lumi = 1000/fb (=1/pb).
 func WithLumi(l float64) Options {
 	return func(cfg *config) {
 		cfg.Lumi.val = l
@@ -364,12 +368,12 @@ func WithHistoNorm(b bool) Options {
 	}
 }
 
-// WithErrBandColor sets the color for the error band of
+// WithTotalBandColor sets the color for the error band of
 // total histogram (and ratio).
-func WithErrBandColor(c color.NRGBA) Options {
+func WithTotalBandColor(c color.NRGBA) Options {
 	return func(cfg *config) {
-		cfg.ErrBandColor.val = c
-		cfg.ErrBandColor.usr = true
+		cfg.TotalBandColor.val = c
+		cfg.TotalBandColor.usr = true
 	}
 }
 
@@ -404,7 +408,7 @@ func WithJointTree(fname, tname string) SampleOptions {
 	}
 }
 
-// WithXsect sets the cross-section [pb] to the sample/component.
+// WithXsec sets the cross-section in pb to the sample/component.
 // The full normalisation factor is (xsec*lumi)/ngen. 'ngen' and
 // 'xsec' are given by sample/component while 'lumi' is given to
 // via ana.New(). By default, xsec = 1 pb. This option cannot be passed to
@@ -491,6 +495,14 @@ func WithBand(b bool) SampleOptions {
 	return func(cfg *config) {
 		cfg.Band.val = b
 		cfg.Band.usr = true
+	}
+}
+
+// WithBandColor sets the color of the sample error band.
+func WithBandColor(c color.NRGBA) SampleOptions {
+	return func(cfg *config) {
+		cfg.BandColor.val = c
+		cfg.BandColor.usr = true
 	}
 }
 

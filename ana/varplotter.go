@@ -184,7 +184,7 @@ func (ana *Maker) PlotVariables() error {
 				// Stacking the background histo
 				stack := hplot.NewHStack(phStack, hplot.WithBand(ana.TotalBand), hplot.WithLogY(v.LogY))
 				if ana.HistoStack && ana.TotalBand {
-					stack.Band.FillColor = ana.ErrBandColor
+					stack.Band.FillColor = ana.TotalBandColor
 					hBand := hplot.NewH1D(hbook.NewH1D(1, 0, 1), hplot.WithBand(true))
 					hBand.Band = stack.Band
 					hBand.LineStyle.Width = 0
@@ -272,7 +272,7 @@ func (ana *Maker) PlotVariables() error {
 					)
 					hps2d_ratioMC.GlyphStyle.Radius = 0
 					hps2d_ratioMC.LineStyle.Width = 0.0
-					hps2d_ratioMC.Band.FillColor = ana.ErrBandColor
+					hps2d_ratioMC.Band.FillColor = ana.TotalBandColor
 					rp.Bottom.Add(hps2d_ratioMC)
 
 				default:
