@@ -38,7 +38,7 @@ func ExampleTreeFunc_general() {
 	})
 
 	// Output:
-	// pt=145.13, eta=-2.08, pt*eta=-302.15 xxx
+	// pt=145.13, eta=-2.08, pt*eta=-302.15
 	// pt=13.85, eta=-1.69, pt*eta=-23.35
 	// pt=44.03, eta=-3.93, pt*eta=-173.06
 	// pt=136.98, eta=0.64, pt*eta=87.88

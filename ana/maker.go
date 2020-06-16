@@ -231,35 +231,44 @@ func (ana Maker) PrintReport() {
 // https://godoc.org/go-hep.org/x/hep/groot/rtree#example-Reader--WithFormulaFromUser
 func (ana *Maker) PrintSlowTreeFuncs() {
 
-	printSlowFunc := func(f TreeFunc) {
+	appendSlow := func(fs *[]TreeFunc, f TreeFunc) {
 		if f.IsSlow() {
-			fmt.Printf("    - %T --> args = %v \n", f.Fct, f.VarsName)
+			*fs = append(*fs, f)
 		}
 	}
 
-	fmt.Println(" List of slow TreeFunc:")
+	// Store all slow function
+	slowFs := &[]TreeFunc{}
 
 	// Variables
 	for _, v := range ana.Variables {
-		printSlowFunc(v.TreeFunc)
+		appendSlow(slowFs, v.TreeFunc)
 	}
 
 	// Kinematic cuts.
 	for _, c := range ana.KinemCuts {
-		printSlowFunc(c.TreeFunc)
+		appendSlow(slowFs, c.TreeFunc)
 	}
 
 	// Samples and component cuts & weights
 	for _, s := range ana.Samples {
-		printSlowFunc(s.CutFunc)
-		printSlowFunc(s.WeightFunc)
+		appendSlow(slowFs, s.CutFunc)
+		appendSlow(slowFs, s.WeightFunc)
 		for _, c := range s.components {
-			printSlowFunc(c.CutFunc)
-			printSlowFunc(c.WeightFunc)
+			appendSlow(slowFs, c.CutFunc)
+			appendSlow(slowFs, c.WeightFunc)
 		}
 	}
 
-	fmt.Println("")
+	// Print only if there is at least one slow func
+	if len(*slowFs) > 0 {
+		fmt.Println(" List of slow TreeFuncs:")
+		for _, f := range *slowFs {
+			fmt.Printf("    - %T --> args = %v \n", f.Fct, f.VarsName)
+		}
+		fmt.Println("")
+	}
+
 }
 
 // RunTimePerKEvts returns the running time in millisecond per kEvents.

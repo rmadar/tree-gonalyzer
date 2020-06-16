@@ -105,7 +105,7 @@ func Example_aSimpleUseCase() {
 
 	// Define variables
 	variables := []*ana.Variable{
-		ana.NewVariable("Mttbar", ana.TreeVarF32("ttbar_m"), 25, 350, 3000,
+		ana.NewVariable("Mttbar", ana.TreeVarF32("ttbar_m"), 25, 350, 1000,
 			ana.WithAxisLabels("M(t,t) [GeV]", "Events Yields"),
 		),
 		ana.NewVariable("DphiLL", ana.TreeVarF64("truth_dphi_ll"), 10, 0, math.Pi,
@@ -615,7 +615,7 @@ func Example_withJointTrees() {
 		),
 
 		// Newly computed based on both
-		ana.NewVariable("calibHit", calibHits, 100, -2, 10,
+		ana.NewVariable("calibHit", calibHits, 100, -2, 3,
 			ana.WithAxisLabels("Calibrated Time", "Number of Hits"),
 		),
 	}
