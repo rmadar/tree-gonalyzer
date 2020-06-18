@@ -40,6 +40,9 @@ func (ana *Maker) PlotVariables() error {
 		log.Fatalf(err)
 	}
 
+	// Compute all normalizations beforehand
+	ana.normHists, ana.normTotal = ana.Normalizations()
+	
 	// Handle on-the-fly LaTeX compilation
 	var latex htex.Handler = htex.NoopHandler{}
 	if ana.CompileLatex {
@@ -73,14 +76,12 @@ func (ana *Maker) plotVar(iVar, iCut int, latex htex.Handler) {
 
 	var (
 		plt             hplot.Drawer
+		p               = hplot.New()
 		figWidth        = 6 * vg.Inch
 		figHeight       = 4.5 * vg.Inch
-		p               = hplot.New()
 		bhData          = hbook.NewH1D(v.Nbins, v.Xmin, v.Xmax)
 		bhBkgTot        = hbook.NewH1D(v.Nbins, v.Xmin, v.Xmax)
 		bhSigTot        = hbook.NewH1D(v.Nbins, v.Xmin, v.Xmax)
-		norm_histos     = make([]float64, 0, len(ana.Samples))
-		normTot         = 0.0
 		bhBkgs_postnorm []*hbook.H1D
 		phBkgs          []*hplot.H1D
 		bhSigs_postnorm []*hbook.H1D
@@ -88,77 +89,49 @@ func (ana *Maker) plotVar(iVar, iCut int, latex htex.Handler) {
 		phData          *hplot.H1D
 	)
 
-	// Add plot title
-	p.Title.Text = ana.PlotTitle
-
-	// First sample loop: compute normalisation, sum bkg bh, keep data bh
-	for iSample := range ana.Samples {
-
-		// Get the current histogram
-		h := ana.HbookHistos[iSample][iCut][iVar]
-
-		// Compute the integral of the current histo
-		n := h.Integral()
-
-		// Properly store individual normalization
-		norm_histos = append(norm_histos, n)
-
-		// For background only
-		if ana.Samples[iSample].IsBkg() {
-			normTot += n
-		}
-
-		// Add signals if stacked
-		if ana.SignalStack {
-			normTot += n
-		}
-
-		// Keep data apart
-		if ana.Samples[iSample].IsData() {
-			bhData = h
-		}
+	// Normalize histograms
+	if ana.HistoNorm {
+		ana.normalizeHistos(iCut, iVar)
 	}
 
-	// Second sample loop: normalize bh, prepare background stack
-	for iSample := range ana.Samples {
+	// FIX-ME [rmadar]: create few functions to get: 
+	//  -> bhBkgs, bhSigs, bhData = ana.getNormalizedH1D()
+	//  -> bhBkgTot, bhSigTot = XXX() altough not sure bhSigTot is needed
+
+	// Function to get hplot histo
+	// and slice to be stacked later.
+	
+	// Sample Loop
+	for iSample, sample := range ana.Samples {
 
 		// Get the current histogram
 		h := ana.HbookHistos[iSample][iCut][iVar]
-
-		// Deal with normalization
-		if ana.HistoNorm {
-			switch ana.Samples[iSample].sType {
-			case data:
-				h.Scale(1 / norm_histos[iSample])
-			case bkg, sig:
-				if ana.HistoStack {
-					h.Scale(1. / normTot)
-				} else {
-					h.Scale(1. / norm_histos[iSample])
-				}
-			}
+		
+		// Keep data appart
+		if sample.IsData() {
+			bhData = h
 		}
-
+			
 		// Get plottable histogram and add it to the legend
-		ana.HplotHistos[iSample][iCut][iVar] = ana.Samples[iSample].CreateHisto(h, hplot.WithLogY(v.LogY))
-		p.Legend.Add(ana.Samples[iSample].LegLabel, ana.HplotHistos[iSample][iCut][iVar])
+		ana.HplotHistos[iSample][iCut][iVar] = sample.CreateHisto(h, hplot.WithLogY(v.LogY))
+		p.Legend.Add(sample.LegLabel, ana.HplotHistos[iSample][iCut][iVar])
 
 		// Keep track of different histo given their type
-		switch ana.Samples[iSample].sType {
+		switch sample.sType {
 
 		// Keep data appart from backgrounds, style it.
 		case data:
 			phData = ana.HplotHistos[iSample][iCut][iVar]
-			if ana.Samples[iSample].DataStyle {
+			if sample.DataStyle {
 				style.ApplyToDataHist(phData)
-				if ana.Samples[iSample].CircleSize > 0 {
-					phData.GlyphStyle.Radius = ana.Samples[iSample].CircleSize
+				if sample.CircleSize > 0 {
+					phData.GlyphStyle.Radius = sample.CircleSize
 				}
-				if ana.Samples[iSample].YErrBarsLineWidth > 0 {
-					phData.YErrs.LineStyle.Width = ana.Samples[iSample].YErrBarsLineWidth
+				if sample.YErrBarsLineWidth > 0 {
+					phData.YErrs.LineStyle.Width = sample.YErrBarsLineWidth
 				}
-				if ana.Samples[iSample].YErrBarsCapWidth > 0 {
-					phData.YErrs.CapWidth = ana.Samples[iSample].YErrBarsCapWidth
+				if sample.YErrBarsCapWidth > 0 {
+					phData.YErrs.CapWidth = sample.YErrBarsCapWidth
 				}
 			}
 
@@ -228,6 +201,8 @@ func (ana *Maker) plotVar(iVar, iCut int, latex htex.Handler) {
 	// FIX-ME (rmadar): the v.setPlotStyle(v) command doesn't update
 	//                  y-axis scale if it is put before the samples
 	//                  loop and I am not sure why.
+	// Add plot title
+	p.Title.Text = ana.PlotTitle
 	style.ApplyToPlot(p)
 	v.setPlotStyle(p)
 
@@ -376,4 +351,73 @@ func (ana *Maker) setAutoStyle() {
 		// Apply user-defined setting on top of default ones.
 		s.applyConfig()
 	}
+}
+
+// Helper function computing the normalisation of
+// of all samples for a given cut
+func (ana *Maker) Normalizations() ([][]float64, []float64) {
+
+	// Initialization
+	nTot := make([]float64, len(ana.KinemCuts))
+	norms := make([][]float64, len(ana.KinemCuts))
+	for i := range norms {
+		norms[i] = make([]float64, len(ana.Samples))
+	}
+
+	// If no normalization is needed, compute nothing.
+	if !ana.HistoNorm {
+		for ic := range ana.KinemCuts {
+			nTot[ic] = 1.0
+			for is := range ana.Samples {
+				norms[ic][is] = 1.0
+			}
+		}
+
+		return norms, nTot
+	}
+	
+	// Otherwise, loop over cuts and samples.
+	for ic, _ := range ana.KinemCuts {
+		for is, s := range ana.Samples {
+			
+			// Individual normalization including under/over-flows
+			n := ana.HbookHistos[is][ic][0].Integral()
+			norms[ic][is] = n
+			
+			// Cumulate backgrounds for the total
+			if s.IsBkg() {
+				nTot[ic] += n
+			}
+			
+			// Cumulate signals for the total, it stacked
+			if s.IsSig() && ana.SignalStack {
+				nTot[ic] += n
+			}
+		}
+	}
+
+	return norms, nTot
+}
+
+// Helper function to normalize histograms of a given cut
+// and variable.
+func (ana *Maker) normalizeHistos(iCut, iVar int) {
+		nHistos, nTot := ana.normHists[iCut], ana.normTotal[iCut]
+		for iSample, sample := range ana.Samples {
+			
+			// Get the current histogram
+			h := ana.HbookHistos[iSample][iCut][iVar]
+
+			// Normalize depending on type / stack
+			switch sample.sType {
+			case data:
+				h.Scale(1 / nHistos[iSample])
+			case bkg, sig:
+				if ana.HistoStack {
+					h.Scale(1. / nTot)
+				} else {
+					h.Scale(1. / nHistos[iSample])
+				}
+			}
+		}
 }

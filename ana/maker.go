@@ -57,6 +57,8 @@ type Maker struct {
 	samIdx      map[string]int // Linking sample name and sample index
 	varIdx      map[string]int // Linking variable name and variable index
 	histoFilled bool           // true if histograms are filled.
+	normTotal   []float64      // Normalisation of total background (and signal if stacked) for each cut
+	normHists   [][]float64    // Normalisation of all samples for each cut
 	nEvents     int64          // Number of processed events
 	timeLoop    time.Duration  // Processing time for filling histograms (event loop over samples x cuts x histos)
 	timePlot    time.Duration  // Processing time for plotting histogram

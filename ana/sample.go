@@ -342,7 +342,7 @@ func (s Sample) CreateHisto(hdata *hbook.H1D, opts ...hplot.Options) *hplot.H1D 
 }
 
 // Helper function to set the error band style.
-func (s Sample) setBandStyle(b *hplot.Band) {
+func (s Sample) setBandStyle(b *hplot.BinnedErrBand) {
 	if s.FillColor != colorNil {
 		b.FillColor = style.ChangeOpacity(s.FillColor, 80)
 	}
