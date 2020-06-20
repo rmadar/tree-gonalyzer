@@ -52,13 +52,20 @@ type Maker struct {
 	nVars       int     // number of variables
 	nEvtsSample []int64 // number of events per sample
 
-	// Internal management
+	// Normalisation of each sample for each cut:
+	// {selections x samples}
+	normHists [][]float64
+
+	// Normalisation of total background (and signal if
+	// stacked) for each cut
+	normTotal []float64
+
+	bkgNames    []string       // Ordered background names
+	sigNames    []string       // Ordered signal names
 	cutIdx      map[string]int // Linking cut name and cut index
 	samIdx      map[string]int // Linking sample name and sample index
 	varIdx      map[string]int // Linking variable name and variable index
 	histoFilled bool           // true if histograms are filled.
-	normTotal   []float64      // Normalisation of total background (and signal if stacked) for each cut
-	normHists   [][]float64    // Normalisation of all samples for each cut
 	nEvents     int64          // Number of processed events
 	timeLoop    time.Duration  // Processing time for filling histograms (event loop over samples x cuts x histos)
 	timePlot    time.Duration  // Processing time for plotting histogram
@@ -155,6 +162,9 @@ func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 	a.varIdx = getIdxMap(a.Variables, &Variable{})
 	a.cutIdx = getIdxMap(a.KinemCuts, &Selection{})
 
+	// Get ordered lists of background and signal names
+	a.bkgNames, a.sigNames = a.getProcNames()
+
 	// Managing event number with concurrency
 	a.nEvtsSample = make([]int64, len(a.Samples))
 
@@ -168,6 +178,21 @@ func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 	a.assessVariableTypes()
 
 	return a
+}
+
+// Helper function to get ordered list of background
+// and signal names
+func (ana *Maker) getProcNames() ([]string, []string) {
+	var bNames, sNames []string
+	for _, s := range ana.Samples {
+		switch s.sType {
+		case bkg:
+			bNames = append(bNames, s.Name)
+		case sig:
+			sNames = append(sNames, s.Name)
+		}
+	}
+	return bNames, sNames
 }
 
 // Helper function creating the mapping between name and objects
