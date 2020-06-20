@@ -60,10 +60,11 @@ type Maker struct {
 	// stacked) for each cut
 	normTotal []float64
 
-	bkgNames    []string       // Ordered background names
-	sigNames    []string       // Ordered signal names
+	idxData  []int       // Indices of data samples in []*Sample slice
+	idxBkgs  []int       // Indices of bkg samples in []*Sample slice
+	idxSigs  []int       // Indices of sig samples in []*Sample slice
 	cutIdx      map[string]int // Linking cut name and cut index
-	samIdx      map[string]int // Linking sample name and sample index
+	samIdx      map[string]int // Linking sample name and cut index
 	varIdx      map[string]int // Linking variable name and variable index
 	histoFilled bool           // true if histograms are filled.
 	nEvents     int64          // Number of processed events
@@ -163,7 +164,7 @@ func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 	a.cutIdx = getIdxMap(a.KinemCuts, &Selection{})
 
 	// Get ordered lists of background and signal names
-	a.bkgNames, a.sigNames = a.getProcNames()
+	a.idxData, a.idxBkgs, a.idxSigs = a.getSampleProc()
 
 	// Managing event number with concurrency
 	a.nEvtsSample = make([]int64, len(a.Samples))
@@ -182,17 +183,21 @@ func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 
 // Helper function to get ordered list of background
 // and signal names
-func (ana *Maker) getProcNames() ([]string, []string) {
-	var bNames, sNames []string
-	for _, s := range ana.Samples {
+func (ana *Maker) getSampleProc() ([]int, []int, []int) {
+	iData := []int{}
+	iBkgs := []int{}
+	iSigs := []int{}
+	for i, s := range ana.Samples {
 		switch s.sType {
+		case data:
+			iData = append(iData, i)
 		case bkg:
-			bNames = append(bNames, s.Name)
+			iBkgs = append(iBkgs, i)
 		case sig:
-			sNames = append(sNames, s.Name)
+			iSigs = append(iSigs, i)
 		}
 	}
-	return bNames, sNames
+	return iData, iBkgs, iSigs
 }
 
 // Helper function creating the mapping between name and objects
