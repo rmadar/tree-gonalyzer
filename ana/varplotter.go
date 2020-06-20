@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 	"time"
-
+	
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotutil"
 	"gonum.org/v1/plot/vg"
@@ -123,7 +123,7 @@ func (ana *Maker) plotVar(iVar, iCut int, latex htex.Handler) {
 	if stack != nil {
 		plt.Add(stack)
 	}
-	if bhData.Entries() > 0 {
+	if bhData != nil {
 		plt.Add(phData)
 	}
 	if !ana.SignalStack {
@@ -150,6 +150,11 @@ func (ana *Maker) plotVar(iVar, iCut int, latex htex.Handler) {
 		plt.Y.Tick.Marker = plot.LogTicks{}
 	}
 
+
+	// -----------------------
+	// TO RE-ORGANIZE FROM HERE
+	// ------------------------
+	
 	drw = plt
 
 	// Addition of the ratio plot
@@ -177,7 +182,7 @@ func (ana *Maker) plotVar(iVar, iCut int, latex htex.Handler) {
 		switch {
 		case ana.HistoStack:
 
-			if bhData.Entries() > 0 {
+			if bhData != nil {
 				// Data to MC
 				hbs2d_ratio, err := hbook.DivideH1D(bhData, bhBkgTot, hbook.DivIgnoreNaNs())
 				if err != nil {
@@ -209,10 +214,10 @@ func (ana *Maker) plotVar(iVar, iCut int, latex htex.Handler) {
 			for name, h := range bhBkgs {
 
 				href := bhData
-				if bhData.Entries() == 0 {
+				if bhData == nil {	
 					href = bhBkgs[ana.bkgNames[0]]
 				}
-
+								
 				hbs2d_ratio, err := hbook.DivideH1D(h, href, hbook.DivIgnoreNaNs())
 				if err != nil {
 					log.Fatal("cannot divide histo for the ratio plot")
@@ -458,12 +463,7 @@ func (ana *Maker) stackHistograms(
 
 	// Stacking the background histo
 	stack := hplot.NewHStack(phStack, hplot.WithBand(ana.TotalBand), hplot.WithLogY(LogY))
-	if ana.HistoStack && ana.TotalBand {
-		stack.Band.FillColor = ana.TotalBandColor
-		hBand := hplot.NewH1D(hbook.NewH1D(1, 0, 1), hplot.WithBand(true))
-		hBand.Band = stack.Band
-		hBand.LineStyle.Width = 0
-	} else {
+	if !ana.HistoStack {
 		stack.Stack = hplot.HStackOff
 	}
 
