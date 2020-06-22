@@ -6,9 +6,6 @@ import (
 	"image/color"
 	"log"
 	"time"
-
-	"go-hep.org/x/hep/hbook"
-	"go-hep.org/x/hep/hplot"
 )
 
 // Analysis maker type is the main object of the ana package.
@@ -36,18 +33,23 @@ type Maker struct {
 	// Plots
 	AutoStyle      bool        // Enable automatic styling (default: true).
 	PlotTitle      string      // General plot title (default: 'TTree GOnalyzer').
-	RatioPlot      bool        // Enable ratio plot (default: true).
 	HistoStack     bool        // Enable histogram stacking (default: true).
 	SignalStack    bool        // Enable signal stack (default: false).
 	HistoNorm      bool        // Normalize distributions to unit area (default: false).
 	TotalBand      bool        // Enable total error band in stack mode (default: true).
 	TotalBandColor color.NRGBA // Color for the uncertainty band (default: gray).
 
+	// Enable ratio plot (default: true).
+	//  - stack on : data / total bkg
+	//  - stack off:
+	//     * if data is filled: sample[i] / data
+	//     * if data is empty : sample[i] / sample[0]
+	RatioPlot bool        
+
 	// Histograms for {samples x selections x variables}
 	HbookHistos [][][]*hbook.H1D
-	HplotHistos [][][]*hplot.H1D
 
-	// Internal: tree dumping
+	// tree dumping
 	nVars       int     // number of variables
 	nEvtsSample []int64 // number of events per sample
 
@@ -307,24 +309,6 @@ func (ana *Maker) Run() error {
 
 	// Return
 	return nil
-}
-
-// Helper function to initialize histogram containers
-func (ana *Maker) initHistoContainers() {
-
-	// Initialize hbook H1D as N[samples] 2D-slices.
-	// Cut x variable initialization is done in fillSampleHistos().
-	ana.HbookHistos = make([][][]*hbook.H1D, len(ana.Samples))
-
-	// Inititialize hplot H1D
-	ana.HplotHistos = make([][][]*hplot.H1D, len(ana.Samples))
-	for iSamp := range ana.Samples {
-		ana.HplotHistos[iSamp] = make([][]*hplot.H1D, len(ana.KinemCuts))
-		for iCut := range ana.KinemCuts {
-			ana.HplotHistos[iSamp][iCut] = make([]*hplot.H1D, len(ana.Variables))
-		}
-	}
-
 }
 
 // Helper duration formating: return a string 'hh:mm:ss' for a time.Duration object

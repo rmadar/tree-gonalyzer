@@ -6,7 +6,6 @@ import (
 	"os"
 	"sync"
 	"time"
-	//"fmt"
 
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotutil"
@@ -384,6 +383,8 @@ func (ana *Maker) stackHistograms(hBkgs, hSigs []*hplot.H1D, LogY bool) *hplot.H
 }
 
 // Helper function computing the ratio and adding them to the plot.
+// Both hplot and hbook histograms are needed to propagate
+// individual histo styles.
 func (ana *Maker) addRatioToPlot(rp *hplot.RatioPlot, bhistos []*hbook.H1D, phistos []*hplot.H1D) {
 
 	// Get all histogram (hbook to compute ratio) and (hplot) for the style

@@ -22,6 +22,9 @@ func (ana *Maker) RunEventLoops() error {
 	// Start timing
 	start := time.Now()
 
+	// Initialize hbook H1D as N[samples] 2D-slices.
+	ana.HbookHistos = make([][][]*hbook.H1D, len(ana.Samples))
+	
 	// Loop over the samples
 	if ana.SampleMT {
 		var wg sync.WaitGroup
