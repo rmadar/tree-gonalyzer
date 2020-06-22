@@ -4,9 +4,7 @@ package ana
 import (
 	"fmt"
 	"image/color"
-	//"log"
 	"time"
-	//"go-hep.org/x/hep/groot/rtree"
 
 	"go-hep.org/x/hep/hbook"
 	"go-hep.org/x/hep/hplot"
@@ -59,13 +57,10 @@ type Maker struct {
 	// Normalisation of total background (and signal if
 	// stacked) for each cut
 	normTotal []float64
-
+	
 	idxData  []int       // Indices of data samples in []*Sample slice
 	idxBkgs  []int       // Indices of bkg samples in []*Sample slice
 	idxSigs  []int       // Indices of sig samples in []*Sample slice
-	cutIdx      map[string]int // Linking cut name and cut index
-	samIdx      map[string]int // Linking sample name and cut index
-	varIdx      map[string]int // Linking variable name and variable index
 	histoFilled bool           // true if histograms are filled.
 	nEvents     int64          // Number of processed events
 	timeLoop    time.Duration  // Processing time for filling histograms (event loop over samples x cuts x histos)
@@ -157,21 +152,16 @@ func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 	if cfg.TotalBandColor.usr {
 		a.TotalBandColor = cfg.TotalBandColor.val
 	}
-
-	// Get mappings between slice indices and object names
-	a.samIdx = getIdxMap(a.Samples, &Sample{})
-	a.varIdx = getIdxMap(a.Variables, &Variable{})
-	a.cutIdx = getIdxMap(a.KinemCuts, &Selection{})
-
+	
 	// Get ordered lists of background and signal names
 	a.idxData, a.idxBkgs, a.idxSigs = a.getSampleProc()
-
+	
 	// Managing event number with concurrency
 	a.nEvtsSample = make([]int64, len(a.Samples))
-
+	
 	// Build hbook and hplot H1D containers
 	a.initHistoContainers()
-
+	
 	// Build the slice of values to store
 	// FIX-ME(rmadar): this is not so clean to assess slice or not
 	//                 by doing a loop over variables for the first
@@ -198,28 +188,6 @@ func (ana *Maker) getSampleProc() ([]int, []int, []int) {
 		}
 	}
 	return iData, iBkgs, iSigs
-}
-
-// Helper function creating the mapping between name and objects
-func getIdxMap(objs interface{}, objType interface{}) map[string]int {
-	res := make(map[string]int)
-	switch objType.(type) {
-	case *Variable:
-		for i, obj := range objs.([]*Variable) {
-			res[obj.Name] = i
-		}
-	case *Sample:
-		for i, obj := range objs.([]*Sample) {
-			res[obj.Name] = i
-		}
-	case *Selection:
-		for i, obj := range objs.([]*Selection) {
-			res[obj.Name] = i
-		}
-	default:
-		panic(fmt.Errorf("invalid variable value-type %T", objType))
-	}
-	return res
 }
 
 // PrintReport prints some general information about the number
