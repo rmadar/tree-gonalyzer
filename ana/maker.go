@@ -6,6 +6,8 @@ import (
 	"image/color"
 	"log"
 	"time"
+
+	"go-hep.org/x/hep/hbook"
 )
 
 // Analysis maker type is the main object of the ana package.
@@ -40,14 +42,13 @@ type Maker struct {
 	TotalBandColor color.NRGBA // Color for the uncertainty band (default: gray).
 
 	// Enable ratio plot (default: true).
-	//  - stack on : data / total bkg
-	//  - stack off:
-	//     * if data is filled: sample[i] / data
-	//     * if data is empty : sample[i] / sample[0]
+	// If stack is on, the ratio is defined as data over total bkg.
+	// If stack is off, ratios are defined as sample[i] / data when
+	// a data sample is defined, sample[i] / sample[0] otherwise.
 	RatioPlot bool        
 
 	// Histograms for {samples x selections x variables}
-	HbookHistos [][][]*hbook.H1D
+	hbookHistos [][][]*hbook.H1D
 
 	// tree dumping
 	nVars       int     // number of variables
@@ -161,9 +162,6 @@ func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 
 	// Managing event number with concurrency
 	a.nEvtsSample = make([]int64, len(a.Samples))
-
-	// Build hbook and hplot H1D containers
-	a.initHistoContainers()
 
 	// Build the slice of values to store
 	// FIX-ME(rmadar): this is not so clean to assess slice or not

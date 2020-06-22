@@ -34,7 +34,7 @@ func (ana *Maker) PlotVariables() error {
 		ana.setAutoStyle()
 	}
 
-	// Return an error if HbookHistos is empty
+	// Return an error if hbookHistos is empty
 	if !ana.histoFilled {
 		err := "There is no histograms. Please make sure that"
 		err += "'FillHistos()' is called before 'PlotVariables()'"
@@ -251,7 +251,7 @@ func (ana *Maker) Normalizations() ([][]float64, []float64) {
 		for is, s := range ana.Samples {
 
 			// Individual normalization including under/over-flows
-			n := ana.HbookHistos[is][ic][0].Integral()
+			n := ana.hbookHistos[is][ic][0].Integral()
 			norms[ic][is] = n
 
 			// Cumulate backgrounds for the total
@@ -283,7 +283,7 @@ func (ana *Maker) getNormHbookHistos(iCut, iVar int) []*hbook.H1D {
 	for i, s := range ana.Samples {
 
 		// Get a clone of the histo
-		h := ana.HbookHistos[i][iCut][iVar].Clone()
+		h := ana.hbookHistos[i][iCut][iVar].Clone()
 
 		// Normalize
 		if ana.HistoNorm {

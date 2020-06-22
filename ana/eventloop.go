@@ -23,7 +23,7 @@ func (ana *Maker) RunEventLoops() error {
 	start := time.Now()
 
 	// Initialize hbook H1D as N[samples] 2D-slices.
-	ana.HbookHistos = make([][][]*hbook.H1D, len(ana.Samples))
+	ana.hbookHistos = make([][][]*hbook.H1D, len(ana.Samples))
 	
 	// Loop over the samples
 	if ana.SampleMT {
@@ -278,7 +278,7 @@ func (ana *Maker) sampleEventLoop(sampleIdx int) {
 	}
 
 	// Fill the histos for this sample
-	ana.HbookHistos[sampleIdx] = h
+	ana.hbookHistos[sampleIdx] = h
 
 	// Explicitely close file and tree
 	if ana.DumpTree {
