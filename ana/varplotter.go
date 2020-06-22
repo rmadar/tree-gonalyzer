@@ -4,10 +4,10 @@ import (
 	"image/color"
 	"log"
 	"os"
-	"time"
 	"sync"
+	"time"
 	//"fmt"
-	
+
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotutil"
 	"gonum.org/v1/plot/vg"
@@ -53,7 +53,7 @@ func (ana *Maker) PlotVariables() error {
 
 	// Loop over variables and cuts
 	var wg sync.WaitGroup
-	wg.Add(len(ana.Variables)*len(ana.KinemCuts))
+	wg.Add(len(ana.Variables) * len(ana.KinemCuts))
 	for iv := range ana.Variables {
 		for ic := range ana.KinemCuts {
 			go ana.concurrentPlotVar(iv, ic, latex, &wg)
@@ -74,7 +74,6 @@ func (ana *Maker) PlotVariables() error {
 	return nil
 }
 
-
 func (ana *Maker) concurrentPlotVar(iVar, iCut int, latex htex.Handler, wg *sync.WaitGroup) {
 
 	// Handle concurrency
@@ -83,7 +82,6 @@ func (ana *Maker) concurrentPlotVar(iVar, iCut int, latex htex.Handler, wg *sync
 	// Fill the histo
 	ana.plotVar(iVar, iCut, latex)
 }
-
 
 func (ana *Maker) plotVar(iVar, iCut int, latex htex.Handler) {
 
@@ -99,38 +97,23 @@ func (ana *Maker) plotVar(iVar, iCut int, latex htex.Handler) {
 
 	// Post-normalization hbook histograms
 	bhistos := ana.getNormHbookHistos(iCut, iVar)
-	
-	// Compute total histogram
-	bhBkgs := make([]*hbook.H1D, len(ana.idxBkgs))
-	for i, ib := range ana.idxBkgs {
-		bhBkgs[i] = bhistos[ib]
-	}
-	bhBkgTot := histTot(bhBkgs)
 
 	// hplot histograms
 	phistos := ana.getHplotH1D(bhistos, v.LogY)
 
 	// Stack signal/bkg histograms
-	hType := func(src []*hplot.H1D, indices []int) []*hplot.H1D {
-		dst := make([]*hplot.H1D, len(indices))
-		for i, idx := range indices {
-			dst[i] = src[idx]
-		}
-		return dst
-	}
-
-	phBkgs := hType(phistos, ana.idxBkgs)
-	phSigs := hType(phistos, ana.idxSigs)
+	phBkgs := hplotHistoFromIdx(phistos, ana.idxBkgs)
+	phSigs := hplotHistoFromIdx(phistos, ana.idxSigs)
 	stack := ana.stackHistograms(phBkgs, phSigs, v.LogY)
 
 	// Data
-	phData := hType(phistos, ana.idxData)
-	
+	phData := hplotHistoFromIdx(phistos, ana.idxData)
+
 	// Add histograms to the legend
 	for i, s := range ana.Samples {
 		plt.Legend.Add(s.LegLabel, phistos[i])
 	}
-	
+
 	// Add total error band to the legend
 	if ana.HistoStack && ana.TotalBand {
 		hBand := hplot.NewH1D(hbook.NewH1D(1, 0, 1), hplot.WithBand(true))
@@ -139,7 +122,7 @@ func (ana *Maker) plotVar(iVar, iCut int, latex htex.Handler) {
 		hBand.LineStyle.Width = 0
 		plt.Legend.Add("Uncer.", hBand)
 	}
-	
+
 	// Add histogram and stacks to the plot
 	if stack != nil {
 		plt.Add(stack)
@@ -161,91 +144,21 @@ func (ana *Maker) plotVar(iVar, iCut int, latex htex.Handler) {
 		plt.Y.Scale = plot.LogScale{}
 		plt.Y.Tick.Marker = plot.LogTicks{}
 	}
-
-
-	// -----------------------
-	// TO RE-ORGANIZE FROM HERE
-	// ------------------------
-	
 	drw = plt
 
 	// Addition of the ratio plot
 	if ana.RatioPlot {
 
-		// Create a ratio plot, init top and bottom plots with current plot p
+		// Create a ratio plot and style it using plt
 		rp := hplot.NewRatioPlot()
-		style.ApplyToBottomPlot(rp.Bottom)
-		rp.Bottom.X = plt.X
-		rp.Top = plt
-		rp.Top.X.Tick.Label.Font.Size = 0
-		rp.Top.X.Tick.Label.Color = color.NRGBA{R: 0, G: 0, B: 0, A: 0}
-		rp.Top.X.Tick.LineStyle.Width = 0.5
-		rp.Top.X.Tick.LineStyle.Color = color.NRGBA{R: 120, G: 120, B: 120, A: 255}
-		rp.Top.X.Tick.Length = 5
-		rp.Top.X.LineStyle.Width = 0.8
-		rp.Top.X.LineStyle.Color = color.NRGBA{R: 120, G: 120, B: 120, A: 255}
-		rp.Top.X.Label.Text = ""
+		style.ApplyToRatioPlot(rp, plt)
 
 		// Update the drawer and figure size
 		figWidth, figHeight = 6*vg.Inch, 4.5*vg.Inch
 		drw = rp
 
-		// Compute and store the ratio (type hbook.S2D)
-		switch {
-		case ana.HistoStack:
-			// MC to MC
-			hbs2d_ratioMC, err := hbook.DivideH1D(bhBkgTot, bhBkgTot, hbook.DivIgnoreNaNs())
-			if err != nil {
-				log.Fatal("cannot divide histo for the ratio plot")
-			}
-			hps2d_ratioMC := hplot.NewS2D(hbs2d_ratioMC, hplot.WithBand(true),
-				hplot.WithStepsKind(hplot.HiSteps),
-			)
-			hps2d_ratioMC.GlyphStyle.Radius = 0
-			hps2d_ratioMC.LineStyle.Width = 0.0
-			hps2d_ratioMC.Band.FillColor = ana.TotalBandColor
-			rp.Bottom.Add(hps2d_ratioMC)
-
-			if len(ana.idxData) > 0 {
-
-				bhData := bhistos[ana.idxData[0]]
-				phData := phistos[ana.idxData[0]]
-				
-				// Data to MC
-				hbs2d_ratio, err := hbook.DivideH1D(bhData, bhBkgTot, hbook.DivIgnoreNaNs())
-				if err != nil {
-					log.Fatal("cannot divide histo for the ratio plot")
-				}
-				hps2d_ratio := hplot.NewS2D(hbs2d_ratio, hplot.WithYErrBars(true),
-					hplot.WithStepsKind(hplot.HiSteps),
-				)
-				style.CopyStyleH1DtoS2D(hps2d_ratio, phData)
-				rp.Bottom.Add(hps2d_ratio)
-			}
-			
-		default:
-			// FIX-ME (rmadar): Ratio wrt data (or first bkg if data is empty)
-			//                    -> to be specied as an option?
-			
-			href := bhBkgs[ana.idxBkgs[0]]
-			if len(ana.idxData) > 0 {
-				href = bhistos[ana.idxData[0]]
-			}
-			for i, h := range bhBkgs {
-								
-				hbs2d_ratio, err := hbook.DivideH1D(h, href, hbook.DivIgnoreNaNs())
-				if err != nil {
-					log.Fatal("cannot divide histo for the ratio plot")
-				}
-
-				hps2d_ratio := hplot.NewS2D(hbs2d_ratio,
-					hplot.WithBand(phBkgs[i].Band != nil),
-					hplot.WithStepsKind(hplot.HiSteps),
-				)
-				style.CopyStyleH1DtoS2D(hps2d_ratio, phBkgs[i])
-				rp.Bottom.Add(hps2d_ratio)
-			}
-		}
+		// Compute and add ratios to the plot
+		ana.addRatioToPlot(rp, bhistos, phistos)
 
 		// Adjust ratio plot scale
 		if v.RatioYmin != v.RatioYmax {
@@ -254,19 +167,19 @@ func (ana *Maker) plotVar(iVar, iCut int, latex htex.Handler) {
 		}
 	}
 
-	// Save the figure
+	// Create the figure
 	f := hplot.Figure(drw)
 	style.ApplyToFigure(f)
 	f.Latex = latex
 
+	// Save the figure
 	path := ana.SavePath + "/" + ana.KinemCuts[iCut].Name
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		os.MkdirAll(path, 0755)
 	}
-	
 	outputname := path + "/" + v.SaveName + "." + ana.SaveFormat
 	if err := hplot.Save(f, figWidth, figHeight, outputname); err != nil {
-			log.Fatalf("error saving plot: %v\n", err)
+		log.Fatalf("error saving plot: %v\n", err)
 	}
 }
 
@@ -360,10 +273,10 @@ func (ana *Maker) Normalizations() ([][]float64, []float64) {
 // Helper function to normalize and return hbook histograms
 // of a given cut  and variable, for bkgs, sigs and data.
 func (ana *Maker) getNormHbookHistos(iCut, iVar int) []*hbook.H1D {
-	
+
 	// Get normalization
 	nHistos, nTot := ana.normHists[iCut], ana.normTotal[iCut]
-	
+
 	// Prepare histo maps
 	bhistos := make([]*hbook.H1D, len(ana.Samples))
 
@@ -372,7 +285,7 @@ func (ana *Maker) getNormHbookHistos(iCut, iVar int) []*hbook.H1D {
 
 		// Get a clone of the histo
 		h := ana.HbookHistos[i][iCut][iVar].Clone()
-		
+
 		// Normalize
 		if ana.HistoNorm {
 			switch s.sType {
@@ -390,25 +303,24 @@ func (ana *Maker) getNormHbookHistos(iCut, iVar int) []*hbook.H1D {
 		// Store
 		bhistos[i] = h
 	}
-		
+
 	return bhistos
 }
-
 
 // Helper function to get hplot histograms from hbook histograms.
 // It returns two maps [string]hplot.H1D (bkgs), [string]hplot.H1D (sigs)
 // and one histogram hplot.H1D (data).
-func (ana *Maker) getHplotH1D(hs[]*hbook.H1D, LogY bool) []*hplot.H1D {	
+func (ana *Maker) getHplotH1D(hs []*hbook.H1D, LogY bool) []*hplot.H1D {
 
 	// Prepare the output
 	phistos := make([]*hplot.H1D, len(ana.Samples))
-	
+
 	// Loop over backgrounds
 	for _, ib := range ana.idxBkgs {
 		s := ana.Samples[ib]
 		phistos[ib] = s.CreateHisto(hs[ib], hplot.WithLogY(LogY))
 	}
-	
+
 	// Loop over signals
 	for _, is := range ana.idxSigs {
 		s := ana.Samples[is]
@@ -432,7 +344,7 @@ func (ana *Maker) getHplotH1D(hs[]*hbook.H1D, LogY bool) []*hplot.H1D {
 			}
 		}
 	}
-	
+
 	return phistos
 }
 
@@ -448,7 +360,7 @@ func (ana *Maker) stackHistograms(hBkgs, hSigs []*hplot.H1D, LogY bool) *hplot.H
 	for _, b := range hBkgs {
 		phStack = append(phStack, b)
 	}
-	
+
 	// Reverse the order so that legend and plot order matches
 	for i, j := 0, len(phStack)-1; i < j; i, j = i+1, j-1 {
 		phStack[i], phStack[j] = phStack[j], phStack[i]
@@ -461,7 +373,7 @@ func (ana *Maker) stackHistograms(hBkgs, hSigs []*hplot.H1D, LogY bool) *hplot.H
 			phStack = append(phStack, hs)
 		}
 	}
-	
+
 	// Stacking the background histo
 	stack := hplot.NewHStack(phStack, hplot.WithBand(ana.TotalBand), hplot.WithLogY(LogY))
 	if !ana.HistoStack {
@@ -469,6 +381,92 @@ func (ana *Maker) stackHistograms(hBkgs, hSigs []*hplot.H1D, LogY bool) *hplot.H
 	}
 
 	return stack
+}
+
+// Helper function computing the ratio and adding them to the plot.
+func (ana *Maker) addRatioToPlot(rp *hplot.RatioPlot, bhistos []*hbook.H1D, phistos []*hplot.H1D) {
+
+	// Get all histogram (hbook to compute ratio) and (hplot) for the style
+	bhBkgs := hbookHistoFromIdx(bhistos, ana.idxBkgs)
+	phBkgs := hplotHistoFromIdx(phistos, ana.idxBkgs)
+	bhBkgTot := histTot(bhBkgs)
+
+	// Compute and store the ratio (type hbook.S2D)
+	switch {
+	case ana.HistoStack:
+
+		// MC to MC
+		hbs2d_ratioMC, err := hbook.DivideH1D(bhBkgTot, bhBkgTot, hbook.DivIgnoreNaNs())
+		if err != nil {
+			log.Fatal("cannot divide histo for the ratio plot")
+		}
+		hps2d_ratioMC := hplot.NewS2D(hbs2d_ratioMC, hplot.WithBand(true),
+			hplot.WithStepsKind(hplot.HiSteps),
+		)
+		hps2d_ratioMC.GlyphStyle.Radius = 0
+		hps2d_ratioMC.LineStyle.Width = 0.0
+		hps2d_ratioMC.Band.FillColor = ana.TotalBandColor
+		rp.Bottom.Add(hps2d_ratioMC)
+
+		if len(ana.idxData) > 0 {
+
+			bhData := bhistos[ana.idxData[0]]
+			phData := phistos[ana.idxData[0]]
+
+			// Data to MC
+			hbs2d_ratio, err := hbook.DivideH1D(bhData, bhBkgTot, hbook.DivIgnoreNaNs())
+			if err != nil {
+				log.Fatal("cannot divide histo for the ratio plot")
+			}
+			hps2d_ratio := hplot.NewS2D(hbs2d_ratio, hplot.WithYErrBars(true),
+				hplot.WithStepsKind(hplot.HiSteps),
+			)
+			style.CopyStyleH1DtoS2D(hps2d_ratio, phData)
+			rp.Bottom.Add(hps2d_ratio)
+		}
+
+	default:
+		// FIX-ME (rmadar): Ratio wrt data (or first bkg if data is empty)
+		//                    -> to be specied as an option?
+		href := bhBkgs[ana.idxBkgs[0]]
+		if len(ana.idxData) > 0 {
+			href = bhistos[ana.idxData[0]]
+		}
+		for i, h := range bhBkgs {
+
+			hbs2d_ratio, err := hbook.DivideH1D(h, href, hbook.DivIgnoreNaNs())
+			if err != nil {
+				log.Fatal("cannot divide histo for the ratio plot")
+			}
+
+			hps2d_ratio := hplot.NewS2D(hbs2d_ratio,
+				hplot.WithBand(phBkgs[i].Band != nil),
+				hplot.WithStepsKind(hplot.HiSteps),
+			)
+			style.CopyStyleH1DtoS2D(hps2d_ratio, phBkgs[i])
+			rp.Bottom.Add(hps2d_ratio)
+		}
+	}
+}
+
+// Helper function returning a slice of hplot histo
+// corresponding to a list of indices.
+func hplotHistoFromIdx(src []*hplot.H1D, indices []int) []*hplot.H1D {
+	dst := make([]*hplot.H1D, len(indices))
+	for i, idx := range indices {
+		dst[i] = src[idx]
+	}
+	return dst
+}
+
+// Helper function returning a slice of hbook histo
+// corresponding to a list of indices.
+func hbookHistoFromIdx(src []*hbook.H1D, indices []int) []*hbook.H1D {
+	dst := make([]*hbook.H1D, len(indices))
+	for i, idx := range indices {
+		dst[i] = src[idx]
+	}
+	return dst
 }
 
 // Helper function returning the summed histogram.

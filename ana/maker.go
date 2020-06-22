@@ -4,6 +4,7 @@ package ana
 import (
 	"fmt"
 	"image/color"
+	"log"
 	"time"
 
 	"go-hep.org/x/hep/hbook"
@@ -57,14 +58,14 @@ type Maker struct {
 	// Normalisation of total background (and signal if
 	// stacked) for each cut
 	normTotal []float64
-	
-	idxData  []int       // Indices of data samples in []*Sample slice
-	idxBkgs  []int       // Indices of bkg samples in []*Sample slice
-	idxSigs  []int       // Indices of sig samples in []*Sample slice
-	histoFilled bool           // true if histograms are filled.
-	nEvents     int64          // Number of processed events
-	timeLoop    time.Duration  // Processing time for filling histograms (event loop over samples x cuts x histos)
-	timePlot    time.Duration  // Processing time for plotting histogram
+
+	idxData     []int         // Indices of data samples in []*Sample slice
+	idxBkgs     []int         // Indices of bkg samples in []*Sample slice
+	idxSigs     []int         // Indices of sig samples in []*Sample slice
+	histoFilled bool          // true if histograms are filled.
+	nEvents     int64         // Number of processed events
+	timeLoop    time.Duration // Processing time for filling histograms (event loop over samples x cuts x histos)
+	timePlot    time.Duration // Processing time for plotting histogram
 }
 
 // New creates a default analysis maker from a list of sample
@@ -152,16 +153,16 @@ func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 	if cfg.TotalBandColor.usr {
 		a.TotalBandColor = cfg.TotalBandColor.val
 	}
-	
+
 	// Get ordered lists of background and signal names
 	a.idxData, a.idxBkgs, a.idxSigs = a.getSampleProc()
-	
+
 	// Managing event number with concurrency
 	a.nEvtsSample = make([]int64, len(a.Samples))
-	
+
 	// Build hbook and hplot H1D containers
 	a.initHistoContainers()
-	
+
 	// Build the slice of values to store
 	// FIX-ME(rmadar): this is not so clean to assess slice or not
 	//                 by doing a loop over variables for the first
@@ -174,9 +175,7 @@ func New(s []*Sample, v []*Variable, opts ...Options) Maker {
 // Helper function to get ordered list of background
 // and signal names
 func (ana *Maker) getSampleProc() ([]int, []int, []int) {
-	iData := []int{}
-	iBkgs := []int{}
-	iSigs := []int{}
+	iData, iBkgs, iSigs := []int{}, []int{}, []int{}
 	for i, s := range ana.Samples {
 		switch s.sType {
 		case data:
@@ -187,6 +186,11 @@ func (ana *Maker) getSampleProc() ([]int, []int, []int) {
 			iSigs = append(iSigs, i)
 		}
 	}
+
+	if len(iData) > 1 {
+		log.Fatalf("More than one data sample")
+	}
+
 	return iData, iBkgs, iSigs
 }
 
