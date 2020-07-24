@@ -213,6 +213,11 @@ func init() {
 		return rfunc.NewFuncF64ToBool(rvars, fct.(func(float64) bool)), nil
 	}
 
+	// (int32) -> float64
+	funcs[reflect.TypeOf((func(int32) float64)(nil))] = func(rvars []string, fct interface{}) (rfunc.Formula, error) {
+		return rfunc.NewFuncI32ToF64(rvars, fct.(func(int32) float64)), nil
+	}
+
 	// (bool) -> bool
 	funcs[reflect.TypeOf((func(bool) bool)(nil))] = newFuncBoolToBool
 
