@@ -6,7 +6,8 @@ import (
 	"os"
 	"sync"
 	"time"
-
+	"math"
+	
 	"go-hep.org/x/hep/groot"
 	"go-hep.org/x/hep/groot/rtree"
 
@@ -116,7 +117,8 @@ func (ana *Maker) sampleEventLoop(sampleIdx int) {
 			}
 
 			// Get the tree reader
-			r, err := rtree.NewReader(t, []rtree.ReadVar{}, rtree.WithRange(0, ana.NevtsMax))
+			nEvtsMax := int64(math.Max(float64(t.Entries()), float64(ana.NevtsMax)))
+			r, err := rtree.NewReader(t, []rtree.ReadVar{}, rtree.WithRange(0, nEvtsMax))
 			if err != nil {
 				log.Fatal("could not create tree reader: %w", err)
 			}
