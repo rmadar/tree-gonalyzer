@@ -117,7 +117,7 @@ func (ana *Maker) sampleEventLoop(sampleIdx int) {
 			}
 
 			// Get the tree reader
-			nEvtsMax := int64(math.Max(float64(t.Entries()), float64(ana.NevtsMax)))
+			nEvtsMax := int64(math.Min(float64(t.Entries()), float64(ana.NevtsMax)))
 			r, err := rtree.NewReader(t, []rtree.ReadVar{}, rtree.WithRange(0, nEvtsMax))
 			if err != nil {
 				log.Fatal("could not create tree reader: %w", err)
