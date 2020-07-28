@@ -202,8 +202,8 @@ func (usr *userFuncF32sF32sF32sToF64) Bind(args []interface{}) error {
 		)
 	}
 	usr.v1 = args[0].(*[]float32)
-	usr.v3 = args[1].(*[]float32)
-	usr.v2 = args[2].(*[]float32)
+	usr.v2 = args[1].(*[]float32)
+	usr.v3 = args[2].(*[]float32)
 	return nil
 }
 
