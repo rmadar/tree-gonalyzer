@@ -6,7 +6,7 @@ import (
 	"os"
 	"sync"
 	"time"
-
+	
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotutil"
 	"gonum.org/v1/plot/vg"
@@ -114,7 +114,7 @@ func (ana *Maker) plotVar(iVar, iCut int, latex htex.Handler) {
 	}
 
 	// Add total error band to the legend
-	if ana.HistoStack && ana.TotalBand {
+	if ana.HistoStack && ana.TotalBand && stack != nil {
 		hBand := hplot.NewH1D(hbook.NewH1D(1, 0, 1), hplot.WithBand(true))
 		hBand.Band = stack.Band
 		hBand.Band.FillColor = ana.TotalBandColor
@@ -151,7 +151,7 @@ func (ana *Maker) plotVar(iVar, iCut int, latex htex.Handler) {
 		// Create a ratio plot and style it using plt
 		rp := hplot.NewRatioPlot()
 		style.ApplyToRatioPlot(rp, plt)
-
+		
 		// Update the drawer and figure size
 		figWidth, figHeight = 6*vg.Inch, 4.5*vg.Inch
 		drw = rp
@@ -326,7 +326,7 @@ func (ana *Maker) getHplotH1D(hs []*hbook.H1D, LogY bool) []*hplot.H1D {
 		phistos[is] = s.CreateHisto(hs[is], hplot.WithLogY(LogY))
 	}
 
-	// Loop over signals
+	// Loop over data
 	for _, id := range ana.idxData {
 		s := ana.Samples[id]
 		phistos[id] = s.CreateHisto(hs[id], hplot.WithLogY(LogY))
@@ -387,6 +387,11 @@ func (ana *Maker) stackHistograms(hBkgs, hSigs []*hplot.H1D, LogY bool) *hplot.H
 // individual histo styles.
 func (ana *Maker) addRatioToPlot(rp *hplot.RatioPlot, bhistos []*hbook.H1D, phistos []*hplot.H1D) {
 
+	// Do nothing if there is no background (ie only, data or only signals)
+	if len(ana.idxBkgs) == 0 {
+		return
+	}
+	
 	// Get all histogram (hbook to compute ratio) and (hplot) for the style
 	bhBkgs := hbookHistoFromIdx(bhistos, ana.idxBkgs)
 	phBkgs := hplotHistoFromIdx(phistos, ana.idxBkgs)
@@ -395,7 +400,7 @@ func (ana *Maker) addRatioToPlot(rp *hplot.RatioPlot, bhistos []*hbook.H1D, phis
 	// Compute and store the ratio (type hbook.S2D)
 	switch {
 	case ana.HistoStack:
-
+		
 		// MC to MC
 		hbs2d_ratioMC, err := hbook.DivideH1D(bhBkgTot, bhBkgTot, hbook.DivIgnoreNaNs())
 		if err != nil {
@@ -472,9 +477,14 @@ func hbookHistoFromIdx(src []*hbook.H1D, indices []int) []*hbook.H1D {
 
 // Helper function returning the summed histogram.
 func histTot(hs []*hbook.H1D) *hbook.H1D {
-	hTot := hs[0]
-	for _, h := range hs[1:] {
-		hTot = hbook.AddH1D(hTot, h)
+	if len(hs)>0 {
+		hTot := hs[0]
+		for _, h := range hs[1:] {
+			hTot = hbook.AddH1D(hTot, h)
+		}
+		return hTot
+	} else {
+		return nil
 	}
-	return hTot
+	
 }
