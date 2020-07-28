@@ -178,9 +178,9 @@ func (usr *userFuncF32sToF64s) Func() interface{} {
 
 // ([]float32, []float32, []float32) -> float64
 func newFuncF32sF32sF32sToF64(varsName []string, fct interface{}) (rfunc.Formula, error) {
-	return &userFuncF32sToF64s{
+	return &userFuncF32sF32sF32sToF64{
 		rvars: varsName,
-		fct:   fct.(func([]float32) []float64),
+		fct:   fct.(func([]float32, []float32, []float32) float64),
 	}, nil
 }
 
