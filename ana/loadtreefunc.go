@@ -143,6 +143,41 @@ func (usr *userFuncBoolToBool) Func() interface{} {
 	}
 }
 
+
+
+// (I32) -> bool
+func newFuncI32ToBool(varsName []string, fct interface{}) (rfunc.Formula, error) {
+	return &userFuncI32ToBool{
+		rvars: varsName,
+		fct:   fct.(func(int32) bool),
+	}, nil
+}
+
+type userFuncI32ToBool struct {
+	rvars []string
+	v1    *int32
+	fct   func(int32) bool
+}
+
+func (usr *userFuncI32ToBool) RVars() []string { return usr.rvars }
+
+func (usr *userFuncI32ToBool) Bind(args []interface{}) error {
+	if got, want := len(args), 1; got != want {
+		return fmt.Errorf(
+			"rfunc: invalid number of bind arguments (got=%d, want=%d)",
+			got, want,
+		)
+	}
+	usr.v1 = args[0].(*int32)
+	return nil
+}
+
+func (usr *userFuncI32ToBool) Func() interface{} {
+	return func() bool {
+		return usr.fct(*usr.v1)
+	}
+}
+
 // ([]float32) -> []float64
 func newFuncF32sToF64s(varsName []string, fct interface{}) (rfunc.Formula, error) {
 	return &userFuncF32sToF64s{
@@ -258,6 +293,9 @@ func init() {
 	// (bool) -> bool
 	funcs[reflect.TypeOf((func(bool) bool)(nil))] = newFuncBoolToBool
 
+	// (int32) -> bool
+	funcs[reflect.TypeOf((func(int32) bool)(nil))] = newFuncI32ToBool
+	
 	// (bool) -> float64
 	funcs[reflect.TypeOf((func(bool) float64)(nil))] = newFuncBoolToF64
 
