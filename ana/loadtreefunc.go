@@ -176,6 +176,43 @@ func (usr *userFuncF32sToF64s) Func() interface{} {
 	}
 }
 
+// ([]float32, []float32, []float32) -> float64
+func newFuncF32sF32sF32sToF64(varsName []string, fct interface{}) (rfunc.Formula, error) {
+	return &userFuncF32sToF64s{
+		rvars: varsName,
+		fct:   fct.(func([]float32) []float64),
+	}, nil
+}
+
+type userFuncF32sF32sF32sToF64 struct {
+	rvars []string
+	v1    *[]float32
+	v2    *[]float32
+	v3    *[]float32
+	fct   func([]float32, []float32, []float32) float64
+}
+
+func (usr *userFuncF32sF32sF32sToF64) RVars() []string { return usr.rvars }
+
+func (usr *userFuncF32sF32sF32sToF64) Bind(args []interface{}) error {
+	if got, want := len(args), 3; got != want {
+		return fmt.Errorf(
+			"rfunc: invalid number of bind arguments (got=%d, want=%d)",
+			got, want,
+		)
+	}
+	usr.v1 = args[0].(*[]float32)
+	usr.v3 = args[1].(*[]float32)
+	usr.v2 = args[2].(*[]float32)
+	return nil
+}
+
+func (usr *userFuncF32sF32sF32sToF64) Func() interface{} {
+	return func() float64 {
+		return usr.fct(*usr.v1, *usr.v2, *usr.v3)
+	}
+}
+
 // Maps of all pre-defined function types.
 var funcs = make(map[reflect.Type]func(rvars []string, fct interface{}) (rfunc.Formula, error))
 
@@ -217,7 +254,7 @@ func init() {
 	funcs[reflect.TypeOf((func(int32) float64)(nil))] = func(rvars []string, fct interface{}) (rfunc.Formula, error) {
 		return rfunc.NewFuncI32ToF64(rvars, fct.(func(int32) float64)), nil
 	}
-
+	
 	// (bool) -> bool
 	funcs[reflect.TypeOf((func(bool) bool)(nil))] = newFuncBoolToBool
 
@@ -232,4 +269,7 @@ func init() {
 
 	// ([]float32) -> []float64
 	funcs[reflect.TypeOf((func([]float32) []float64)(nil))] = newFuncF32sToF64s
+
+	// ([]float32, []float32, []float32) -> float64
+	funcs[reflect.TypeOf((func([]float32, []float32, []float32) float64)(nil))] = newFuncF32sF32sF32sToF64
 }
