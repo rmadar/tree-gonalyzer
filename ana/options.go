@@ -239,7 +239,8 @@ func WithKinemCuts(c []*Selection) Options {
 }
 
 // WithNevtsMax sets the maximum processed event for
-// each sample component.
+// each sample component. If n[sample]<n, the tool
+// will run n[sample] events for this sample.
 func WithNevtsMax(n int64) Options {
 	return func(cfg *config) {
 		cfg.NevtsMax.val = n
