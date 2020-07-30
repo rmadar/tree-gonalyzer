@@ -3,11 +3,11 @@ package ana
 import (
 	"fmt"
 	"log"
+	"math"
 	"os"
 	"sync"
 	"time"
-	"math"
-	
+
 	"go-hep.org/x/hep/groot"
 	"go-hep.org/x/hep/groot/rtree"
 
@@ -25,7 +25,7 @@ func (ana *Maker) RunEventLoops() error {
 
 	// Initialize hbook H1D as N[samples] 2D-slices.
 	ana.hbookHistos = make([][][]*hbook.H1D, len(ana.Samples))
-	
+
 	// Loop over the samples
 	if ana.SampleMT {
 		var wg sync.WaitGroup

@@ -45,7 +45,7 @@ type Maker struct {
 	// If stack is on, the ratio is defined as data over total bkg.
 	// If stack is off, ratios are defined as sample[i] / data when
 	// a data sample is defined, sample[i] / sample[0] otherwise.
-	RatioPlot bool        
+	RatioPlot bool
 
 	// Histograms for {samples x selections x variables}
 	hbookHistos [][][]*hbook.H1D

@@ -6,7 +6,7 @@ import (
 	"os"
 	"sync"
 	"time"
-	
+
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotutil"
 	"gonum.org/v1/plot/vg"
@@ -151,7 +151,7 @@ func (ana *Maker) plotVar(iVar, iCut int, latex htex.Handler) {
 		// Create a ratio plot and style it using plt
 		rp := hplot.NewRatioPlot()
 		style.ApplyToRatioPlot(rp, plt)
-		
+
 		// Update the drawer and figure size
 		figWidth, figHeight = 6*vg.Inch, 4.5*vg.Inch
 		drw = rp
@@ -391,7 +391,7 @@ func (ana *Maker) addRatioToPlot(rp *hplot.RatioPlot, bhistos []*hbook.H1D, phis
 	if len(ana.idxBkgs) == 0 {
 		return
 	}
-	
+
 	// Get all histogram (hbook to compute ratio) and (hplot) for the style
 	bhBkgs := hbookHistoFromIdx(bhistos, ana.idxBkgs)
 	phBkgs := hplotHistoFromIdx(phistos, ana.idxBkgs)
@@ -400,7 +400,7 @@ func (ana *Maker) addRatioToPlot(rp *hplot.RatioPlot, bhistos []*hbook.H1D, phis
 	// Compute and store the ratio (type hbook.S2D)
 	switch {
 	case ana.HistoStack:
-		
+
 		// MC to MC
 		hbs2d_ratioMC, err := hbook.DivideH1D(bhBkgTot, bhBkgTot, hbook.DivIgnoreNaNs())
 		if err != nil {
@@ -477,7 +477,7 @@ func hbookHistoFromIdx(src []*hbook.H1D, indices []int) []*hbook.H1D {
 
 // Helper function returning the summed histogram.
 func histTot(hs []*hbook.H1D) *hbook.H1D {
-	if len(hs)>0 {
+	if len(hs) > 0 {
 		hTot := hs[0]
 		for _, h := range hs[1:] {
 			hTot = hbook.AddH1D(hTot, h)
@@ -486,5 +486,5 @@ func histTot(hs []*hbook.H1D) *hbook.H1D {
 	} else {
 		return nil
 	}
-	
+
 }

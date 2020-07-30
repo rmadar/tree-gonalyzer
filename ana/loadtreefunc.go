@@ -143,8 +143,6 @@ func (usr *userFuncBoolToBool) Func() interface{} {
 	}
 }
 
-
-
 // (I32) -> bool
 func newFuncI32ToBool(varsName []string, fct interface{}) (rfunc.Formula, error) {
 	return &userFuncI32ToBool{
@@ -213,7 +211,6 @@ func (usr *userFuncBoolF32ToBool) Func() interface{} {
 	}
 }
 
-
 // (bool, int32) -> bool
 func newFuncBoolI32ToBool(varsName []string, fct interface{}) (rfunc.Formula, error) {
 	return &userFuncBoolI32ToBool{
@@ -248,9 +245,6 @@ func (usr *userFuncBoolI32ToBool) Func() interface{} {
 		return usr.fct(*usr.v1, *usr.v2)
 	}
 }
-
-
-
 
 // ([]float32) -> []float64
 func newFuncF32sToF64s(varsName []string, fct interface{}) (rfunc.Formula, error) {
@@ -322,7 +316,6 @@ func (usr *userFuncF32sF32sF32sToF64) Func() interface{} {
 	}
 }
 
-
 // ([]int32, []float32) -> []float64
 func newFuncI32sF32sToF64s(varsName []string, fct interface{}) (rfunc.Formula, error) {
 	return &userFuncI32sF32sToF64s{
@@ -357,8 +350,6 @@ func (usr *userFuncI32sF32sToF64s) Func() interface{} {
 		return usr.fct(*usr.v1, *usr.v2)
 	}
 }
-
-
 
 // Maps of all pre-defined function types.
 var funcs = make(map[reflect.Type]func(rvars []string, fct interface{}) (rfunc.Formula, error))
@@ -401,13 +392,13 @@ func init() {
 	funcs[reflect.TypeOf((func(int32) float64)(nil))] = func(rvars []string, fct interface{}) (rfunc.Formula, error) {
 		return rfunc.NewFuncI32ToF64(rvars, fct.(func(int32) float64)), nil
 	}
-	
+
 	// (bool) -> bool
 	funcs[reflect.TypeOf((func(bool) bool)(nil))] = newFuncBoolToBool
 
 	// (int32) -> bool
 	funcs[reflect.TypeOf((func(int32) bool)(nil))] = newFuncI32ToBool
-	
+
 	// (bool) -> float64
 	funcs[reflect.TypeOf((func(bool) float64)(nil))] = newFuncBoolToF64
 
@@ -425,10 +416,10 @@ func init() {
 
 	// ([]int32, []float32) -> []float64
 	funcs[reflect.TypeOf((func([]int32, []float32) []float64)(nil))] = newFuncI32sF32sToF64s
-	
+
 	// (bool, float32) -> bool
 	funcs[reflect.TypeOf((func(bool, float32) bool)(nil))] = newFuncBoolF32ToBool
-	
+
 	// (bool, int32) -> bool
 	funcs[reflect.TypeOf((func(bool, int32) bool)(nil))] = newFuncBoolI32ToBool
 }
