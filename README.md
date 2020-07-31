@@ -49,7 +49,7 @@ analyzer.Run()
 
 ## Performances
 
-![benchmarking](ana-perf/perf.png)
+![benchmarking](ana/perf/perf.png)
 
 For 2M events and 60 variables, a comparison with similar ROOT-based code
 (using `t->Draw()`) gives:

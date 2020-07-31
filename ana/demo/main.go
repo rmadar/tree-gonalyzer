@@ -83,9 +83,9 @@ func main() {
 // Few definition
 var (
 	// Files and tree names
-	file1 = "../testdata/file1.root"
-	file2 = "../testdata/file2.root"
-	file3 = "../testdata/file3.root"
+	file1 = "../../testdata/file1.root"
+	file2 = "../../testdata/file2.root"
+	file3 = "../../testdata/file3.root"
 	tname = "truth"
 
 	// TreeFunc: variables, weights and cuts
