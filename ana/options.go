@@ -565,7 +565,7 @@ func WithAxisLabels(xlab, ylab string) VariableOptions {
 	}
 }
 
-// WithAxisLabels sets the x- and y-axis labels.
+// WithTickFormats sets the x- and y-axis labels.
 func WithTickFormats(xticks, yticks string) VariableOptions {
 	return func(cfg *config) {
 		cfg.XTickFormat.val = xticks
