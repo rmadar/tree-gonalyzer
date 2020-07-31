@@ -27,7 +27,7 @@ type CutFlow []Yields
 // Cut contains the needed information
 type Cut struct {
 	Name string
-	Pass func(e *Event) bool
+	Pass interface{}//func(e *Event) bool
 }
 
 // Serie of several cuts.

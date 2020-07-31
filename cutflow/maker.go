@@ -75,14 +75,17 @@ func (ana *Maker) CutFlow() CutFlow {
 	// Loop over events
         err = r.Read(func(ctx rtree.RCtx) error {  
 
-		// Apply preselection
-		if !ana.Preselection(&e) {
-			return nil
+		// Apply preselection if any
+		if ana.Preselection != nil {
+			if !ana.Preselection(&e) {
+				return nil
+			}
 		}
 		
 		// Loop over the cuts
 		for ic, cut := range ana.Cuts {
-			if cut.Pass(&e) {
+			pass := cut.Pass.(func(e *Event) bool)
+			if pass(&e) {
 				cutFlow[ic].Nraw += 1
 				cutFlow[ic].Nwgt += e.weight()
 			}
