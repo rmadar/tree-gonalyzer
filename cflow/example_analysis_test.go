@@ -42,7 +42,7 @@ var (
 	}
 )
 
-func Example_Analysis() {
+func ExampleAnalysis_basicCutFlow() {
 
 	// Input files
 	files := []string{
