@@ -1,11 +1,9 @@
-package cutflow_test
+package cflow_test
 
 import (
-	_ "fmt"
+	"go-hep.org/x/hep/groot/rtree"	
 
-	"go-hep.org/x/hep/groot/rtree"
-	
-	"github.com/rmadar/tree-gonalyzer/cutflow"
+	"github.com/rmadar/tree-gonalyzer/cflow"
 )
 
 type usrEvent struct {
@@ -37,24 +35,24 @@ func Example_aSimpleCutFlow() {
 	}
 	
 	// User-defined event model
-	var e usrEvent
-	e = &cutflow.Event{}
+	var e cflow.Event 
+	e = usrEvent{}
 	
 	// Cuts
-	ptCut  := func(e usrEvent) bool {return e.pt >50}
-	etaCut := func(e usrEvent) bool {return ptCut(e)  && e.eta>0.5}
-	phiCut := func(e usrEvent) bool {return etaCut(e) && e.phi<2}
+	ptCut  := func(e cflow.Event) bool {return e.pt >50}
+	etaCut := func(e cflow.Event) bool {return ptCut(e)  && e.eta>0.5}
+	phiCut := func(e cflow.Event) bool {return etaCut(e) && e.phi<2}
 
 	// Cut sequence
-	cutSeq := cutflow.NewCutSeq(
-		cutflow.Cut{Name: "CUT0", Pass: ptCut },
-		cutflow.Cut{Name: "CUT1", Pass: etaCut},
-		cutflow.Cut{Name: "CUT2", Pass: phiCut},
+	cutSeq := cflow.NewCutSeq(
+		cflow.Cut{Name: "CUT0", Pass: ptCut },
+		cflow.Cut{Name: "CUT1", Pass: etaCut},
+		cflow.Cut{Name: "CUT2", Pass: phiCut},
 	)
 
 	// Define the cutflow analyzer
-	ana := cutflow.Maker{
-		Event:     &e.(cutflow.Event),
+	ana := cflow.Maker{
+		Event:     eCF,
 		Cuts:      cutSeq,
 		FilesName: files,
 		TreeName: "truth",

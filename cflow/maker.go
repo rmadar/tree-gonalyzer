@@ -1,4 +1,4 @@
-package cutflow
+package cflow
 
 import (
 	"log"
@@ -84,8 +84,7 @@ func (ana *Maker) CutFlow() CutFlow {
 		
 		// Loop over the cuts
 		for ic, cut := range ana.Cuts {
-			pass := cut.Pass.(func(e *Event) bool)
-			if pass(&e) {
+			if cut.Pass(e) {
 				cutFlow[ic].Nraw += 1
 				cutFlow[ic].Nwgt += e.weight()
 			}

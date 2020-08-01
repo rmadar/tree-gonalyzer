@@ -1,5 +1,5 @@
 // Doc for cutflow package
-package cutflow
+package cflow
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 )
 
 // Event model interface
-type Event interface {
+type Event interface{
 	rvars() []rtree.ReadVar
 	weight() float64
 }
@@ -27,7 +27,7 @@ type CutFlow []Yields
 // Cut contains the needed information
 type Cut struct {
 	Name string
-	Pass interface{}//func(e *Event) bool
+	Pass func(e Event) bool
 }
 
 // Serie of several cuts.
