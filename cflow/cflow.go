@@ -9,8 +9,8 @@ import (
 
 // Event model interface
 type Event interface{
-	rvars() []rtree.ReadVar
-	weight() float64
+	RVars() []rtree.ReadVar
+	Weight() float64
 }
 
 // Event yields type with both raw and
@@ -57,7 +57,7 @@ func From(cuts CutSequence) CutFlow {
 func (cf CutFlow) String() string {
 	var str string
 	for _, y := range cf {
-		str += fmt.Sprintf("%v %v %v %v\n", y.Name, y.Nraw, y.Nwgt)
+		str += fmt.Sprintf("%v %v %v\n", y.Name, y.Nraw, y.Nwgt)
 	}
 	return str
 }

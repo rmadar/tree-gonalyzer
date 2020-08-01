@@ -62,7 +62,7 @@ func (ana *Maker) CutFlow() CutFlow {
 	var e Event
 
 	// Tree reader
-        r, err := rtree.NewReader(tree, e.rvars())  
+        r, err := rtree.NewReader(tree, e.RVars())  
         if err != nil {                                               
                 log.Fatalf("could not create tree reader: %+v", err)  
         }                                                             
@@ -86,7 +86,7 @@ func (ana *Maker) CutFlow() CutFlow {
 		for ic, cut := range ana.Cuts {
 			if cut.Pass(e) {
 				cutFlow[ic].Nraw += 1
-				cutFlow[ic].Nwgt += e.weight()
+				cutFlow[ic].Nwgt += e.Weight()
 			}
 		}
 		

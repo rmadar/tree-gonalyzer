@@ -13,7 +13,7 @@ type usrEvent struct {
 	pid int32
 }
 
-func (e usrEvent) rvars() []rtree.ReadVar {
+func (e usrEvent) RVars() []rtree.ReadVar {
 	return []rtree.ReadVar{
 		{Name: "l_pt" , Value: &e.pt },
 		{Name: "l_eta", Value: &e.eta},
@@ -22,7 +22,7 @@ func (e usrEvent) rvars() []rtree.ReadVar {
 	}
 }
 
-func (e usrEvent) weight() float64 {
+func (e usrEvent) Weight() float64 {
 	return float64(e.pt * (e.eta + e.phi) / 100.)
 }
 
@@ -39,9 +39,9 @@ func Example_aSimpleCutFlow() {
 	e = usrEvent{}
 	
 	// Cuts
-	ptCut  := func(e cflow.Event) bool {return e.pt >50}
-	etaCut := func(e cflow.Event) bool {return ptCut(e)  && e.eta>0.5}
-	phiCut := func(e cflow.Event) bool {return etaCut(e) && e.phi<2}
+	ptCut  := func(e usrEvent) bool {return e.pt >50}
+	etaCut := func(e usrEvent) bool {return ptCut(e)  && e.eta>0.5}
+	phiCut := func(e usrEvent) bool {return etaCut(e) && e.phi<2}
 
 	// Cut sequence
 	cutSeq := cflow.NewCutSeq(
@@ -52,7 +52,7 @@ func Example_aSimpleCutFlow() {
 
 	// Define the cutflow analyzer
 	ana := cflow.Maker{
-		Event:     eCF,
+		Event:     &e,
 		Cuts:      cutSeq,
 		FilesName: files,
 		TreeName: "truth",
