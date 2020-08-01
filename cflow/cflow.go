@@ -7,8 +7,8 @@ import (
 
 // Event model interface
 type Evt interface{
-	Vars()   []Var
-	Weight() float64
+	Vars()   []Var   // Return the list of needed variables.
+	Weight() float64 // Define the weight (from available variables).
 }
 
 // TreeVar groups the branch name and a value
