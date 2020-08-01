@@ -56,14 +56,15 @@ func ExampleAnalysis_basicCutFlow() {
 	}
 
 	// User-defined event model, based on cflow.Evt interface.
-	var e cflow.Evt; e = &usrEvt{}
+	var e cflow.Evt;
+	e = &usrEvt{}
 	
 	// Cut sequence - they are cumulated.
-	cutSeq := cflow.NewCutSeq(
-		cflow.Cut{Name: "CUT0", Sel: cut0},
-		cflow.Cut{Name: "CUT1", Sel: cut1},
-		cflow.Cut{Name: "CUT2", Sel: cut2},
-	)
+	cutSeq := []cflow.Cut{
+		{Name: "CUT0", Sel: cut0},
+		{Name: "CUT1", Sel: cut1},
+		{Name: "CUT2", Sel: cut2},
+	}
 
 	// Define the cutflow analyzer
 	ana := cflow.Analysis{

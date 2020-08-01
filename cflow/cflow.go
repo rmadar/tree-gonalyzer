@@ -35,22 +35,9 @@ type Cut struct {
 	Sel  func(e Evt) bool
 }
 
-// Serie of several cuts.
-type CutSequence []Cut
-
-// NewCutSeq creates a cut sequence from
-// a list of cuts.
-func NewCutSeq(cuts ...Cut) CutSequence {
-	cs := make([]Cut, len(cuts))
-	for i, c := range cuts {
-		cs[i] = c
-	}
-	return cs
-}
-
 // newCutFlow creates a CutFlow object corresponding
 // to a given cut sequence.
-func newCutFlow(cuts CutSequence) cutFlow {
+func newCutFlow(cuts []Cut) cutFlow {
 	cf := make([]yields, len(cuts))
 	for i, cut := range cuts {
 		cf[i].Name = cut.Name

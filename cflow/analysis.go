@@ -22,10 +22,10 @@ type Analysis struct {
 	// of the cut sequence.
 	Preselection func(e Evt) bool
 
-	// Cut sequence defining each stage of the cut flow.
+	// Slice of cuts defining each stage of the cut flow.
 	// The cuts are cumulated: if an event passes n-th cut,
 	// it means it passes cut[0] && cut[1] && ... && cut[n].
-	Cuts CutSequence
+	Cuts []Cut
 
 	// List of the name of files to be analyzed.
 	FilesName []string
@@ -85,9 +85,8 @@ func (ana *Analysis) Run() {
         }                                                             
         defer r.Close()
 	
-	// Cut sequence and associated cutflow
-	cutSeq  := NewCutSeq(ana.Cuts...)
-	cutFlow := newCutFlow(cutSeq)
+	// Cutflow corresponding to the slice of cuts.
+	cutFlow := newCutFlow(ana.Cuts)
 
 	// Loop over events
         err = r.Read(func(ctx rtree.RCtx) error {  
