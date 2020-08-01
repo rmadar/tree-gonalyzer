@@ -6,7 +6,7 @@ import (
 )
 
 // Event model interface
-type Event interface{
+type Evt interface{
 	Vars()   []Var
 	Weight() float64
 }
@@ -32,7 +32,7 @@ type cutFlow []yields
 // Cut contains the needed information
 type Cut struct {
 	Name string
-	Sel  func(e Event) bool
+	Sel  func(e Evt) bool
 }
 
 // Serie of several cuts.

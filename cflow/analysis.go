@@ -13,16 +13,18 @@ import (
 // on a single sample.
 type Analysis struct {
 
-	// Event model implementing the Event interface.
+	// EventMoel implements the Event interface.
 	// It requires two functions, namely Event.Vars()
 	// and Event.Weight(), to be defined.
-	Event *Event
+	EventModel *Evt
 
-	// Selection applied before checking individual cuts
+	// Selection applied before applying individual cuts
 	// of the cut sequence.
-	Preselection func(e Event) bool
+	Preselection func(e Evt) bool
 
 	// Cut sequence defining each stage of the cut flow.
+	// The cuts are cumulated: if an event passes n-th cut,
+	// it means it passes cut[0] && cut[1] && ... && cut[n].
 	Cuts CutSequence
 
 	// List of the name of files to be analyzed.
@@ -67,7 +69,7 @@ func (ana *Analysis) Run() {
 	}
 	
 	// Event 
-	evt := *ana.Event
+	evt := *ana.EventModel
 
 	// Variables to read.
 	vars  := evt.Vars()

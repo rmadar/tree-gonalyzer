@@ -18,6 +18,7 @@ func (e *usrEvt) Vars() []cflow.Var {
 		{Name: "l_pt" , Value: &e.pt },
 		{Name: "l_eta", Value: &e.eta},
 		{Name: "l_phi", Value: &e.phi},
+		{Name: "l_pid", Value: &e.pid},
 	}
 }
 
@@ -28,15 +29,19 @@ func (e *usrEvt) Weight() float64 {
 
 // Definition of the Cuts 
 var (
-	Cut0 = func(e cflow.Event) bool {
+	presel = func(e cflow.Evt) bool {
+		evt := e.(*usrEvt)
+		return evt.pid == 11
+	}
+	cut0 = func(e cflow.Evt) bool {
 		evt := e.(*usrEvt)
 		return evt.pt > 10
 	}
-	Cut1 = func(e cflow.Event) bool {
+	cut1 = func(e cflow.Evt) bool {
 		evt := e.(*usrEvt)
 		return evt.eta > 0.5
 	}
-	Cut2 = func(e cflow.Event) bool {
+	cut2 = func(e cflow.Evt) bool {
 		evt := e.(*usrEvt)
 		return evt.phi < 2.0
 	}
@@ -44,37 +49,38 @@ var (
 
 func ExampleAnalysis_basicCutFlow() {
 
-	// Input files
+	// List of input files
 	files := []string{
 		"../testdata/file1.root",
 		"../testdata/file2.root",
 	}
 
-	// User-defined event model, based on cflow.Event
-	var e cflow.Event; e = &usrEvt{}
+	// User-defined event model, based on cflow.Evt interface.
+	var e cflow.Evt; e = &usrEvt{}
 	
-	// Cut sequence
+	// Cut sequence - they are cumulated.
 	cutSeq := cflow.NewCutSeq(
-		cflow.Cut{Name: "CUT0", Sel: Cut0},
-		cflow.Cut{Name: "CUT1", Sel: Cut1},
-		cflow.Cut{Name: "CUT2", Sel: Cut2},
+		cflow.Cut{Name: "CUT0", Sel: cut0},
+		cflow.Cut{Name: "CUT1", Sel: cut1},
+		cflow.Cut{Name: "CUT2", Sel: cut2},
 	)
 
 	// Define the cutflow analyzer
 	ana := cflow.Analysis{
-		Event:     &e,
-		Cuts:      cutSeq,
-		FilesName: files,
-		TreeName: "truth",
+		EventModel:   &e,
+		Preselection: presel,
+		Cuts:         cutSeq,
+		FilesName:    files,
+		TreeName:     "truth",
 	}
 
 	// Run the cutflow
 	ana.Run()
 
 	// Output:
-	// CUT0 28897 1551.0207463856786
-	// CUT1 10645 564.4076810218394
-	// CUT2 8701 460.4137644460425
+	// CUT0 14516 778.1039342284203
+	// CUT1 5281 280.65974103752524
+	// CUT2 4312 228.74728883057833
 }
 
 
