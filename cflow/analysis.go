@@ -85,7 +85,7 @@ func (ana *Analysis) Run() {
 	
 	// Cut sequence and associated cutflow
 	cutSeq  := NewCutSeq(ana.Cuts...)
-	cutFlow := From(cutSeq)
+	cutFlow := newCutFlow(cutSeq)
 
 	// Loop over events
         err = r.Read(func(ctx rtree.RCtx) error {  
