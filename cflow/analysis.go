@@ -8,11 +8,14 @@ import (
 	"go-hep.org/x/hep/groot/rtree"
 )
 
+// Analysis type groups together all needed
+// information to perform a cutflow analysis
+// on a single sample.
 type Analysis struct {
 
 	// Event model implementing the Event interface.
-	// It requires two functions, namely Event.rvars()
-	// and Event.weight(), to be defined.
+	// It requires two functions, namely Event.Vars()
+	// and Event.Weight(), to be defined.
 	Event *Event
 
 	// Selection applied before checking individual cuts
@@ -29,6 +32,9 @@ type Analysis struct {
 	TreeName string
 }
 
+// Run executes the event loop in order to count raw
+// and weighted yields. The final cutflow is printed
+// in this function, after the event loop.
 func (ana *Analysis) Run() {
 	
 	// Full rtree
