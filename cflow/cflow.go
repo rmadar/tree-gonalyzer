@@ -12,10 +12,10 @@ type Evt interface{
 }
 
 // TreeVar groups the branch name and a value
-// of the proper type.
+// of the proper type, as needed by rtree.ReadVar.
 type Var struct {
-	Name string
-	Value interface{}
+	Name string        // Name of the branch
+	Value interface{}  // Pointer of the same type of the stored branch.
 }
 
 // Event yields type with both raw and
@@ -23,7 +23,7 @@ type Var struct {
 type yields struct {
 	Name   string  // Name of the cut stage.
 	Nraw   float64 // Raw yields.
-	Nwgt   float64 // Weighted yields, weight is defined by Event.weight()
+	Nwgt   float64 // Weighted yields, as defined by Evt.weight()
 }
 
 // cutFlow is a slice of Yields, once per cut.
@@ -31,8 +31,8 @@ type cutFlow []yields
 
 // Cut contains the needed information
 type Cut struct {
-	Name string
-	Sel  func(e Evt) bool
+	Name string           // Name of the cut.
+	Sel  func(e Evt) bool // Function defining the cut.
 }
 
 // newCutFlow creates a CutFlow object corresponding
