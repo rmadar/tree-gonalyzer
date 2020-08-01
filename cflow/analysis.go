@@ -2,7 +2,6 @@ package cflow
 
 import (
 	"log"
-	"fmt"
 	
 	"go-hep.org/x/hep/groot"
 	"go-hep.org/x/hep/groot/rtree"
@@ -112,5 +111,5 @@ func (ana *Analysis) Run() {
 	})
 
 	// Print the result
-        fmt.Printf("%v", cutFlow) 
+        cutFlow.Print()
 }

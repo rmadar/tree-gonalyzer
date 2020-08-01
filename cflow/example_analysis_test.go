@@ -79,9 +79,11 @@ func ExampleAnalysis_basicCutFlow() {
 	ana.Run()
 
 	// Output:
-	// CUT0 14516 778.1039342284203
-	// CUT1 5281 280.65974103752524
-	// CUT2 4312 228.74728883057833
+	// Cut name     Raw Yields   Weighted Yields
+	// --------     ----------   ---------------
+	// CUT0         14516        778.10         
+	// CUT1         5281         280.66         
+	// CUT2         4312         228.75
 }
 
 

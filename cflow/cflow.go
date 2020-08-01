@@ -2,7 +2,9 @@
 package cflow
 
 import (
+	"os"
 	"fmt"
+	"text/tabwriter"
 )
 
 // Event model interface
@@ -45,11 +47,20 @@ func newCutFlow(cuts []Cut) cutFlow {
 	return cf
 }
 
-// Cutflow string formater
-func (cf cutFlow) String() string {
-	var str string
+// Print outputs nicely the result
+func (cf cutFlow) Print() {
+
+	// minwidth, tabwidth, padding, padchar, flags
+	w := new(tabwriter.Writer)
+	w.Init(os.Stdout, 13, 2, 0, ' ', tabwriter.TabIndent)
+	defer w.Flush()
+
+	// Headers
+	fmt.Fprintf(w, "\n%s\t%s\t%s\t", "Cut name", "Raw Yields", "Weighted Yields")
+	fmt.Fprintf(w, "\n%s\t%s\t%s\t", "--------", "----------", "---------------")
+	
+	// Loop over yields (cuts)
 	for _, y := range cf {
-		str += fmt.Sprintf("%v %v %v\n", y.Name, y.Nraw, y.Nwgt)
+		fmt.Fprintf(w, "\n%s\t%.0f\t%.2f\t", y.Name, y.Nraw, y.Nwgt)
 	}
-	return str
 }
