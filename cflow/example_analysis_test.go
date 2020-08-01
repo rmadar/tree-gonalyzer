@@ -73,6 +73,10 @@ func ExampleAnalysis_basicCutFlow() {
 
 	// Run the cutflow
 	ana.Run()
+
+	// Output:
+	// ccc
+
 }
 
 

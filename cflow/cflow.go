@@ -52,15 +52,42 @@ func (cf cutFlow) Print() {
 
 	// minwidth, tabwidth, padding, padchar, flags
 	w := new(tabwriter.Writer)
-	w.Init(os.Stdout, 13, 5, 0, ' ', tabwriter.TabIndent)
+	w.Init(os.Stdout, 1, 5, 7, ' ', tabwriter.TabIndent)
 	defer w.Flush()
 
 	// Headers
-	fmt.Fprintf(w, "\n%s\t%s\t%s\t", "Cut name", "Raw Yields", "Weighted Yields")
-	fmt.Fprintf(w, "\n%s\t%s\t%s\t", "--------", "----------", "---------------")
+	fmt.Fprintf(w, "\n%s\t%s\t%s\t", "Cut name", "  Raw Yields  ", "Weighted Yields")
+	fmt.Fprintf(w, "\n%s\t%s\t%s\t", "--------", "---------------", "---------------")
 	
 	// Loop over yields (cuts)
-	for _, y := range cf {
-		fmt.Fprintf(w, "\n%s\t%.0f\t%.2f\t", y.Name, y.Nraw, y.Nwgt)
+	
+	for i, y := range cf {
+		absEff := Efficiency(y, cf[0])
+		relEff := Efficiency(y, cf[0])
+				
+		if i>0 {
+			relEff = Efficiency(y, cf[i-1])
+			fmt.Fprintf(w, "\n%s\t%.0f %0.1f %0.1f\t%.2f %0.1f %0.1f\t",
+				y.Name,
+				y.Nraw, absEff.Nraw, relEff.Nraw,
+				y.Nwgt, absEff.Nwgt, relEff.Nwgt,
+			)	
+		} else {
+			
+			fmt.Fprintf(w, "\n%s\t%.0f %%abs %%rel\t%.2f %%abs %%rel\t",
+				y.Name,
+				y.Nraw, 
+				y.Nwgt, 
+			)
+			
+		}
+	}
+}
+
+func Efficiency(y, yref yields) yields {
+	return yields{
+		Name: y.Name,
+		Nraw: y.Nraw / yref.Nraw * 100,
+		Nwgt: y.Nwgt / yref.Nwgt * 100,
 	}
 }
