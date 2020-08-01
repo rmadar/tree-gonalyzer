@@ -52,7 +52,7 @@ func (cf cutFlow) Print() {
 
 	// minwidth, tabwidth, padding, padchar, flags
 	w := new(tabwriter.Writer)
-	w.Init(os.Stdout, 13, 2, 0, ' ', tabwriter.TabIndent)
+	w.Init(os.Stdout, 13, 5, 0, ' ', tabwriter.TabIndent)
 	defer w.Flush()
 
 	// Headers

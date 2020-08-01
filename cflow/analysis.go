@@ -35,7 +35,13 @@ type Analysis struct {
 
 // Run executes the event loop in order to count raw
 // and weighted yields. The final cutflow is printed
-// in this function, after the event loop.
+// in this function, after the event loop. The typical
+// output of this function is:
+//    Cut name     Raw Yields   Weighted Yields
+//    --------     ----------   ---------------
+//    CUT0         14516        778.10
+//    CUT1         5281         280.66
+//    CUT2         4312         228.75
 func (ana *Analysis) Run() {
 	
 	// Full rtree
@@ -109,7 +115,7 @@ func (ana *Analysis) Run() {
 		
 		return nil
 	})
-
+	
 	// Print the result
         cutFlow.Print()
 }

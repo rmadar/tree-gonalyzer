@@ -30,20 +30,16 @@ func (e *usrEvt) Weight() float64 {
 // Definition of the Cuts 
 var (
 	presel = func(e cflow.Evt) bool {
-		evt := e.(*usrEvt)
-		return evt.pid == 11
+		return e.(*usrEvt).pid == 11
 	}
 	cut0 = func(e cflow.Evt) bool {
-		evt := e.(*usrEvt)
-		return evt.pt > 10
+		return e.(*usrEvt).pt > 10
 	}
 	cut1 = func(e cflow.Evt) bool {
-		evt := e.(*usrEvt)
-		return evt.eta > 0.5
+		return e.(*usrEvt).eta > 0.5
 	}
 	cut2 = func(e cflow.Evt) bool {
-		evt := e.(*usrEvt)
-		return evt.phi < 2.0
+		return e.(*usrEvt).phi < 2.0
 	}
 )
 
@@ -77,13 +73,6 @@ func ExampleAnalysis_basicCutFlow() {
 
 	// Run the cutflow
 	ana.Run()
-
-	// Output:
-	// Cut name     Raw Yields   Weighted Yields
-	// --------     ----------   ---------------
-	// CUT0         14516        778.10         
-	// CUT1         5281         280.66         
-	// CUT2         4312         228.75
 }
 
 
