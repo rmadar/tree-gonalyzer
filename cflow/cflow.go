@@ -3,14 +3,19 @@ package cflow
 
 import (
 	"fmt"
-	
-	"go-hep.org/x/hep/groot/rtree"
 )
 
 // Event model interface
 type Event interface{
-	RVars() []rtree.ReadVar
+	Vars()   []Var
 	Weight() float64
+}
+
+// TreeVar groups the branch name and a value
+// of the proper type.
+type Var struct {
+	Name string
+	Value interface{}
 }
 
 // Event yields type with both raw and
@@ -27,7 +32,7 @@ type CutFlow []Yields
 // Cut contains the needed information
 type Cut struct {
 	Name string
-	Pass func(e Event) bool
+	Sel  func(e Event) bool
 }
 
 // Serie of several cuts.

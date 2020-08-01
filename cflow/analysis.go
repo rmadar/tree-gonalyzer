@@ -2,12 +2,13 @@ package cflow
 
 import (
 	"log"
+	"fmt"
 	
 	"go-hep.org/x/hep/groot"
 	"go-hep.org/x/hep/groot/rtree"
 )
 
-type Maker struct {
+type Analysis struct {
 
 	// Event model implementing the Event interface.
 	// It requires two functions, namely Event.rvars()
@@ -16,7 +17,7 @@ type Maker struct {
 
 	// Selection applied before checking individual cuts
 	// of the cut sequence.
-	Preselection func(e *Event) bool
+	Preselection func(e Event) bool
 
 	// Cut sequence defining each stage of the cut flow.
 	Cuts CutSequence
@@ -28,8 +29,8 @@ type Maker struct {
 	TreeName string
 }
 
-func (ana *Maker) CutFlow() CutFlow {
-
+func (ana *Analysis) Run() {
+	
 	// Full rtree
 	var tree rtree.Tree
 
@@ -41,6 +42,7 @@ func (ana *Maker) CutFlow() CutFlow {
 		if err != nil {
 			log.Fatal(err)
 		}
+		defer f.Close()
 		
 		// Get the tree
 		obj, err := f.Get(ana.TreeName)
@@ -58,11 +60,18 @@ func (ana *Maker) CutFlow() CutFlow {
 		}
 	}
 	
-	// Event type
-	var e Event
+	// Event 
+	evt := *ana.Event
 
+	// Variables to read.
+	vars  := evt.Vars()
+	rvars := make([]rtree.ReadVar, len(vars))
+	for i, v := range vars {
+		rvars[i] = rtree.ReadVar{Name: v.Name, Value: v.Value}
+	}
+	
 	// Tree reader
-        r, err := rtree.NewReader(tree, e.RVars())  
+        r, err := rtree.NewReader(tree, rvars)  
         if err != nil {                                               
                 log.Fatalf("could not create tree reader: %+v", err)  
         }                                                             
@@ -77,22 +86,24 @@ func (ana *Maker) CutFlow() CutFlow {
 
 		// Apply preselection if any
 		if ana.Preselection != nil {
-			if !ana.Preselection(&e) {
+			if !ana.Preselection(evt) {
 				return nil
 			}
 		}
 		
-		// Loop over the cuts
+		// Loop over the cuts and cumulate them.
+		pass := true
 		for ic, cut := range ana.Cuts {
-			if cut.Pass(e) {
+			pass = pass && cut.Sel(evt)
+			if pass {
 				cutFlow[ic].Nraw += 1
-				cutFlow[ic].Nwgt += e.Weight()
+				cutFlow[ic].Nwgt += evt.Weight()
 			}
 		}
 		
 		return nil
 	})
 
-	// return the result
-	return cutFlow
+	// Print the result
+        fmt.Printf("%v", cutFlow) 
 }
