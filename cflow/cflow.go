@@ -62,11 +62,11 @@ func (cf cutFlow) Print() {
 	// Loop over yields (cuts)
 	
 	for i, y := range cf {
-		absEff := Efficiency(y, cf[0])
-		relEff := Efficiency(y, cf[0])
+		absEff := efficiency(y, cf[0])
+		relEff := efficiency(y, cf[0])
 				
 		if i>0 {
-			relEff = Efficiency(y, cf[i-1])
+			relEff = efficiency(y, cf[i-1])
 			fmt.Fprintf(w, "\n%s\t%.0f %0.1f %0.1f\t%.2f %0.1f %0.1f\t",
 				y.Name,
 				y.Nraw, absEff.Nraw, relEff.Nraw,
@@ -84,7 +84,7 @@ func (cf cutFlow) Print() {
 	}
 }
 
-func Efficiency(y, yref yields) yields {
+func efficiency(y, yref yields) yields {
 	return yields{
 		Name: y.Name,
 		Nraw: y.Nraw / yref.Nraw * 100,
