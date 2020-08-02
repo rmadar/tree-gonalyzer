@@ -37,11 +37,12 @@ type Analysis struct {
 // and weighted yields. The final cutflow is printed
 // in this function, after the event loop. The typical
 // output of this function is:
-//    Cut name     Raw Yields   Weighted Yields
-//    --------     ----------   ---------------
-//    CUT0         14516        778.10
-//    CUT1         5281         280.66
-//    CUT2         4312         228.75
+//   | Cut name            | Raw Yields               | Weighted Yields          |
+//   |                     |               Abs    Rel |               Abs    Rel |
+//   |---------------------|--------------------------|--------------------------|
+//   | CUT0                |      14516   100%   100% |     778.10   100%   100% |
+//   | CUT1                |       5281    36%    36% |     280.66    36%    36% |
+//   | CUT2                |       4312    30%    82% |     228.75    29%    82% |
 func (ana *Analysis) Run() {
 	
 	// Full rtree
@@ -108,8 +109,8 @@ func (ana *Analysis) Run() {
 		for ic, cut := range ana.Cuts {
 			pass = pass && cut.Sel(evt)
 			if pass {
-				cutFlow[ic].Nraw += 1
-				cutFlow[ic].Nwgt += evt.Weight()
+				cutFlow[ic].Raw += 1
+				cutFlow[ic].Wgt += evt.Weight()
 			}
 		}
 		

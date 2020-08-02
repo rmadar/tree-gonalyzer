@@ -2,9 +2,8 @@
 package cflow
 
 import (
-	"os"
 	"fmt"
-	"text/tabwriter"
+	_ "text/tabwriter"
 )
 
 // Event model interface
@@ -23,9 +22,9 @@ type Var struct {
 // Event yields type with both raw and
 // weighted yields, and a name for a cut stage.
 type yields struct {
-	Name   string  // Name of the cut stage.
-	Nraw   float64 // Raw yields.
-	Nwgt   float64 // Weighted yields, as defined by Evt.weight()
+	Name  string  // Name of the cut stage.
+	Raw   float64 // Raw yields.
+	Wgt   float64 // Weighted yields, as defined by Evt.weight()
 }
 
 // cutFlow is a slice of Yields, once per cut.
@@ -50,44 +49,35 @@ func newCutFlow(cuts []Cut) cutFlow {
 // Print outputs nicely the result
 func (cf cutFlow) Print() {
 
-	// minwidth, tabwidth, padding, padchar, flags
-	w := new(tabwriter.Writer)
-	w.Init(os.Stdout, 1, 5, 7, ' ', tabwriter.TabIndent)
-	defer w.Flush()
+	// Table header
+	ul20 := "---------------------"
+	ul25 := "--------------------------"
+	fmt.Printf("\n| %-20s| %-25s| %-25s|\n", "Cut name", "Raw Yields", "Weighted Yields")
+	fmt.Printf(  "| %-20s| %17s %6s | %17s %6s |\n", "", "Abs", "Rel", "Abs", "Rel")
+	fmt.Printf("|%s|%s|%s|\n", ul20, ul25, ul25)
 
-	// Headers
-	fmt.Fprintf(w, "\n%s\t%s\t%s\t", "Cut name", "  Raw Yields  ", "Weighted Yields")
-	fmt.Fprintf(w, "\n%s\t%s\t%s\t", "--------", "---------------", "---------------")
-	
-	// Loop over yields (cuts)
-	
+	// Print each cut yields
 	for i, y := range cf {
-		absEff := efficiency(y, cf[0])
-		relEff := efficiency(y, cf[0])
-				
-		if i>0 {
-			relEff = efficiency(y, cf[i-1])
-			fmt.Fprintf(w, "\n%s\t%.0f %0.1f %0.1f\t%.2f %0.1f %0.1f\t",
-				y.Name,
-				y.Nraw, absEff.Nraw, relEff.Nraw,
-				y.Nwgt, absEff.Nwgt, relEff.Nwgt,
-			)	
-		} else {
-			
-			fmt.Fprintf(w, "\n%s\t%.0f %%abs %%rel\t%.2f %%abs %%rel\t",
-				y.Name,
-				y.Nraw, 
-				y.Nwgt, 
-			)
-			
+		var yref yields
+		switch i {
+		case 0 : yref = cf[0]
+		default: yref = cf[i-1]
 		}
+		absEff := efficiency(y, cf[0])
+		relEff := efficiency(y, yref )
+		fmt.Printf("| %-20s|%11.0f  %4.0f%%  %4.0f%% |%11.2f  %4.0f%%  %4.0f%% |\n",
+			y.Name,
+			y.Raw, absEff.Raw, relEff.Raw, 
+			y.Wgt, absEff.Wgt, relEff.Wgt, 
+		)
 	}
+	fmt.Printf("\n")
 }
 
 func efficiency(y, yref yields) yields {
 	return yields{
 		Name: y.Name,
-		Nraw: y.Nraw / yref.Nraw * 100,
-		Nwgt: y.Nwgt / yref.Nwgt * 100,
+		Raw:  y.Raw / yref.Raw * 100,
+		Wgt:  y.Wgt / yref.Wgt * 100,
 	}
 }

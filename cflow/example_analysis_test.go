@@ -75,8 +75,12 @@ func ExampleAnalysis_basicCutFlow() {
 	ana.Run()
 
 	// Output:
-	// ccc
-
+	// | Cut name            | Raw Yields               | Weighted Yields          |
+	// |                     |               Abs    Rel |               Abs    Rel |
+	// |---------------------|--------------------------|--------------------------|
+	// | CUT0                |      14516   100%   100% |     778.10   100%   100% |
+	// | CUT1                |       5281    36%    36% |     280.66    36%    36% |
+	// | CUT2                |       4312    30%    82% |     228.75    29%    82% |
 }
 
 
