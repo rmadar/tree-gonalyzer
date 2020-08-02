@@ -1,9 +1,9 @@
-// Doc for cutflow package
+// cflow package exposes types allowing to
+// perform a cut flow on a single file.
 package cflow
 
 import (
 	"fmt"
-	_ "text/tabwriter"
 )
 
 // Event model interface
