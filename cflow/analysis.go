@@ -37,12 +37,13 @@ type Analysis struct {
 // and weighted yields. The final cutflow is printed
 // in this function, after the event loop. The typical
 // output of this function is:
-//   | Cut name            | Raw Yields               | Weighted Yields          |
-//   |                     |               Abs    Rel |               Abs    Rel |
-//   |---------------------|--------------------------|--------------------------|
-//   | CUT0                |      14516   100%   100% |     778.10   100%   100% |
-//   | CUT1                |       5281    36%    36% |     280.66    36%    36% |
-//   | CUT2                |       4312    30%    82% |     228.75    29%    82% |
+//  | Cut name                 | Raw Yields                    | Weighted Yields               |
+//  |                          |                    Abs    Rel |                    Abs    Rel |
+//  |--------------------------|-------------------------------|-------------------------------|
+//  | Electron channel         |            5526   100%   100% |        28230.59   100%   100% |
+//  | pT > 10 GeV              |            5281    96%    96% |        28065.97    99%    99% |
+//  | Phi < 2.0 rad            |            4312    78%    82% |        22874.73    81%    82% |
+//
 func (ana *Analysis) Run() {
 	
 	// Full rtree

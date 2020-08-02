@@ -50,11 +50,11 @@ func newCutFlow(cuts []Cut) cutFlow {
 func (cf cutFlow) Print() {
 
 	// Table header
-	ul20 := "---------------------"
 	ul25 := "--------------------------"
-	fmt.Printf("\n| %-20s| %-25s| %-25s|\n", "Cut name", "Raw Yields", "Weighted Yields")
-	fmt.Printf(  "| %-20s| %17s %6s | %17s %6s |\n", "", "Abs", "Rel", "Abs", "Rel")
-	fmt.Printf("|%s|%s|%s|\n", ul20, ul25, ul25)
+	ul30 := "-------------------------------"
+	fmt.Printf("\n| %-25s| %-30s| %-30s|\n", "Cut name", "Raw Yields", "Weighted Yields")
+	fmt.Printf(  "| %-25s| %22s %6s | %22s %6s |\n", "", "Abs", "Rel", "Abs", "Rel")
+	fmt.Printf("|%s|%s|%s|\n", ul25, ul30, ul30)
 
 	// Print each cut yields
 	for i, y := range cf {
@@ -65,7 +65,7 @@ func (cf cutFlow) Print() {
 		}
 		absEff := efficiency(y, cf[0])
 		relEff := efficiency(y, yref )
-		fmt.Printf("| %-20s|%11.0f  %4.0f%%  %4.0f%% |%11.2f  %4.0f%%  %4.0f%% |\n",
+		fmt.Printf("| %-25s|%16.0f  %4.0f%%  %4.0f%% |%16.2f  %4.0f%%  %4.0f%% |\n",
 			y.Name,
 			y.Raw, absEff.Raw, relEff.Raw, 
 			y.Wgt, absEff.Wgt, relEff.Wgt, 

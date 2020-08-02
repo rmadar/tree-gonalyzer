@@ -24,7 +24,7 @@ func (e *usrEvt) Vars() []cflow.Var {
 
 // Definition of the event weight
 func (e *usrEvt) Weight() float64 {
-	return float64(e.pt / 1000.)
+	return float64(e.pt / 10.)
 }
 
 // Definition of the Cuts 
@@ -33,10 +33,10 @@ var (
 		return e.(*usrEvt).pid == 11
 	}
 	cut0 = func(e cflow.Evt) bool {
-		return e.(*usrEvt).pt > 10
+		return e.(*usrEvt).eta > 0.5
 	}
 	cut1 = func(e cflow.Evt) bool {
-		return e.(*usrEvt).eta > 0.5
+		return e.(*usrEvt).pt > 10
 	}
 	cut2 = func(e cflow.Evt) bool {
 		return e.(*usrEvt).phi < 2.0
@@ -57,9 +57,9 @@ func ExampleAnalysis_basicCutFlow() {
 	
 	// Cut sequence - they are cumulated.
 	cutSeq := []cflow.Cut{
-		{Name: "CUT0", Sel: cut0},
-		{Name: "CUT1", Sel: cut1},
-		{Name: "CUT2", Sel: cut2},
+		{Name: "Electron channel", Sel: cut0},
+		{Name: "pT > 10 GeV"     , Sel: cut1},
+		{Name: "Phi < 2.0 rad"   , Sel: cut2},
 	}
 
 	// Define the cutflow analyzer
