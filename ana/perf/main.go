@@ -35,20 +35,17 @@ func main() {
 	// Run all test
 	for i, n := range nVars {
 
-		if n == 60 {
-			
-			fmt.Println("Running for nVars =", n)
-			t0[i] = runTest(nEvts0, int(n))
-			fmt.Printf("  -> 50k evts: %.2f ms/kEvts\n", t0[i])
-			t1[i] = runTest(nEvts1, int(n))
-			fmt.Printf("  -> 0.5M evts: %.2f ms/kEvts\n", t1[i])
-			t2[i] = runTest(nEvts2, int(n))
-			fmt.Printf("  -> 1.0M evts: %.2f ms/kEvts\n", t2[i])
-			t3[i] = runTest(nEvts3, int(n))
-			fmt.Printf("  -> 2.0M evts: %.2f ms/kEvts\n", t3[i])
-			t4[i] = runTest(nEvts4, int(n))
-			fmt.Printf("  -> 2.5M evts: %.2f ms/kEvts\n", t4[i])
-		}
+		fmt.Println("Running for nVars =", n)
+		t0[i] = runTest(nEvts0, int(n))
+		fmt.Printf("  -> 50k evts: %.2f ms/kEvts\n", t0[i])
+		t1[i] = runTest(nEvts1, int(n))
+		fmt.Printf("  -> 0.5M evts: %.2f ms/kEvts\n", t1[i])
+		t2[i] = runTest(nEvts2, int(n))
+		fmt.Printf("  -> 1.0M evts: %.2f ms/kEvts\n", t2[i])
+		t3[i] = runTest(nEvts3, int(n))
+		fmt.Printf("  -> 2.0M evts: %.2f ms/kEvts\n", t3[i])
+		t4[i] = runTest(nEvts4, int(n))
+		fmt.Printf("  -> 2.5M evts: %.2f ms/kEvts\n", t4[i])
 	}
 
 	// Plot benchmarks
@@ -81,7 +78,7 @@ func plotBenchmarks(s0, s1, s2, s3, s4, n []float64) {
 	applyStyle(g4, 4)
 
 	// Add graph to the legend
-	p.Legend.Add(` 50k Evts`, g0)
+	//p.Legend.Add(` 50k Evts`, g0)
 	p.Legend.Add(`0.5M Evts`, g1)
 	p.Legend.Add(`1.0M Evts`, g2)
 	p.Legend.Add(`2.0M Evts`, g3)
@@ -92,7 +89,7 @@ func plotBenchmarks(s0, s1, s2, s3, s4, n []float64) {
 	p.Legend.YOffs = -8
 
 	// Add graph to the plot
-	p.Add(g0)
+	//p.Add(g0)
 	p.Add(g1)
 	p.Add(g2)
 	p.Add(g3)
