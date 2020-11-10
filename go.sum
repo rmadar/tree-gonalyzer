@@ -177,6 +177,8 @@ github.com/rmadar/hplot-style v0.0.0-20200526215101-0690a1dea78f h1:K29BdrJhAvhr
 github.com/rmadar/hplot-style v0.0.0-20200526215101-0690a1dea78f/go.mod h1:EQXTn/P8KD0WH0+YrEfuaOsaovM5MWkQcdQj/0Gj1dE=
 github.com/rmadar/hplot-style v0.0.0-20200622093637-0b24904248b2 h1:juX1fCrsvEzLbPTU3+EsouiV08oi/a5ZQbHgAsjbpAM=
 github.com/rmadar/hplot-style v0.0.0-20200622093637-0b24904248b2/go.mod h1:EQXTn/P8KD0WH0+YrEfuaOsaovM5MWkQcdQj/0Gj1dE=
+github.com/rmadar/hplot-style v0.0.0-20201110133143-0110f22cff55 h1:r2eXAIBc+37oil5KEYnRd3YMZdgaPuQvG2bY4TsHJq0=
+github.com/rmadar/hplot-style v0.0.0-20201110133143-0110f22cff55/go.mod h1:mQw0P4/fJl5UNFQuLKPh9dyUizBB6TewbhXKsfTTPG4=
 github.com/ruudk/golang-pdf417 v0.0.0-20181029194003-1af4ab5afa58/go.mod h1:6lfFZQK844Gfx8o5WFuvpxWRwnSoipWe/p622j1v06w=
 github.com/sbinet/npyio v0.2.0/go.mod h1:Wk81yG1hlHgHAy4KXRQ59EfpZoAzT+2V4Pjyv7rUEM0=
 github.com/sbinet/npyio v0.3.0/go.mod h1:dJ6OpFwUDVVuDSqP5b8paU3yd7Rcs2TZiFimWwD30nc=

@@ -23,33 +23,40 @@ func main() {
 	nVars := []float64{1, 5, 14, 20, 25, 30, 35, 40, 45, 50, 55, 60}
 
 	// Scan number of events
-	nEvts1, nEvts2, nEvts3, nEvts4 := 10, 20, 50, 100
+	nEvts0, nEvts1, nEvts2, nEvts3, nEvts4 := 1, 10, 20, 50, 100
 
 	// Containers
+	t0 := make([]float64, len(nVars))
 	t1 := make([]float64, len(nVars))
 	t2 := make([]float64, len(nVars))
 	t3 := make([]float64, len(nVars))
 	t4 := make([]float64, len(nVars))
-
+	
 	// Run all test
 	for i, n := range nVars {
-		fmt.Println("Running for nVars =", n)
-		t1[i] = runTest(nEvts1, int(n))
-		fmt.Printf("  -> 0.5M evts: %.2f ms/kEvts\n", t1[i])
-		t2[i] = runTest(nEvts2, int(n))
-		fmt.Printf("  -> 1.0M evts: %.2f ms/kEvts\n", t2[i])
-		t3[i] = runTest(nEvts3, int(n))
-		fmt.Printf("  -> 2.0M evts: %.2f ms/kEvts\n", t3[i])
-		t4[i] = runTest(nEvts4, int(n))
-		fmt.Printf("  -> 2.5M evts: %.2f ms/kEvts\n", t4[i])
+
+		if n == 60 {
+			
+			fmt.Println("Running for nVars =", n)
+			t0[i] = runTest(nEvts0, int(n))
+			fmt.Printf("  -> 50k evts: %.2f ms/kEvts\n", t0[i])
+			t1[i] = runTest(nEvts1, int(n))
+			fmt.Printf("  -> 0.5M evts: %.2f ms/kEvts\n", t1[i])
+			t2[i] = runTest(nEvts2, int(n))
+			fmt.Printf("  -> 1.0M evts: %.2f ms/kEvts\n", t2[i])
+			t3[i] = runTest(nEvts3, int(n))
+			fmt.Printf("  -> 2.0M evts: %.2f ms/kEvts\n", t3[i])
+			t4[i] = runTest(nEvts4, int(n))
+			fmt.Printf("  -> 2.5M evts: %.2f ms/kEvts\n", t4[i])
+		}
 	}
 
 	// Plot benchmarks
-	plotBenchmarks(t1, t2, t3, t4, nVars)
+	plotBenchmarks(t0, t1, t2, t3, t4, nVars)
 
 }
 
-func plotBenchmarks(s1, s2, s3, s4, n []float64) {
+func plotBenchmarks(s0, s1, s2, s3, s4, n []float64) {
 
 	// Plot
 	p := hplot.New()
@@ -60,28 +67,32 @@ func plotBenchmarks(s1, s2, s3, s4, n []float64) {
 	p.Y.Min = 0.0
 
 	// Graph
+	g0 := hplot.NewS2D(hbook.NewS2DFrom(n, s0))
 	g1 := hplot.NewS2D(hbook.NewS2DFrom(n, s1))
 	g2 := hplot.NewS2D(hbook.NewS2DFrom(n, s2))
 	g3 := hplot.NewS2D(hbook.NewS2DFrom(n, s3))
 	g4 := hplot.NewS2D(hbook.NewS2DFrom(n, s4))
 
 	// Comsetics
-	applyStyle(g1, 0)
-	applyStyle(g2, 1)
-	applyStyle(g3, 2)
-	applyStyle(g4, 3)
+	applyStyle(g0, 0)
+	applyStyle(g1, 1)
+	applyStyle(g2, 2)
+	applyStyle(g3, 3)
+	applyStyle(g4, 4)
 
 	// Add graph to the legend
+	p.Legend.Add(` 50k Evts`, g0)
 	p.Legend.Add(`0.5M Evts`, g1)
 	p.Legend.Add(`1.0M Evts`, g2)
-	p.Legend.Add(`2.5M Evts`, g3)
-	p.Legend.Add(`5.0M Evts`, g4)
+	p.Legend.Add(`2.0M Evts`, g3)
+	p.Legend.Add(`2.5M Evts`, g4)
 	p.Legend.Top = true
 	p.Legend.Left = true
 	p.Legend.XOffs = 12
 	p.Legend.YOffs = -8
 
 	// Add graph to the plot
+	p.Add(g0)
 	p.Add(g1)
 	p.Add(g2)
 	p.Add(g3)
