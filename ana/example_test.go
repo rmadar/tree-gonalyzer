@@ -69,6 +69,13 @@ func TestWithSignalsStacked(t *testing.T) {
 	)
 }
 
+func TestWithVariableCut(t *testing.T) {
+	cmpimg.CheckPlot(Example_withVariableCut, t,
+		"Plots_withVariableCut/Mttbar.png",
+		"Plots_withVariableCut/Mttbar_cut.png",
+	)
+}
+
 func TestWithTreeDumping(t *testing.T) {
 	cmpimg.CheckPlot(Example_withTreeDumping, t,
 		"Plots_withTreeDumping/LowM/Mttbar.png",
@@ -439,6 +446,43 @@ func Example_shapeDistortion() {
 
 func Example_withKinemCuts() {
 
+}
+
+func Example_withVariableCut() {
+
+	// Define the cut to be applied to the variable
+	varCut := ana.TreeFunc{
+		VarsName: []string{"ttbar_m"},
+		Fct: func(m float32) bool { return m>600 },
+	}
+	
+	// Define samples
+	samples := []*ana.Sample{
+		ana.CreateSample("data", "data", `Data`, fData, tName),
+	}
+	
+	// Define variables
+	variables := []*ana.Variable{
+		ana.NewVariable("Mttbar", ana.TreeVarF32("ttbar_m"), 25, 350, 1000,
+			ana.WithAxisLabels("M(t,t) [GeV]", "Events Yields"),
+		),
+		ana.NewVariable("Mttbar_cut", ana.TreeVarF32("ttbar_m"), 25, 350, 1000,
+			ana.WithAxisLabels("M(t,t) [GeV] for M(t,t)>600", "Events Yields"),
+			ana.WithVarCut(varCut),
+		),
+		
+	}
+
+	// Create analyzer object
+	analyzer := ana.New(samples, variables,
+		ana.WithSavePath("testdata/Plots_withVariableCut"),
+	)
+
+	// Run the analyzer to produce all the plots
+	if err := analyzer.Run(); err != nil {
+		panic(err)
+	}
+	
 }
 
 func Example_withTreeDumping() {

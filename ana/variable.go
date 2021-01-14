@@ -17,7 +17,7 @@ type Variable struct {
 	RangeYmin, RangeYmax     float64  // Y-axis range (default: hplot default).
 	RatioYmin, RatioYmax     float64  // Ratio Y-axis range (default: hplot default).
 	LegPosTop, LegPosLeft    bool     // Legend position (default: true, false)
-
+	Cut                      TreeFunc // Additional cut applied for the current variable only
 	isSlice bool
 }
 
@@ -90,7 +90,9 @@ func NewVariable(name string, tFunc TreeFunc, nBins int, xMin, xMax float64, opt
 	if cfg.LegPosLeft.usr {
 		v.LegPosLeft = cfg.LegPosLeft.val
 	}
-
+	if cfg.VarCut.usr {
+		v.Cut = cfg.VarCut.val
+	}
 	return v
 }
 
