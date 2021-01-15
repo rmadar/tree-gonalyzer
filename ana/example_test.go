@@ -106,10 +106,10 @@ func Example_aSimpleUseCase() {
 	// Define variables
 	variables := []*ana.Variable{
 		ana.NewVariable("Mttbar", ana.TreeVarF32("ttbar_m"), 25, 350, 1000,
-			ana.WithAxisLabels("M(t,t) [GeV]", "Events Yields"),
+			ana.WithAxisLabels(`M(t,t) [GeV]`, "Events Yields"),
 		),
 		ana.NewVariable("DphiLL", ana.TreeVarF64("truth_dphi_ll"), 10, 0, math.Pi,
-			ana.WithAxisLabels("dPhi(l,l)", "Events Yields"),
+			ana.WithAxisLabels(`dPhi(l,l)`, "Events Yields"),
 			ana.WithLegLeft(true)),
 	}
 
