@@ -202,7 +202,7 @@ func (ana *Maker) sampleEventLoop(sampleIdx int) {
 					err += " TreeFunc.Fct must return a bool.\n"
 					err += "\t -> Make sure to use NewCutBool(), not NewVarBool()."
 					log.Fatal(fmt.Sprintf(err, cut.Name))
-				} 
+				}
 			}
 
 			// Prepare the cut string for variable
@@ -247,7 +247,7 @@ func (ana *Maker) sampleEventLoop(sampleIdx int) {
 					for iv, v := range ana.Variables {
 
 						fillHisto := passVarCut[iv]()
-						
+
 						// Fill histo (and fill tree) with full slices...
 						if v.isSlice {
 							xs := getF64s[iv]()

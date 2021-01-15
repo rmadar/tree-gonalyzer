@@ -453,14 +453,14 @@ func Example_withVariableCut() {
 	// Define the cut to be applied to the variable
 	varCut := ana.TreeFunc{
 		VarsName: []string{"ttbar_m"},
-		Fct: func(m float32) bool { return m>600 },
+		Fct:      func(m float32) bool { return m > 600 },
 	}
-	
+
 	// Define samples
 	samples := []*ana.Sample{
 		ana.CreateSample("data", "data", `Data`, fData, tName),
 	}
-	
+
 	// Define variables
 	variables := []*ana.Variable{
 		ana.NewVariable("Mttbar", ana.TreeVarF32("ttbar_m"), 25, 350, 1000,
@@ -470,7 +470,6 @@ func Example_withVariableCut() {
 			ana.WithAxisLabels("M(t,t) [GeV] for M(t,t)>600", "Events Yields"),
 			ana.WithVarCut(varCut),
 		),
-		
 	}
 
 	// Create analyzer object
@@ -482,7 +481,7 @@ func Example_withVariableCut() {
 	if err := analyzer.Run(); err != nil {
 		panic(err)
 	}
-	
+
 }
 
 func Example_withTreeDumping() {

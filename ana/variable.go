@@ -18,7 +18,7 @@ type Variable struct {
 	RatioYmin, RatioYmax     float64  // Ratio Y-axis range (default: hplot default).
 	LegPosTop, LegPosLeft    bool     // Legend position (default: true, false)
 	Cut                      TreeFunc // Additional cut applied for the current variable only
-	isSlice bool
+	isSlice                  bool
 }
 
 // NewVariable creates a new variable value with
