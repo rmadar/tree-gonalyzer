@@ -205,22 +205,6 @@ func (ana *Maker) sampleEventLoop(sampleIdx int) {
 				}
 			}
 
-			// Prepare the cut string for variable
-			passVarCut := make([]func() bool, len(ana.Variables))
-			for iv, v := range ana.Variables {
-				idx := iv
-				if v.Cut.Fct != nil {
-					if passVarCut[idx], ok = v.Cut.GetFuncBool(r); !ok {
-						err := "Type assertion failed [cut of variable \"%v\"]:"
-						err += " TreeFunc.Fct must return a bool.\n"
-						err += "\t -> Make sure to use NewCutBool(), not NewVarBool()."
-						log.Fatal(fmt.Sprintf(err, v.Name))
-					}
-				} else {
-					passVarCut[idx] = func() bool { return true }
-				}
-			}
-
 			// Read the tree (event loop)
 			err = r.Read(func(ctx rtree.RCtx) error {
 
@@ -246,27 +230,21 @@ func (ana *Maker) sampleEventLoop(sampleIdx int) {
 					// Otherwise, loop over variables.
 					for iv, v := range ana.Variables {
 
-						fillHisto := passVarCut[iv]()
-
 						// Fill histo (and fill tree) with full slices...
 						if v.isSlice {
 							xs := getF64s[iv]()
-							if fillHisto {
-								for _, x := range xs {
-									h[ic][iv].Fill(x, w)
-								}
+							for _, x := range xs {
+								h[ic][iv].Fill(x, w)
 							}
 							if ana.DumpTree {
 								dump.Vars[iv] = xs
 								dump.VarsN[iv] = int32(len(xs))
 							}
-
+							
 						} else {
 							// ... or the single variable value.
 							x := getF64[iv]()
-							if fillHisto {
-								h[ic][iv].Fill(x, w)
-							}
+							h[ic][iv].Fill(x, w)
 							if ana.DumpTree {
 								dump.Var[iv] = x
 							}

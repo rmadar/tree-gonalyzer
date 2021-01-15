@@ -222,10 +222,6 @@ type config struct {
 		val bool // Legend position
 		usr bool
 	}
-	VarCut struct {
-		val TreeFunc // Cut only applied for a given variable
-		usr bool
-	}
 }
 
 // newConfig returns a config type with a set of passed options.
@@ -625,11 +621,3 @@ func WithLegTop(top bool) VariableOptions {
 	}
 }
 
-// WithVarCut sets a cut (as TreeFunc) applied only for this variable.
-// Typical use-case: pT[b-jets] only if N[b-jets]>0.
-func WithVarCut(f TreeFunc) VariableOptions {
-	return func(cfg *config) {
-		cfg.VarCut.val = f
-		cfg.VarCut.usr = true
-	}
-}
